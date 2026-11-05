@@ -1,0 +1,28 @@
+[Unit]
+Description=Class assistant HTTPS gateway
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+User=homework-web
+Group=homework-web
+Environment=XDG_DATA_HOME=/var/lib/homework-web/data
+Environment=XDG_CONFIG_HOME=/var/lib/homework-web/config
+ExecStart=/usr/local/bin/class-assistant-caddy run --config /etc/homework/Caddyfile --adapter caddyfile
+ExecReload=/usr/local/bin/class-assistant-caddy reload --config /etc/homework/Caddyfile --adapter caddyfile
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/homework-web
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

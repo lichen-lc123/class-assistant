@@ -7,6 +7,7 @@ import { parseAccountText } from './import.mjs';
 import { timetableService } from './timetable.mjs';
 import { homeworkService } from './homework.mjs';
 import { reminderSettingsService } from './reminder-settings.mjs';
+import { clientAddress } from './client-address.mjs';
 
 const SESSION_LIFETIME = 8 * 60 * 60 * 1000;
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
@@ -25,7 +26,7 @@ async function readJson(req, limit = 1024 * 1024) {
     return body;
   } catch { fail(400, '提交格式不正确。'); }
 }
-export async function createApp({ databasePath, serveStatic = false, allowedOrigins = [] } = {}) {
+export async function createApp({ databasePath, serveStatic = false, allowedOrigins = [], trustLoopbackProxy = false } = {}) {
   const db = openDatabase(databasePath);
   const timetable = timetableService(db);
   const homework = homeworkService(db,timetable);
@@ -79,7 +80,7 @@ export async function createApp({ databasePath, serveStatic = false, allowedOrig
       if (path === '/api/auth/login' && req.method === 'POST') {
         const body = await readJson(req);
         const studentId = typeof body.studentId === 'string' ? body.studentId.trim() : '';
-        const rateKey = req.socket.remoteAddress;
+        const rateKey = clientAddress(req, trustLoopbackProxy);
         const rate = attempts.get(rateKey);
         if (rate && rate.until > Date.now() && rate.count >= 15) fail(429, '尝试次数过多，请 15 分钟后重试。');
         const record = db.prepare('SELECT * FROM users WHERE student_id = ?').get(studentId);
