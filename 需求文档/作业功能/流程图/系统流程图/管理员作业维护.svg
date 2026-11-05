@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1857" viewBox="0 0 1100 1857" role="img" aria-labelledby="title desc">
+<title id="title">管理员作业维护 · 系统流程图</title>
+<desc id="desc">一期已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
+<rect width="1100" height="1857" fill="#F7F5F0"/>
+<g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
+<text x="70" y="55" font-size="29" font-weight="700">管理员作业维护 · 系统流程图</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-04 · 作业功能 · 已实现</text>
+<text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
+<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="445.0" font-size="15" fill="#66765D">会话、学期标识</text>
+<path d="M510 551.0 L641 551.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="539.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 613 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="642.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="789.0" font-size="15" fill="#66765D">字段、班级、版本</text>
+<path d="M510 895.0 L641 895.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="883.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 957 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="986.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1133.0" font-size="15" fill="#66765D">最新作业及目标班级</text>
+<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1305.0" font-size="15" fill="#66765D">本人已选班级</text>
+<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1477.0" font-size="15" fill="#66765D">可见作业与附件地址</text>
+<path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="188.0">开始</tspan>
+</text>
+<rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="348.5">前端｜携带登录会话和目标学期</tspan>
+<tspan x="290.0" y="371.5">读取课程班级与作业清单</tspan>
+</text>
+<polygon points="290.0,489 510,551.0 290.0,613 70,551.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="545.5">后端｜登录、改密与</tspan>
+<tspan x="290.0" y="568.5">管理员权限有效？</tspan>
+</text>
+<rect x="645" y="511.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="545.5">后端｜返回拒绝原因</tspan>
+<tspan x="837.5" y="568.5">不读取管理资料</tspan>
+</text>
+<rect x="70" y="661" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="692.5">前端｜提交原表字段、班级</tspan>
+<tspan x="290.0" y="715.5">发布开关及已有版本</tspan>
+</text>
+<polygon points="290.0,833 510,895.0 290.0,957 70,895.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="889.5">后端｜字段、班级</tspan>
+<tspan x="290.0" y="912.5">和版本校验通过？</tspan>
+</text>
+<rect x="645" y="855.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="889.5">前端｜显示具体错误</tspan>
+<tspan x="837.5" y="912.5">要求核对或刷新</tspan>
+</text>
+<path d="M70 1018 A220.0 13 0 0 1 510 1018 L510 1066 A220.0 13 0 0 1 70 1066 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 1018 A220.0 13 0 0 0 510 1018" stroke="#8A9CA6" fill="none"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1036.5">数据库｜事务保存作业记录</tspan>
+<tspan x="290.0" y="1059.5">班级关联与图片引用</tspan>
+</text>
+<rect x="70" y="1177" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1208.5">后端｜学生请求时从会话识别本人</tspan>
+<tspan x="290.0" y="1231.5">读取本人课表的选班关系</tspan>
+</text>
+<rect x="70" y="1349" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1380.5">后端｜按学期及已选班级过滤</tspan>
+<tspan x="290.0" y="1403.5">仅返回已发布正文和授权图片</tspan>
+</text>
+<rect x="70" y="1521" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1552.5">前端｜学生查看作业</tspan>
+<tspan x="290.0" y="1575.5">学委可再次管理更新</tspan>
+</text>
+<rect x="70" y="1693" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1736.0">结束</tspan>
+</text>
+<text x="70" y="1827" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+</g></svg>

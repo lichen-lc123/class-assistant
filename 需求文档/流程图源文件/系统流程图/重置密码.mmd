@@ -1,0 +1,33 @@
+%% 重置密码 · 系统流程图 · V1.0 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["前端｜提交目标 ID 与临时密码"]
+    N2{"后端｜管理权限、目标非本人<br/>且密码符合规则？"}
+    B2["拒绝操作"]
+    N3["后端｜计算新盐与哈希<br/>写入前再次确认管理会话"]
+    N4[("数据库｜更新密码哈希<br/>设置改密标记、修改时间")]
+    N5[("数据库｜删除目标账号所有会话")]
+    N6["后端｜返回成功<br/>前端刷新密码状态"]
+    N7(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 decision;
+    class B2 exception;
+    class N3 normal;
+    class N4 database;
+    class N5 database;
+    class N6 normal;
+    class N7 terminal;

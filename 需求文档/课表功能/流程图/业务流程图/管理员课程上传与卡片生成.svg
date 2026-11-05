@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1685" viewBox="0 0 1100 1685" role="img" aria-labelledby="title desc">
+<title id="title">管理员课程上传与卡片生成 · 业务流程图</title>
+<desc id="desc">一期已实现功能。业务流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
+<rect width="1100" height="1685" fill="#F7F5F0"/>
+<g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
+<text x="70" y="55" font-size="29" font-weight="700">管理员课程上传与卡片生成 · 业务流程图</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-02 · 课表功能 · 已实现</text>
+<text x="70" y="116" font-size="13" fill="#788371">使用者操作与业务判断；右侧为本次处理的其他结果。</text>
+<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="188.0">开始</tspan>
+</text>
+<rect x="70" y="317" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="348.5">学委｜进入课表模板选择学期</tspan>
+<tspan x="290.0" y="371.5">命名并导入一位同学的课表</tspan>
+</text>
+<rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="520.5">网站｜按学期及上课班去重</tspan>
+<tspan x="290.0" y="543.5">缺少班号时仅保守匹配完整安排</tspan>
+</text>
+<rect x="70" y="661" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="692.5">网站｜预览新增与复用课程</tspan>
+<tspan x="290.0" y="715.5">差异安排明确沿用已有卡片</tspan>
+</text>
+<rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="864.5">学委｜核对课程与差异并确认</tspan>
+<tspan x="290.0" y="887.5">不再选择是否生成卡片</tspan>
+</text>
+<rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1036.5">网站｜事务保存独立模板</tspan>
+<tspan x="290.0" y="1059.5">自动生成新卡片或复用已有卡片</tspan>
+</text>
+<rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1208.5">学委｜继续导入其他同学模板</tspan>
+<tspan x="290.0" y="1231.5">每份保留自己的课程组合</tspan>
+</text>
+<rect x="70" y="1349" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1380.5">学生｜整套选择模板或自由组合卡片</tspan>
+<tspan x="290.0" y="1403.5">个人课表按账号保存</tspan>
+</text>
+<rect x="70" y="1521" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1564.0">结束</tspan>
+</text>
+<text x="70" y="1655" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+</g></svg>

@@ -1,0 +1,36 @@
+%% 修改密码 · 业务流程图 · V1.0 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["用户进入我的账号"]
+    N2["填写当前密码、新密码和确认密码"]
+    N3{"输入满足要求？"}
+    B3["提示修正，不修改密码"]
+    N4{"当前密码正确？"}
+    B4["提示当前密码错误"]
+    N5["保存新密码并结束其他设备会话"]
+    N6["提示成功，继续使用"]
+    N7(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 -->|否| B3
+    N3 -->|是| N4
+    N4 -->|否| B4
+    N4 -->|是| N5
+    N5 --> N6
+    N6 --> N7
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 decision;
+    class B3 exception;
+    class N4 decision;
+    class B4 exception;
+    class N5 normal;
+    class N6 normal;
+    class N7 terminal;

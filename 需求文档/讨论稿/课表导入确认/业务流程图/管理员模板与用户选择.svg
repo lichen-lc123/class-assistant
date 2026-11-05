@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="2029" viewBox="0 0 1100 2029" role="img" aria-labelledby="title desc">
+<title id="title">管理员模板与用户选择 · 业务流程图</title>
+<desc id="desc">课表导入待确认设计。业务流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
+<rect width="1100" height="2029" fill="#F7F5F0"/>
+<g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
+<text x="70" y="55" font-size="29" font-weight="700">管理员模板与用户选择 · 业务流程图</text>
+<text x="70" y="90" font-size="15" fill="#788371">V0.5 · 2026-11-02 · 课表按学期管理 · 待确认后开发</text>
+<text x="70" y="116" font-size="13" fill="#788371">使用者操作与业务判断；右侧为本次处理的其他结果。</text>
+<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 1067.0 L641 1067.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="1055.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 1129 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1158.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 1411.0 L641 1411.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="1399.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 1473 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1502.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1767 L290.0 1861" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="188.0">开始</tspan>
+</text>
+<rect x="70" y="317" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="348.5">管理员｜选择学期</tspan>
+<tspan x="290.0" y="371.5">导入课程资料并核对上课班</tspan>
+</text>
+<rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="520.5">管理员｜确认日历、课次和备注</tspan>
+<tspan x="290.0" y="543.5">时间待通知的课程明确标记</tspan>
+</text>
+<rect x="70" y="661" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="692.5">管理员｜组合并发布</tspan>
+<tspan x="290.0" y="715.5">模板一、模板二等学期模板</tspan>
+</text>
+<rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="876.0">学生｜选择该学期模板入口</tspan>
+</text>
+<polygon points="290.0,1005 510,1067.0 290.0,1129 70,1067.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="1061.5">系统｜没有其他来源的</tspan>
+<tspan x="290.0" y="1084.5">本学期课表？</tspan>
+</text>
+<rect x="645" y="1027.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="1073.0">阻止叠加，提示先删除原表</tspan>
+</text>
+<rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1220.0">学生｜预览模板及包含的上课班</tspan>
+</text>
+<polygon points="290.0,1349 510,1411.0 290.0,1473 70,1411.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="1417.0">学生｜确认使用该模板？</tspan>
+</text>
+<rect x="645" y="1371.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="1417.0">不创建个人课表</tspan>
+</text>
+<rect x="70" y="1521" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1552.5">系统｜保存个人选课关系</tspan>
+<tspan x="290.0" y="1575.5">生成一份学期课表</tspan>
+</text>
+<rect x="70" y="1693" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1724.5">后续｜模板增删不改个人选课</tspan>
+<tspan x="290.0" y="1747.5">已选班安排按个人优先规则更新</tspan>
+</text>
+<rect x="70" y="1865" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1908.0">结束</tspan>
+</text>
+<text x="70" y="1999" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+</g></svg>

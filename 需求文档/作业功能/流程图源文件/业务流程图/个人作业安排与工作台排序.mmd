@@ -1,0 +1,36 @@
+%% 个人作业安排与工作台排序 · 业务流程图 · V1.0 · 2026-11-04
+flowchart TD
+    N0(["开始"])
+    N1["用户｜进入个人中心的我的作业<br/>查看本人已选课程的发布内容"]
+    N2["用户｜查看学委截止要求<br/>可展开文字与图片附件"]
+    N3["用户｜可选择个人优先级<br/>及自己的计划完成时间"]
+    N4["网站｜保存本人的个人安排<br/>学委原截止继续保留显示"]
+    N5["网站｜先按个人优先级<br/>再按计划或学委截止正序排列"]
+    N6["用户｜工作台查看前3项待做作业<br/>同时查看学委截止与个人计划"]
+    N7["用户｜标记或撤销自己的完成状态<br/>已完成作业移出工作台待做列表"]
+    N8["学委｜内容更新后提示用户核对<br/>用户重新确认当前版本已完成"]
+    N9(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    N7 --> N8
+    N8 --> N9
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 normal;
+    class N8 normal;
+    class N9 terminal;

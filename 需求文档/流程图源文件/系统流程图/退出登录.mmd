@@ -1,0 +1,30 @@
+%% 退出登录 · 系统流程图 · V1.0 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["前端｜提交退出请求"]
+    N2{"后端｜当前会话有效？"}
+    B2["清除无效 Cookie<br/>返回未登录，前端回登录页"]
+    N3[("数据库｜删除当前会话摘要")]
+    N4["后端｜清除 Cookie 并返回成功"]
+    N5["前端｜清空当前账号状态<br/>显示登录页"]
+    N6(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 decision;
+    class B2 exception;
+    class N3 database;
+    class N4 normal;
+    class N5 normal;
+    class N6 terminal;

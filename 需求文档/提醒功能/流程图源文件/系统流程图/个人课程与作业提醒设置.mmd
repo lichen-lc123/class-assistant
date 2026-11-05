@@ -1,0 +1,45 @@
+%% 个人课程与作业提醒设置 · 系统流程图 · V1.0 · 2026-11-04
+flowchart TD
+    N0(["开始"])
+    N1["前端｜携带登录会话<br/>读取个人提醒设置"]
+    N2{"后端｜登录有效<br/>并完成首次改密？"}
+    B2["后端｜拒绝读取或保存<br/>提示登录或先修改密码"]
+    N3[("数据库｜按会话用户读取设置<br/>未保存时后端返回默认偏好")]
+    N4["前端｜显示开关、提前时间<br/>及手机通知待接通状态"]
+    N5["前端｜每次修改发送完整偏好<br/>同时提交已读取版本"]
+    N6{"后端｜本人会话、字段<br/>及版本校验通过？"}
+    B6["前端｜保留未保存更改并提示原因<br/>重试或由用户读取最新版本"]
+    N7[("数据库｜只保存当前用户偏好<br/>更新版本与保存时间")]
+    N8["后端｜返回已保存的完整偏好<br/>发送状态仍为未接通"]
+    N9["前端｜显示自动保存成功<br/>不申请设备通知权限或触发发送"]
+    N10(["结束"])
+    N0 --> N1
+    N1 -->|会话 Cookie| N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 -->|默认或持久化偏好、版本| N4
+    N4 -->|用户的设置调整| N5
+    N5 -->|设置字段与版本| N6
+    N6 -->|否| B6
+    N6 -->|是| N7
+    N7 -->|保存结果与新版本| N8
+    N8 -->|完整设置及未接通状态| N9
+    N9 --> N10
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 decision;
+    class B2 exception;
+    class N3 database;
+    class N4 normal;
+    class N5 normal;
+    class N6 decision;
+    class B6 exception;
+    class N7 database;
+    class N8 normal;
+    class N9 normal;
+    class N10 terminal;

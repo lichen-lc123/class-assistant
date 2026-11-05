@@ -1,0 +1,48 @@
+%% 外部AI内容导入 · 系统流程图 · V1.0 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["前端｜复制提示词<br/>网站不发送资料到 AI"]
+    N2["学生与外部 AI｜在网站外处理<br/>原始资料 → JSON"]
+    N3["前端｜提交学期与 JSON<br/>source=ai"]
+    N4{"后端｜该用户本学期允许<br/>使用当前来源？"}
+    B4["已有其他来源时拒绝<br/>提示先删除原课表"]
+    N5["后端｜解析 JSON 与版本<br/>校验字段、学期、班号和规则"]
+    N6{"后端｜结构与必要字段<br/>是否有效？"}
+    B6["返回具体问题与修正建议<br/>不保存为正式课表"]
+    N7[("数据库｜读取公共上课班候选<br/>教学日历与节次作息")]
+    N8["后端｜生成日期预览及待确认项<br/>保留原文；未绑定班号不自动关联作业"]
+    N9["前端｜显示预览与问题清单<br/>用户确认个人信息与匹配结果"]
+    N10[("数据库｜确认时重新校验学期来源<br/>保存个人课表、原文与个人覆盖")]
+    N11(["结束"])
+    N0 --> N1
+    N1 -->|提示词与用户提供的原始资料| N2
+    N2 -->|用户复制回来的 JSON| N3
+    N3 --> N4
+    N4 -->|否| B4
+    N4 -->|是| N5
+    N5 --> N6
+    N6 -->|否| B6
+    N6 -->|是| N7
+    N7 -->|公共候选、教学日历及作息| N8
+    N8 -->|日期预览、缺失及冲突提示| N9
+    N9 -->|用户确认结果和个人修改| N10
+    N10 --> N11
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 decision;
+    class B4 exception;
+    class N5 normal;
+    class N6 decision;
+    class B6 exception;
+    class N7 database;
+    class N8 normal;
+    class N9 normal;
+    class N10 database;
+    class N11 terminal;

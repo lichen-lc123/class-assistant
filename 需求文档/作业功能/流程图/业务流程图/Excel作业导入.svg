@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1857" viewBox="0 0 1100 1857" role="img" aria-labelledby="title desc">
+<title id="title">Excel作业导入 · 业务流程图</title>
+<desc id="desc">一期已实现功能。业务流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
+<rect width="1100" height="1857" fill="#F7F5F0"/>
+<g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
+<text x="70" y="55" font-size="29" font-weight="700">Excel作业导入 · 业务流程图</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-04 · 作业功能 · 已实现</text>
+<text x="70" y="116" font-size="13" fill="#788371">使用者操作与业务判断；右侧为本次处理的其他结果。</text>
+<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 723.0 L641 723.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="711.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 785 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="814.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="188.0">开始</tspan>
+</text>
+<rect x="70" y="317" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="348.5">学委｜进入作业管理并选择学期</tspan>
+<tspan x="290.0" y="371.5">选择本地作业表 Excel</tspan>
+</text>
+<rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="520.5">网站｜识别多工作表、作业</tspan>
+<tspan x="290.0" y="543.5">考核说明及相关图片</tspan>
+</text>
+<polygon points="290.0,661 510,723.0 290.0,785 70,723.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="717.5">网站｜表头和文件</tspan>
+<tspan x="290.0" y="740.5">可识别？</tspan>
+</text>
+<rect x="645" y="683.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="717.5">学委｜查看错误原因</tspan>
+<tspan x="837.5" y="740.5">修正或另存 XLSX 后重试</tspan>
+</text>
+<rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="864.5">网站｜展示导入预览</tspan>
+<tspan x="290.0" y="887.5">保留原截止说明和警告</tspan>
+</text>
+<rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1036.5">学委｜逐项核对作业与图片</tspan>
+<tspan x="290.0" y="1059.5">选择上课班或保留草稿</tspan>
+</text>
+<rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1208.5">学委｜勾选确认并导入</tspan>
+<tspan x="290.0" y="1231.5">可排除本次不需要的记录</tspan>
+</text>
+<rect x="70" y="1349" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1380.5">网站｜保存所选记录</tspan>
+<tspan x="290.0" y="1403.5">重复跳过，不覆盖已有内容</tspan>
+</text>
+<rect x="70" y="1521" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1552.5">学委｜查看新增与草稿结果</tspan>
+<tspan x="290.0" y="1575.5">后续可编辑并发布草稿</tspan>
+</text>
+<rect x="70" y="1693" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1736.0">结束</tspan>
+</text>
+<text x="70" y="1827" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+</g></svg>

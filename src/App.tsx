@@ -1,0 +1,50 @@
+import { useEffect, useState } from 'react';
+import { Bell, BookOpen, CalendarDays, ClipboardCheck, LayoutDashboard, FileSpreadsheet, LogOut, Settings, UserRound } from 'lucide-react';
+import { api, type User } from './services/auth';
+import { LoginPage } from './pages/LoginPage';
+import { AccountSettings } from './pages/AccountSettings';
+import { UserManagement } from './pages/UserManagement';
+import { TimetablePage } from './timetable/TimetablePage';
+import { AdminTimetable } from './timetable/AdminTimetable';
+import { DashboardPage } from './timetable/DashboardPage';
+import { HomeworkPage } from './homework/HomeworkPage';
+import { ReminderSettingsPage } from './reminders/ReminderSettings';
+import { HomeworkCompletionDialog,readCompletionIntent } from './homework/HomeworkCompletionDialog';
+export function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<'dashboard' | 'timetable' | 'timetableManage' | 'users' | 'courseAdmin' | 'homework' | 'homeworkAdmin' | 'reminders' | 'account'>('dashboard');
+  const [completionIntent,setCompletionIntent]=useState(()=>readCompletionIntent(window.location.search));
+  const [workspace, setWorkspace] = useState<'personal' | 'admin'>('personal');
+  const [error, setError] = useState('');
+  useEffect(() => {
+    let active = true;
+    api<User>('/auth/me').then((value) => { if (active) setUser(value); }).catch(() => {}).finally(() => { if (active) setLoading(false); });
+    const expire = () => { setUser(null); setError(''); };
+    const refresh = () => { void api<User>('/auth/me').then((value) => { if (active) setUser(value); }).catch(() => {}); };
+    window.addEventListener('session-expired', expire);
+    window.addEventListener('account-updated', refresh);
+    window.addEventListener('focus', refresh);
+    return () => { active = false; window.removeEventListener('session-expired', expire); window.removeEventListener('account-updated', refresh); window.removeEventListener('focus', refresh); };
+  }, []);
+  useEffect(() => { window.scrollTo(0, 0); }, [user?.id, tab]);
+  const titles = { reminders:'提醒设置',homework:'我的作业',homeworkAdmin:'作业管理',dashboard:'工作台',timetableManage:'课表管理',timetable:'我的课表',users:'账号管理',courseAdmin:'课程管理',account:'我的账号' };
+  const adminWorkspace = user?.role==='admin' && !user.mustChangePassword && workspace==='admin';
+  const activeTab = user?.mustChangePassword ? 'account' : adminWorkspace ? (tab==='reminders'||tab==='homework'||tab==='timetable'||tab==='dashboard'||tab==='timetableManage'?'courseAdmin':tab) : (tab==='homeworkAdmin'||tab==='courseAdmin'||tab==='users'?'dashboard':tab);
+  useEffect(() => { document.title = user ? `${titles[activeTab]} · 作业提醒` : '学号登录 · 作业提醒'; }, [user, activeTab]);
+  useEffect(()=>{if(user&&!user.mustChangePassword&&completionIntent){setWorkspace('personal');setTab('homework');}},[user?.id,user?.mustChangePassword,completionIntent]);
+  function closeCompletion(){setCompletionIntent(null);const url=new URL(window.location.href);url.searchParams.delete('completeHomework');url.searchParams.delete('homeworkRevision');window.history.replaceState(null,'',url.pathname+url.search+url.hash);window.dispatchEvent(new Event('homework-updated'));}
+  async function logout() {
+    try { await api('/auth/logout', 'POST'); setUser(null); setWorkspace('personal'); setTab('dashboard'); }
+    catch (failure) { setError(failure instanceof Error ? failure.message : '退出失败。'); }
+  }
+  if (loading) return <main className="loading-screen">正在加载…</main>;
+  if (!user) return <LoginPage onAuthenticated={(value) => { setUser(value); setWorkspace('personal'); setTab('dashboard'); }} />;
+  const allowedAdmin = user.role === 'admin' && !user.mustChangePassword;
+  return <div className="workspace"><aside className="workspace-sidebar"><div className="workspace-brand"><span className="brand-icon"><ClipboardCheck size={24} /></span><strong>作业提醒</strong></div>
+    {allowedAdmin&&<div className="workspace-mode-switch" role="group" aria-label="切换个人中心与管理工作台"><button type="button" aria-pressed={!adminWorkspace} className={!adminWorkspace?'active':''} onClick={()=>{setWorkspace('personal');setTab('dashboard');}}>个人中心</button><button type="button" aria-pressed={adminWorkspace} className={adminWorkspace?'active':''} onClick={()=>{setWorkspace('admin');setTab('courseAdmin');}}>管理工作台</button></div>}
+    <nav aria-label="主导航">{!adminWorkspace&&!user.mustChangePassword&&<><button className={activeTab==='homework'?'active':''} onClick={()=>setTab('homework')}><ClipboardCheck size={19}/>我的作业</button><button className={activeTab==='dashboard'?'active':''} onClick={()=>setTab('dashboard')}><LayoutDashboard size={19}/>工作台</button><button className={activeTab==='timetable'?'active':''} onClick={()=>setTab('timetable')}><CalendarDays size={19}/>我的课表</button><button className={activeTab==='timetableManage'?'active':''} onClick={()=>setTab('timetableManage')}><FileSpreadsheet size={19}/>课表管理</button><button className={activeTab==='reminders'?'active':''} onClick={()=>setTab('reminders')}><Bell size={19}/>提醒设置</button></>}{adminWorkspace&&<><button className={activeTab==='homeworkAdmin'?'active':''} onClick={()=>setTab('homeworkAdmin')}><ClipboardCheck size={19}/>作业管理</button><button className={activeTab==='courseAdmin'?'active':''} onClick={()=>setTab('courseAdmin')}><BookOpen size={19}/>课程管理</button><button className={activeTab==='users'?'active':''} onClick={()=>setTab('users')}><Settings size={19}/>账号管理</button></>}<button className={activeTab==='account'?'active':''} onClick={()=>setTab('account')}><UserRound size={19}/>我的账号</button></nav>
+    <div className="sidebar-profile"><span className="avatar small-avatar">{user.name.slice(0, 1)}</span><div><strong>{user.name}</strong><p>{user.studentId}</p></div></div></aside>
+    <main className="workspace-main"><header className="workspace-heading"><div><span className="eyebrow">作业提醒 · {adminWorkspace ? '管理工作台' : '个人中心'}</span><h1>{titles[activeTab]}</h1><p>{activeTab==='reminders'?'上课、作业，按自己的节奏设置提醒。':activeTab==='homework'?'查看作业、截止时间与课程考核要求。':activeTab==='homeworkAdmin'?'按上课班发布作业，支持 Excel 批量导入。':activeTab==='dashboard'?'接下来三个上课日，提前安排。':activeTab==='timetableManage'?'导入课表，维护自己的课程安排。':activeTab==='timetable'?'按日、周、月查看你的课程。':activeTab==='courseAdmin'?'导入不同同学的课表模板，自动生成去重课程卡片。':activeTab==='users'?'简单管理，让每位同学顺利加入。':'管理你的账号信息与登录密码。'}</p></div><button className="secondary-button logout-button" onClick={() => void logout()}><LogOut size={16} />退出登录</button></header>
+    {error && <p role="alert" className="feedback">{error}</p>}{activeTab==='reminders'&&!adminWorkspace?<ReminderSettingsPage key={user.id+'reminders'} user={user}/>:activeTab==='homework'&&!adminWorkspace?<HomeworkPage key={user.id+'homework'}/>:activeTab==='homeworkAdmin'&&adminWorkspace?<HomeworkPage key={user.id+'homeworkAdmin'} admin/>:activeTab==='dashboard'&&!adminWorkspace?<DashboardPage key={user.id} onHomework={()=>setTab('homework')} onTimetable={()=>setTab('timetable')} onManage={()=>setTab('timetableManage')}/>:activeTab==='timetable'&&!adminWorkspace?<TimetablePage key={user.id+':view'}/>:activeTab==='timetableManage'&&!adminWorkspace?<TimetablePage key={user.id+':manage'} manage/>:activeTab==='courseAdmin'&&allowedAdmin?<AdminTimetable/>:activeTab==='users'&&allowedAdmin?<UserManagement currentUser={user}/>:<AccountSettings user={user} onUpdated={setUser}/>}</main>{completionIntent&&!user.mustChangePassword&&<HomeworkCompletionDialog key={user.id+':'+completionIntent.id} intent={completionIntent} onClose={closeCompletion}/>}</div>;
+}

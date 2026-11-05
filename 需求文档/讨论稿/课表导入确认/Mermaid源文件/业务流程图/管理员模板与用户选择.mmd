@@ -1,0 +1,45 @@
+%% 管理员模板与用户选择 · 业务流程图 · V0.5 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["管理员｜选择学期<br/>导入课程资料并核对上课班"]
+    N2["管理员｜确认日历、课次和备注<br/>时间待通知的课程明确标记"]
+    N3["管理员｜组合并发布<br/>模板一、模板二等学期模板"]
+    N4["学生｜选择该学期模板入口"]
+    N5{"系统｜没有其他来源的<br/>本学期课表？"}
+    B5["阻止叠加，提示先删除原表"]
+    N6["学生｜预览模板及包含的上课班"]
+    N7{"学生｜确认使用该模板？"}
+    B7["不创建个人课表"]
+    N8["系统｜保存个人选课关系<br/>生成一份学期课表"]
+    N9["后续｜模板增删不改个人选课<br/>已选班安排按个人优先规则更新"]
+    N10(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 -->|否| B5
+    N5 -->|是| N6
+    N6 --> N7
+    N7 -->|否| B7
+    N7 -->|是| N8
+    N8 --> N9
+    N9 --> N10
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 decision;
+    class B5 exception;
+    class N6 normal;
+    class N7 decision;
+    class B7 exception;
+    class N8 normal;
+    class N9 normal;
+    class N10 terminal;

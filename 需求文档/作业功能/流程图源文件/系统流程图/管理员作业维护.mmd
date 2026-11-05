@@ -1,0 +1,42 @@
+%% 管理员作业维护 · 系统流程图 · V1.0 · 2026-11-04
+flowchart TD
+    N0(["开始"])
+    N1["前端｜携带登录会话和目标学期<br/>读取课程班级与作业清单"]
+    N2{"后端｜登录、改密与<br/>管理员权限有效？"}
+    B2["后端｜返回拒绝原因<br/>不读取管理资料"]
+    N3["前端｜提交原表字段、班级<br/>发布开关及已有版本"]
+    N4{"后端｜字段、班级<br/>和版本校验通过？"}
+    B4["前端｜显示具体错误<br/>要求核对或刷新"]
+    N5[("数据库｜事务保存作业记录<br/>班级关联与图片引用")]
+    N6["后端｜学生请求时从会话识别本人<br/>读取本人课表的选班关系"]
+    N7["后端｜按学期及已选班级过滤<br/>仅返回已发布正文和授权图片"]
+    N8["前端｜学生查看作业<br/>学委可再次管理更新"]
+    N9(["结束"])
+    N0 --> N1
+    N1 -->|会话、学期标识| N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 -->|字段、班级、版本| N4
+    N4 -->|否| B4
+    N4 -->|是| N5
+    N5 -->|最新作业及目标班级| N6
+    N6 -->|本人已选班级| N7
+    N7 -->|可见作业与附件地址| N8
+    N8 --> N9
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 decision;
+    class B2 exception;
+    class N3 normal;
+    class N4 decision;
+    class B4 exception;
+    class N5 database;
+    class N6 normal;
+    class N7 normal;
+    class N8 normal;
+    class N9 terminal;

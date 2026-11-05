@@ -1,0 +1,33 @@
+%% 个人工作台与后续上课日 · 系统流程图 · V1.0 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["前端｜请求个人工作台<br/>不提交他人账号或参考日期"]
+    N2["后端｜从登录会话确定用户<br/>读取本人各学期课表"]
+    N3[("数据库｜返回本人选班关系<br/>个人覆盖与公共课程基值")]
+    N4["后端｜合成实际课程安排<br/>按北京时间日期排除今天和过去"]
+    N5["后端｜按有课日期分组排序<br/>截取前三组并计算日期差"]
+    N6["前端｜渲染日期卡片和全部课程<br/>不足三天仅展示已有安排"]
+    N7["前端｜跨日、返回页面或刷新<br/>重新请求并更新倒计时"]
+    N8(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    N7 --> N8
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 database;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 normal;
+    class N8 terminal;

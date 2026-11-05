@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="2029" viewBox="0 0 1100 2029" role="img" aria-labelledby="title desc">
+<title id="title">个人课程与作业提醒设置 · 系统流程图</title>
+<desc id="desc">一期已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
+<rect width="1100" height="2029" fill="#F7F5F0"/>
+<g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
+<text x="70" y="55" font-size="29" font-weight="700">个人课程与作业提醒设置 · 系统流程图</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-04 · 个人提醒偏好 · 已实现</text>
+<text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
+<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="445.0" font-size="15" fill="#66765D">会话 Cookie</text>
+<path d="M510 551.0 L641 551.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="539.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 613 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="642.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="789.0" font-size="15" fill="#66765D">默认或持久化偏好、版本</text>
+<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="961.0" font-size="15" fill="#66765D">用户的设置调整</text>
+<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1133.0" font-size="15" fill="#66765D">设置字段与版本</text>
+<path d="M510 1239.0 L641 1239.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="1227.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 1301 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1330.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1477.0" font-size="15" fill="#66765D">保存结果与新版本</text>
+<path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1649.0" font-size="15" fill="#66765D">完整设置及未接通状态</text>
+<path d="M290.0 1767 L290.0 1861" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="188.0">开始</tspan>
+</text>
+<rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="348.5">前端｜携带登录会话</tspan>
+<tspan x="290.0" y="371.5">读取个人提醒设置</tspan>
+</text>
+<polygon points="290.0,489 510,551.0 290.0,613 70,551.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="545.5">后端｜登录有效</tspan>
+<tspan x="290.0" y="568.5">并完成首次改密？</tspan>
+</text>
+<rect x="645" y="511.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="545.5">后端｜拒绝读取或保存</tspan>
+<tspan x="837.5" y="568.5">提示登录或先修改密码</tspan>
+</text>
+<path d="M70 674 A220.0 13 0 0 1 510 674 L510 722 A220.0 13 0 0 1 70 722 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 674 A220.0 13 0 0 0 510 674" stroke="#8A9CA6" fill="none"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="692.5">数据库｜按会话用户读取设置</tspan>
+<tspan x="290.0" y="715.5">未保存时后端返回默认偏好</tspan>
+</text>
+<rect x="70" y="833" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="864.5">前端｜显示开关、提前时间</tspan>
+<tspan x="290.0" y="887.5">及手机通知待接通状态</tspan>
+</text>
+<rect x="70" y="1005" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1036.5">前端｜每次修改发送完整偏好</tspan>
+<tspan x="290.0" y="1059.5">同时提交已读取版本</tspan>
+</text>
+<polygon points="290.0,1177 510,1239.0 290.0,1301 70,1239.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="1233.5">后端｜本人会话、字段</tspan>
+<tspan x="290.0" y="1256.5">及版本校验通过？</tspan>
+</text>
+<rect x="645" y="1199.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="1233.5">前端｜保留未保存更改并提示原因</tspan>
+<tspan x="837.5" y="1256.5">重试或由用户读取最新版本</tspan>
+</text>
+<path d="M70 1362 A220.0 13 0 0 1 510 1362 L510 1410 A220.0 13 0 0 1 70 1410 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 1362 A220.0 13 0 0 0 510 1362" stroke="#8A9CA6" fill="none"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1380.5">数据库｜只保存当前用户偏好</tspan>
+<tspan x="290.0" y="1403.5">更新版本与保存时间</tspan>
+</text>
+<rect x="70" y="1521" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1552.5">后端｜返回已保存的完整偏好</tspan>
+<tspan x="290.0" y="1575.5">发送状态仍为未接通</tspan>
+</text>
+<rect x="70" y="1693" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1724.5">前端｜显示自动保存成功</tspan>
+<tspan x="290.0" y="1747.5">不申请设备通知权限或触发发送</tspan>
+</text>
+<rect x="70" y="1865" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1908.0">结束</tspan>
+</text>
+<text x="70" y="1999" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+</g></svg>

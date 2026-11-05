@@ -1,0 +1,25 @@
+[Unit]
+Description=Homework and timetable application
+After=network.target
+
+[Service]
+Type=simple
+User=homework
+Group=homework
+WorkingDirectory=/opt/homework/current
+Environment=NODE_ENV=production
+Environment=TZ=Asia/Shanghai
+EnvironmentFile=/etc/homework/homework.env
+ExecStart=/usr/bin/node server/index.mjs --static
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/homework
+
+[Install]
+WantedBy=multi-user.target

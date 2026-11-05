@@ -1,0 +1,33 @@
+%% 账号查询 · 系统流程图 · V1.0 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["前端｜请求账号列表"]
+    N2{"后端｜会话有效、已改密<br/>且角色为管理员？"}
+    B2["返回未登录或无权限"]
+    N3[("数据库｜查询公开字段<br/>按 ID 倒序排列")]
+    N4["后端｜返回账号列表"]
+    N5["前端｜统计数量并渲染列表"]
+    N6["前端｜按关键词筛选已加载数据"]
+    N7(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 decision;
+    class B2 exception;
+    class N3 database;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 terminal;

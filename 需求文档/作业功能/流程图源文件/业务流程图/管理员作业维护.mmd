@@ -1,0 +1,36 @@
+%% 管理员作业维护 · 业务流程图 · V1.0 · 2026-11-04
+flowchart TD
+    N0(["开始"])
+    N1["学委｜进入管理工作台的作业管理<br/>选择已配置学期"]
+    N2["学委｜搜索并选择本学期课程<br/>带入老师和上课班，填写作业字段"]
+    N3["学委｜选择课程对应上课班<br/>核对学委截止说明"]
+    N4{"学委｜适用上课班<br/>已经明确？"}
+    B4["学委｜保存草稿<br/>学生暂不可见"]
+    N5["学委｜保存并发布作业<br/>或明确选择保留草稿"]
+    N6["学生｜在个人作业页查看<br/>本人已选上课班的发布内容"]
+    N7["学委｜后续编辑或确认删除<br/>学生读取最新发布内容"]
+    N8(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 -->|否| B4
+    N4 -->|是| N5
+    N5 --> N6
+    N6 --> N7
+    N7 --> N8
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 decision;
+    class B4 exception;
+    class N5 normal;
+    class N6 normal;
+    class N7 normal;
+    class N8 terminal;

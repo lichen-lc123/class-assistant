@@ -1,0 +1,12 @@
+import type {ReactNode} from 'react';
+import {CheckCircle2} from 'lucide-react';
+import {deadlineLabel,deadlineSourceLabel,planLabel,priorityNames,type Homework,type HomeworkAsset} from './types';
+const fields=[['content','作业内容'],['submission','提交方式'],['assessment_rules','考核规则'],['team_requirement','组队要求'],['notes','补充说明']] as const;
+export function HomeworkCard({record:r,assets=[],children}:{record:Homework;assets?:HomeworkAsset[];children?:ReactNode}){
+  return <article className={`homework-card workspace-card ${r.completed?'homework-completed':''}`}><header><div><span className="eyebrow">{r.course_name||'个人事项'}{r.teacher?' · '+r.teacher:''}</span><h2>{r.title}</h2></div><span className={`homework-status ${r.overdue?'overdue':''}`}>{!r.published?'草稿':r.kind==='reference'?'考核说明':r.completed?'已完成':r.overdue?'已逾期':'待完成'}</span></header><span className="role-badge">{r.sourceType==='personal'?'个人作业 · 仅自己可见':'课程作业 · 学委维护'}</span>
+    {r.kind==='assignment'&&<><div className="homework-deadline"><span>{deadlineSourceLabel(r)}</span><strong>{deadlineLabel(r)}</strong>{!r.completed&&r.daysUntil!=null&&r.daysUntil>=0&&<span>{r.daysUntil===0?'今天截止':`距截止 ${r.daysUntil} 天`}</span>}{r.deadline_raw&&<p>原表说明：{r.deadline_raw}</p>}</div>{r.priority&&<div className="homework-personal-plan"><span>{priorityNames[r.priority]}</span><p>我的计划：{planLabel(r)}</p></div>}</>}
+    <p className="muted-note">{r.academicYear} {r.termName}{r.targets?.length?` · 上课班 ${r.targets.map(t=>t.classCode||'未编号').join('、')}`:''}</p>
+    {r.completed&&<p className="homework-completed-note"><CheckCircle2 size={15}/>已完成 · 不再列入后续作业提醒</p>}
+    {r.needsReconfirm&&<p className="notice">{r.sourceType==='personal'?'个人作业内容已修改，请重新确认完成状态。':'学委更新了内容，请重新核对后标记完成。'}</p>}
+    <details className="homework-details"><summary>查看内容与附件{r.attachments.length?`（${r.attachments.length} 张图片）`:''}</summary>{fields.map(([key,label])=>{const attachments=r.attachments.filter(a=>a.field===key);return r[key]||attachments.length?<section key={key}><h3>{label}</h3>{r[key]&&<p className="homework-text">{r[key]}</p>}{attachments.map(a=>{const asset=assets.find(x=>x.id===a.assetId),url=asset?`data:${asset.mime};base64,${asset.content}`:a.url;return url&&<figure key={a.assetId}><a href={url} target="_blank" rel="noreferrer"><img loading="lazy" src={url} alt={a.caption||label}/></a><figcaption>{a.caption||label} · 点击放大</figcaption></figure>;})}</section>:null;})}</details>{children&&<footer>{children}</footer>}</article>;
+}

@@ -1,0 +1,39 @@
+%% 个人课程与作业提醒设置 · 业务流程图 · V1.0 · 2026-11-04
+flowchart TD
+    N0(["开始"])
+    N1["用户｜进入个人中心的提醒设置<br/>学生与管理员个人身份均可使用"]
+    N2["网站｜读取当前账号的提醒偏好<br/>无保存记录时展示默认设置"]
+    N3["用户｜调整上课提醒提前时间<br/>课程变动及作业更新开关"]
+    N4["用户｜调整作业截止提前时间<br/>选择学委截止或个人计划依据"]
+    N5["网站｜每次修改后自动保存<br/>保存过程中暂停重复修改"]
+    N6{"网站｜保存成功？"}
+    B6["用户｜查看未保存或版本冲突提示<br/>重试保存或读取最新设置"]
+    N7["用户｜看到设置已保存<br/>同一账号换设备可重新读取"]
+    N8["网站｜持续展示手机通知待接通<br/>此阶段不发送实际提醒"]
+    N9(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 -->|否| B6
+    N6 -->|是| N7
+    N7 --> N8
+    N8 --> N9
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 normal;
+    class N6 decision;
+    class B6 exception;
+    class N7 normal;
+    class N8 normal;
+    class N9 terminal;

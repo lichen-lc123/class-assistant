@@ -1,0 +1,45 @@
+%% 手动创建账号 · 系统流程图 · V1.0 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["前端｜提交创建表单"]
+    N2{"后端｜管理权限与字段有效？"}
+    B2["返回权限或字段错误"]
+    N3["后端｜生成盐和密码哈希"]
+    N4{"后端｜管理会话仍有效？"}
+    B4["拒绝写入"]
+    N5[("数据库｜唯一约束插入账号<br/>首次改密标记为 1")]
+    N6{"数据库｜插入成功？"}
+    B6["返回学号已存在，不覆盖"]
+    N7["后端｜返回公开账号字段"]
+    N8["前端｜关闭表单并刷新列表"]
+    N9(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 --> N4
+    N4 -->|否| B4
+    N4 -->|是| N5
+    N5 --> N6
+    N6 -->|否| B6
+    N6 -->|是| N7
+    N7 --> N8
+    N8 --> N9
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 decision;
+    class B2 exception;
+    class N3 normal;
+    class N4 decision;
+    class B4 exception;
+    class N5 database;
+    class N6 decision;
+    class B6 exception;
+    class N7 normal;
+    class N8 normal;
+    class N9 terminal;

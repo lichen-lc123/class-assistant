@@ -1,0 +1,42 @@
+%% Excel作业导入 · 系统流程图 · V1.0 · 2026-11-04
+flowchart TD
+    N0(["开始"])
+    N1["前端｜发送学期与 XLSX 数据<br/>请求作业导入预览"]
+    N2["后端｜核对管理员会话<br/>限制文件、解压内容和图片大小"]
+    N3["后端｜解析文字、真实合并区域<br/>WPS 单元格图片和英语详细表"]
+    N4["后端｜归一日期并按课程老师<br/>生成班级候选及核对警告"]
+    N5["前端｜展示草稿与图片<br/>接收学委选择和修正"]
+    N6["前端｜发送所选记录、图片资料<br/>及核对确认标记"]
+    N7{"后端｜权限、字段、班级<br/>图片及确认均有效？"}
+    B7["后端｜返回错误<br/>不写入本次导入"]
+    N8[("数据库｜事务保存记录和附件<br/>相同记录自动跳过")]
+    N9["前端｜展示新增、草稿<br/>及重复跳过数量"]
+    N10(["结束"])
+    N0 --> N1
+    N1 -->|会话、目标学期、文件| N2
+    N2 -->|校验后的 XLSX 内容| N3
+    N3 -->|课程、老师、原文、图片| N4
+    N4 -->|预览记录与班级候选| N5
+    N5 -->|核对后的所选草稿| N6
+    N6 -->|确认、记录与图片摘要| N7
+    N7 -->|否| B7
+    N7 -->|是| N8
+    N8 -->|新增、草稿和跳过统计| N9
+    N9 --> N10
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 decision;
+    class B7 exception;
+    class N8 database;
+    class N9 normal;
+    class N10 terminal;

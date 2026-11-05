@@ -1,0 +1,33 @@
+%% 管理员课程上传与卡片生成 · 业务流程图 · V1.0 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["学委｜进入课表模板选择学期<br/>命名并导入一位同学的课表"]
+    N2["网站｜按学期及上课班去重<br/>缺少班号时仅保守匹配完整安排"]
+    N3["网站｜预览新增与复用课程<br/>差异安排明确沿用已有卡片"]
+    N4["学委｜核对课程与差异并确认<br/>不再选择是否生成卡片"]
+    N5["网站｜事务保存独立模板<br/>自动生成新卡片或复用已有卡片"]
+    N6["学委｜继续导入其他同学模板<br/>每份保留自己的课程组合"]
+    N7["学生｜整套选择模板或自由组合卡片<br/>个人课表按账号保存"]
+    N8(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    N7 --> N8
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 normal;
+    class N8 terminal;

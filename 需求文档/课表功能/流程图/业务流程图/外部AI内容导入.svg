@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="2029" viewBox="0 0 1100 2029" role="img" aria-labelledby="title desc">
+<title id="title">外部AI内容导入 · 业务流程图</title>
+<desc id="desc">一期已实现功能。业务流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
+<rect width="1100" height="2029" fill="#F7F5F0"/>
+<g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
+<text x="70" y="55" font-size="29" font-weight="700">外部AI内容导入 · 业务流程图</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-02 · 课表功能 · 已实现</text>
+<text x="70" y="116" font-size="13" fill="#788371">使用者操作与业务判断；右侧为本次处理的其他结果。</text>
+<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 551.0 L641 551.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="539.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 613 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="642.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 1583.0 L641 1583.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="1571.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 1645 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1674.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1767 L290.0 1861" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="188.0">开始</tspan>
+</text>
+<rect x="70" y="317" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="348.5">学生｜直接进入外部 AI 导入</tspan>
+<tspan x="290.0" y="371.5">自动沿用管理员设置的当前学期</tspan>
+</text>
+<polygon points="290.0,489 510,551.0 290.0,613 70,551.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="545.5">系统｜没有其他来源的</tspan>
+<tspan x="290.0" y="568.5">本学期课表？</tspan>
+</text>
+<rect x="645" y="511.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="557.0">提示先删除原课表再换来源</tspan>
+</text>
+<rect x="70" y="661" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="704.0">网站｜提供可复制的提示词</tspan>
+</text>
+<rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="864.5">学生｜把提示词与原始选课资料</tspan>
+<tspan x="290.0" y="887.5">交给自己选择的外部 AI</tspan>
+</text>
+<rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1036.5">外部 AI｜输出 JSON</tspan>
+<tspan x="290.0" y="1059.5">由学生复制带回网站</tspan>
+</text>
+<rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1208.5">网站｜展示导入预览</tspan>
+<tspan x="290.0" y="1231.5">提示缺失、疑似重复及冲突</tspan>
+</text>
+<rect x="70" y="1349" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1380.5">学生｜核对上课班并补充信息</tspan>
+<tspan x="290.0" y="1403.5">或将问题内容带回外部 AI 修正</tspan>
+</text>
+<polygon points="290.0,1521 510,1583.0 290.0,1645 70,1583.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="1589.0">学生｜确认保存当前结果？</tspan>
+</text>
+<rect x="645" y="1543.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="1589.0">不写入个人课表</tspan>
+</text>
+<rect x="70" y="1693" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1724.5">系统｜生成一份学期课表</tspan>
+<tspan x="290.0" y="1747.5">缺失时间的课程标记待安排</tspan>
+</text>
+<rect x="70" y="1865" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1908.0">结束</tspan>
+</text>
+<text x="70" y="1999" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+</g></svg>

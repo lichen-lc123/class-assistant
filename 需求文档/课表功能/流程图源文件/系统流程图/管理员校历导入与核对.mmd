@@ -1,0 +1,48 @@
+%% 管理员校历导入与核对 · 系统流程图 · V1.0 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["前端｜请求校历提示词或示例<br/>校历图片仅在浏览器核对"]
+    N2["后端｜从会话识别管理员<br/>拒绝学生读取导入管理入口"]
+    N3["前端｜提交 academic-calendar.v1<br/>请求校历预览"]
+    N4{"后端｜类型、日期与<br/>节次校验通过？"}
+    B4["返回校验问题<br/>不写入学期"]
+    N5["后端｜返回学期草稿与警告<br/>保留原文及重叠事项"]
+    N6["前端｜自动填表并计算周历<br/>展示全部节次和事项供核对"]
+    N7["前端｜提交确认标记<br/>学期字段、校历和当前版本"]
+    N8{"后端｜管理员、已确认<br/>且版本有效？"}
+    B8["拒绝保存，要求核对或刷新<br/>不覆盖原配置"]
+    N9[("数据库｜保存 terms 配置<br/>保留教学周、作息和 schoolCalendar")]
+    N10["后端｜返回保存结果<br/>学生只读配置并导入本人课表"]
+    N11(["结束"])
+    N0 --> N1
+    N1 -->|登录会话及管理入口| N2
+    N2 -->|校历提示词和提取结果| N3
+    N3 -->|原始 JSON 与目标学期| N4
+    N4 -->|否| B4
+    N4 -->|是| N5
+    N5 -->|规范化草稿、原文和警告| N6
+    N6 -->|核对后的字段与确认状态| N7
+    N7 -->|已确认配置及版本| N8
+    N8 -->|否| B8
+    N8 -->|是| N9
+    N9 -->|已保存的管理员配置| N10
+    N10 --> N11
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 decision;
+    class B4 exception;
+    class N5 normal;
+    class N6 normal;
+    class N7 normal;
+    class N8 decision;
+    class B8 exception;
+    class N9 database;
+    class N10 normal;
+    class N11 terminal;

@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="2029" viewBox="0 0 1100 2029" role="img" aria-labelledby="title desc">
+<title id="title">Excel课表导入 · 系统流程图</title>
+<desc id="desc">一期已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
+<rect width="1100" height="2029" fill="#F7F5F0"/>
+<g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
+<text x="70" y="55" font-size="29" font-weight="700">Excel课表导入 · 系统流程图</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-02 · 课表功能 · 已实现</text>
+<text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
+<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="445.0" font-size="15" fill="#66765D">学期与多个文件</text>
+<path d="M510 551.0 L641 551.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="539.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 613 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="642.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 895.0 L641 895.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="883.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 957 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="986.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1133.0" font-size="15" fill="#66765D">课程候选与缺失清单</text>
+<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1305.0" font-size="15" fill="#66765D">班级匹配、周次及作息</text>
+<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1477.0" font-size="15" fill="#66765D">排课预览、重复与冲突</text>
+<path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1649.0" font-size="15" fill="#66765D">确认后的课程关系与安排</text>
+<path d="M290.0 1767 L290.0 1861" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="188.0">开始</tspan>
+</text>
+<rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="348.5">前端｜提交学年、目标学期与文件</tspan>
+<tspan x="290.0" y="371.5">source=excel</tspan>
+</text>
+<polygon points="290.0,489 510,551.0 290.0,613 70,551.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="545.5">后端｜该用户本学期允许</tspan>
+<tspan x="290.0" y="568.5">使用当前来源？</tspan>
+</text>
+<rect x="645" y="511.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="545.5">已有其他来源时拒绝</tspan>
+<tspan x="837.5" y="568.5">提示先删除原课表</tspan>
+</text>
+<rect x="70" y="661" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="692.5">后端｜读取 XLS / XLSX 表格</tspan>
+<tspan x="290.0" y="715.5">普通规则解析，不调用 AI</tspan>
+</text>
+<polygon points="290.0,833 510,895.0 290.0,957 70,895.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="889.5">后端｜文件可读取且</tspan>
+<tspan x="290.0" y="912.5">属于所选学年及学期？</tspan>
+</text>
+<rect x="645" y="855.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="889.5">提示损坏或格式错误</tspan>
+<tspan x="837.5" y="912.5">跨学期数据须分别导入</tspan>
+</text>
+<rect x="70" y="1005" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1036.5">后端｜提取课程、学季及来源</tspan>
+<tspan x="290.0" y="1059.5">保留原文，标记缺失和疑似重复</tspan>
+</text>
+<path d="M70 1190 A220.0 13 0 0 1 510 1190 L510 1238 A220.0 13 0 0 1 70 1238 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 1190 A220.0 13 0 0 0 510 1190" stroke="#8A9CA6" fill="none"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1208.5">数据库｜读取上课班、教学日历</tspan>
+<tspan x="290.0" y="1231.5">及节次作息配置</tspan>
+</text>
+<rect x="70" y="1349" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1380.5">后端｜按已确认规则展开日期</tspan>
+<tspan x="290.0" y="1403.5">处理补课、调课与实践活动</tspan>
+</text>
+<rect x="70" y="1521" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1552.5">前端｜预览合并结果</tspan>
+<tspan x="290.0" y="1575.5">确认去重、班号和个人安排</tspan>
+</text>
+<path d="M70 1706 A220.0 13 0 0 1 510 1706 L510 1754 A220.0 13 0 0 1 70 1754 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 1706 A220.0 13 0 0 0 510 1706" stroke="#8A9CA6" fill="none"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1724.5">数据库｜重新校验来源与唯一性</tspan>
+<tspan x="290.0" y="1747.5">保存个人学期课表和待安排项</tspan>
+</text>
+<rect x="70" y="1865" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1908.0">结束</tspan>
+</text>
+<text x="70" y="1999" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+</g></svg>

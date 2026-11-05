@@ -1,0 +1,42 @@
+%% 课程卡片自由组合 · 系统流程图 · V0.5 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["前端｜提交学期、搜索词和筛选<br/>请求公开的上课班卡片"]
+    N2["后端｜仅查询管理员发布的卡片<br/>未生成卡片的新课程不出现在结果中"]
+    N3["前端｜维护本次个人选择<br/>拖动不写入新的上课时刻"]
+    N4["前端｜提交选班清单供校验<br/>source_type=cards"]
+    N5{"后端｜该用户本学期允许<br/>使用当前来源？"}
+    B5["已有其他来源时拒绝<br/>提示先删除原课表"]
+    N6["后端｜检查同班重复、学期<br/>并按实际日期检查时间冲突"]
+    N7["前端｜显示重复、冲突和待安排<br/>用户修改或确认保留"]
+    N8[("数据库｜保存该用户该学期选班关系<br/>不删除或修改公共上课班")]
+    N9["后端｜按公共安排与个人覆盖<br/>生成个人学期课表"]
+    N10(["结束"])
+    N0 --> N1
+    N1 -->|学期、关键词及学季| N2
+    N2 -->|上课班卡片数据| N3
+    N3 -->|个人选择的上课班清单| N4
+    N4 --> N5
+    N5 -->|否| B5
+    N5 -->|是| N6
+    N6 -->|重复、冲突和待安排提示| N7
+    N7 -->|学生确认的个人选择| N8
+    N8 --> N9
+    N9 --> N10
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 decision;
+    class B5 exception;
+    class N6 normal;
+    class N7 normal;
+    class N8 database;
+    class N9 normal;
+    class N10 terminal;

@@ -1,0 +1,460 @@
+{
+  "schema_version": "academic-calendar.v1",
+  "academic_year": "2026-2027",
+  "semester": "秋冬学期",
+  "starts_on": "2026-09-14",
+  "ends_on": "2027-01-17",
+  "aliases": [
+    "秋",
+    "冬",
+    "秋冬",
+    "秋学期",
+    "冬学期",
+    "秋冬学期"
+  ],
+  "calendars": [
+    {
+      "name": "工程师学院秋冬",
+      "start_date": "2026-09-14",
+      "end_date": "2027-01-17"
+    },
+    {
+      "name": "工程师学院秋",
+      "start_date": "2026-09-14",
+      "end_date": "2026-11-08"
+    },
+    {
+      "name": "工程师学院冬",
+      "start_date": "2026-11-09",
+      "end_date": "2027-01-17"
+    }
+  ],
+  "periods": [
+    {
+      "number": 1,
+      "section": "上午",
+      "start": "08:00",
+      "end": "08:45"
+    },
+    {
+      "number": 2,
+      "section": "上午",
+      "start": "08:50",
+      "end": "09:35"
+    },
+    {
+      "number": 3,
+      "section": "上午",
+      "start": "10:00",
+      "end": "10:45"
+    },
+    {
+      "number": 4,
+      "section": "上午",
+      "start": "10:50",
+      "end": "11:35"
+    },
+    {
+      "number": 5,
+      "section": "上午",
+      "start": "11:40",
+      "end": "12:25"
+    },
+    {
+      "number": 6,
+      "section": "下午",
+      "start": "13:25",
+      "end": "14:10"
+    },
+    {
+      "number": 7,
+      "section": "下午",
+      "start": "14:15",
+      "end": "15:00"
+    },
+    {
+      "number": 8,
+      "section": "下午",
+      "start": "15:05",
+      "end": "15:50"
+    },
+    {
+      "number": 9,
+      "section": "下午",
+      "start": "16:15",
+      "end": "17:00"
+    },
+    {
+      "number": 10,
+      "section": "下午",
+      "start": "17:05",
+      "end": "17:50"
+    },
+    {
+      "number": 11,
+      "section": "晚上",
+      "start": "18:00",
+      "end": "18:45"
+    },
+    {
+      "number": 12,
+      "section": "晚上",
+      "start": "18:50",
+      "end": "19:35"
+    },
+    {
+      "number": 13,
+      "section": "晚上",
+      "start": "19:40",
+      "end": "20:25"
+    },
+    {
+      "number": 14,
+      "section": "晚上",
+      "start": "20:30",
+      "end": "21:15"
+    }
+  ],
+  "school_calendar": {
+    "title": "浙江大学国家卓越工程师学院非全日制研究生2026-2027学年秋冬学期教学日历",
+    "institution": "浙江大学国家卓越工程师学院",
+    "source_name": "用户提供的2026—2027秋冬学期校历图片",
+    "display_start": "2026-08-17",
+    "display_end": "2027-01-24",
+    "events": [
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-10-16",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-10-17",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-10-18",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-10-30",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-10-31",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-11-01",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-11-13",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-11-14",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-11-15",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-11-27",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-11-28",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-11-29",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-12-11",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-12-12",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-12-13",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-12-25",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-12-26",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2026-12-27",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2027-01-08",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2027-01-09",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2027-01-10",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2027-01-15",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2027-01-16",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "非全日制研究生上课",
+        "kind": "class",
+        "start_date": "2027-01-17",
+        "end_date": null,
+        "description": "按原图绿色单元格整理，请与图片逐日核对。"
+      },
+      {
+        "title": "图示暑假阶段",
+        "kind": "holiday",
+        "start_date": "2026-08-17",
+        "end_date": "2026-09-13",
+        "description": "仅代表校历展示范围，不代表暑假真实开始日期；开学准备事项另列。"
+      },
+      {
+        "title": "开学准备",
+        "kind": "preparation",
+        "start_date": "2026-09-07",
+        "end_date": "2026-09-13",
+        "description": "图中开学前一周。"
+      },
+      {
+        "title": "研究生新生报到注册",
+        "kind": "event",
+        "start_date": "2026-09-10",
+        "end_date": null,
+        "description": ""
+      },
+      {
+        "title": "研究生老生报到注册",
+        "kind": "event",
+        "start_date": "2026-09-11",
+        "end_date": null,
+        "description": ""
+      },
+      {
+        "title": "研究生新生始业教育",
+        "kind": "event",
+        "start_date": "2026-09-11",
+        "end_date": "2026-09-30",
+        "description": ""
+      },
+      {
+        "title": "新生开学典礼",
+        "kind": "event",
+        "start_date": "2026-09-13",
+        "end_date": null,
+        "description": ""
+      },
+      {
+        "title": "秋学期开始上课",
+        "kind": "event",
+        "start_date": "2026-09-14",
+        "end_date": null,
+        "description": ""
+      },
+      {
+        "title": "秋季研究生毕业教育及离校",
+        "kind": "event",
+        "start_date": "2026-09-21",
+        "end_date": "2026-09-30",
+        "description": ""
+      },
+      {
+        "title": "中秋节放假",
+        "kind": "holiday",
+        "start_date": "2026-09-25",
+        "end_date": "2026-09-27",
+        "description": ""
+      },
+      {
+        "title": "国庆节放假调休",
+        "kind": "holiday",
+        "start_date": "2026-10-01",
+        "end_date": "2026-10-07",
+        "description": "10月6日、7日分别与9月20日、10月10日的课对调，10月17日补10月2日的课。具体以正式通知为准。"
+      },
+      {
+        "title": "国庆调课说明",
+        "kind": "adjustment",
+        "start_date": "2026-10-17",
+        "end_date": null,
+        "description": "原文：10月6日、7日分别与9月20日、10月10日的课对调，10月17日补10月2日的课。此记录不自动移动具体课程。"
+      },
+      {
+        "title": "秋季校运动会",
+        "kind": "event",
+        "start_date": "2026-10-23",
+        "end_date": "2026-10-25",
+        "description": ""
+      },
+      {
+        "title": "秋学期考试（第一组）",
+        "kind": "exam",
+        "start_date": "2026-11-07",
+        "end_date": "2026-11-08",
+        "description": "原图事项区；适用范围请管理员核对。"
+      },
+      {
+        "title": "秋学期考试（第二组）",
+        "kind": "exam",
+        "start_date": "2026-11-14",
+        "end_date": "2026-11-15",
+        "description": "原图事项区与绿色上课日重叠，均保留，不取消非全日制课程。"
+      },
+      {
+        "title": "冬学期开始上课",
+        "kind": "event",
+        "start_date": "2026-11-09",
+        "end_date": null,
+        "description": ""
+      },
+      {
+        "title": "冬季研究生毕业教育及离校",
+        "kind": "event",
+        "start_date": "2026-12-21",
+        "end_date": "2026-12-30",
+        "description": ""
+      },
+      {
+        "title": "浙江大学学生节",
+        "kind": "event",
+        "start_date": "2026-12-31",
+        "end_date": null,
+        "description": "2027年1月4日补12月31日的课。"
+      },
+      {
+        "title": "学生节补课说明",
+        "kind": "adjustment",
+        "start_date": "2027-01-04",
+        "end_date": null,
+        "description": "2027年1月4日补2026年12月31日的课；不自动调整本网站具体课程。"
+      },
+      {
+        "title": "元旦放假",
+        "kind": "holiday",
+        "start_date": "2027-01-01",
+        "end_date": null,
+        "description": "原图注明调休安排另行通知；不推断1月2日、3日是否放假。"
+      },
+      {
+        "title": "校级停课考试开始",
+        "kind": "event",
+        "start_date": "2027-01-06",
+        "end_date": null,
+        "description": "原图注明学校停课考试起点，未给结束日期。作为校级事项保留，不覆盖非全日制绿色上课日。"
+      },
+      {
+        "title": "校级学生寒假开始",
+        "kind": "event",
+        "start_date": "2027-01-16",
+        "end_date": null,
+        "description": "原图注明学生寒假开始，2月6日春节。与非全日制1月16、17日上课并列保留，需核对适用范围。"
+      },
+      {
+        "title": "图示寒假阶段",
+        "kind": "holiday",
+        "start_date": "2027-01-18",
+        "end_date": "2027-01-24",
+        "description": "仅表示图片最右侧展示的一周，不代表真实寒假结束日期。"
+      }
+    ],
+    "notes": [
+      "2026年国家法定放假节日安排，其调课方式依正式通知为准。",
+      "学校通用考试、寒假和调课通知与非全日制上课日分开保留，不自动改变具体课程。",
+      "图示暑假、寒假范围只用于复现校历展示，不能作为完整假期起止日期。"
+    ],
+    "warnings": [
+      "此样例依据图片人工整理，尚未保存到学期；请核对日期、颜色、标题及全部14节作息后确认。",
+      "学期结束日期按图中1月18日进入寒假推定为1月17日，需管理员确认；图片只显示部分假期。",
+      "原图11月14—15日考试说明与上课标记、1月16日起学生寒假与非全日制上课标记有重叠，需确认适用人群。",
+      "部分红色单元格与文字放假区间存在差异；调休另行通知及模糊颜色未用于推断额外假期。"
+    ]
+  }
+}

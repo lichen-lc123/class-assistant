@@ -1,0 +1,39 @@
+%% 个人作业新增与维护 · 系统流程图 · V1.0 · 2026-11-04
+flowchart TD
+    N0(["开始"])
+    N1["前端｜提交个人作业与目标学期<br/>携带登录会话"]
+    N2["后端｜校验学期及字段<br/>从会话确定唯一创建者"]
+    N3[("数据库｜保存 owner_id 私人记录<br/>不创建公共班级关联")]
+    N4["后端｜读取本人私人记录<br/>及已选班级的已发布作业"]
+    N5["后端｜合成个人偏好和完成状态<br/>排序后返回列表及前3项摘要"]
+    N6["前端｜私人卡片显示编辑与删除<br/>公共卡片保持原权限"]
+    N7{"后端｜修改或删除时<br/>确为创建者且版本有效？"}
+    B7["后端｜拒绝越权或旧版请求<br/>原记录保持不变"]
+    N8[("数据库｜更新或确认删除私人记录<br/>保留其他用户及公共记录")]
+    N9(["结束"])
+    N0 --> N1
+    N1 -->|会话、学期、作业字段| N2
+    N2 -->|已验证字段与创建者ID| N3
+    N3 -->|私人归属与公共班级关系| N4
+    N4 -->|本人可见的两类作业| N5
+    N5 -->|来源标识、可编辑权限及排序| N6
+    N6 -->|本人操作与记录版本| N7
+    N7 -->|否| B7
+    N7 -->|是| N8
+    N8 --> N9
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 database;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 decision;
+    class B7 exception;
+    class N8 database;
+    class N9 terminal;

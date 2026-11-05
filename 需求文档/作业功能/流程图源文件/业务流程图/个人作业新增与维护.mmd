@@ -1,0 +1,33 @@
+%% 个人作业新增与维护 · 业务流程图 · V1.0 · 2026-11-04
+flowchart TD
+    N0(["开始"])
+    N1["用户｜进入我的作业<br/>点击新增个人作业"]
+    N2["用户｜选择已配置学期<br/>填写标题及可选课程和截止"]
+    N3["网站｜保存为仅本人可见的作业<br/>不发布给上课班"]
+    N4["用户｜查看课程作业与个人作业<br/>设置优先级及计划完成时间"]
+    N5["网站｜工作台按统一排序<br/>展示前3项未完成作业"]
+    N6["用户｜编辑、标记完成<br/>或确认删除自己的个人作业"]
+    N7["网站｜保存本人变更<br/>其他用户及公共作业不受影响"]
+    N8(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    N7 --> N8
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 normal;
+    class N8 terminal;

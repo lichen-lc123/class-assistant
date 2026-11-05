@@ -1,0 +1,42 @@
+%% 个人优先与公共同步 · 系统流程图 · V0.5 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1[("数据库｜读取公共安排更新<br/>以及受影响用户的选班关系")]
+    N2["后端｜分别读取个人安排覆盖<br/>公共基值与个人来源记录"]
+    N3{"后端｜目标字段存在个人覆盖？"}
+    B3["使用公共新值<br/>其他字段仍逐项处理"]
+    N4["后端｜个人值优先<br/>记录公共更新差异供用户查看"]
+    N5["后端｜校验合成后的完整时段<br/>缺失或冲突进入提示清单"]
+    N6["前端｜展示本人最终课表<br/>及公共变动、个人覆盖提示"]
+    N7{"学生｜选择保留个人覆盖？"}
+    B7["数据库｜清除所选字段覆盖<br/>重新采用公共值"]
+    N8[("数据库｜保留个人覆盖<br/>仅影响当前用户课表")]
+    N9(["结束"])
+    N0 --> N1
+    N1 -->|公共新值与受影响用户| N2
+    N2 -->|公共基值及个人覆盖| N3
+    N3 -->|否| B3
+    N3 -->|是| N4
+    N4 -->|合成后的完整排课信息| N5
+    N5 -->|最终课表、差异和冲突提示| N6
+    N6 --> N7
+    N7 -->|否| B7
+    N7 -->|是| N8
+    N8 --> N9
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 database;
+    class N2 normal;
+    class N3 decision;
+    class B3 exception;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 decision;
+    class B7 exception;
+    class N8 database;
+    class N9 terminal;

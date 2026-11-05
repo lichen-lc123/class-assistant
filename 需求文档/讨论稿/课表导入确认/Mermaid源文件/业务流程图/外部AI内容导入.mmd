@@ -1,0 +1,45 @@
+%% 外部AI内容导入 · 业务流程图 · V0.5 · 2026-11-02
+flowchart TD
+    N0(["开始"])
+    N1["学生｜选择学期及外部 AI 导入"]
+    N2{"系统｜没有其他来源的<br/>本学期课表？"}
+    B2["提示先删除原课表再换来源"]
+    N3["网站｜提供可复制的提示词"]
+    N4["学生｜把提示词与原始选课资料<br/>交给自己选择的外部 AI"]
+    N5["外部 AI｜输出 JSON<br/>由学生复制带回网站"]
+    N6["网站｜展示导入预览<br/>提示缺失、疑似重复及冲突"]
+    N7["学生｜核对上课班并补充信息<br/>或将问题内容带回外部 AI 修正"]
+    N8{"学生｜确认保存当前结果？"}
+    B8["不写入个人课表"]
+    N9["系统｜生成一份学期课表<br/>缺失时间的课程标记待安排"]
+    N10(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    N7 --> N8
+    N8 -->|否| B8
+    N8 -->|是| N9
+    N9 --> N10
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 decision;
+    class B2 exception;
+    class N3 normal;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 normal;
+    class N8 decision;
+    class B8 exception;
+    class N9 normal;
+    class N10 terminal;
