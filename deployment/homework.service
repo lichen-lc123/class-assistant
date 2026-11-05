@@ -10,7 +10,7 @@ WorkingDirectory=/opt/homework/current
 Environment=NODE_ENV=production
 Environment=TZ=Asia/Shanghai
 EnvironmentFile=/etc/homework/homework.env
-ExecStart=/usr/bin/node server/index.mjs --static
+ExecStart=/opt/class-assistant-runtime/node-v24.22.2-linux-x64/bin/node server/index.mjs --static
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30

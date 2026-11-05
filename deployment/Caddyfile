@@ -1,0 +1,20 @@
+{
+    admin 127.0.0.1:2019
+    default_sni 122.51.112.10
+}
+
+https://122.51.112.10 {
+    tls {
+        issuer acme {
+            dir https://acme-v02.api.letsencrypt.org/directory
+            profile shortlived
+        }
+    }
+    request_body {
+        max_size 40MB
+    }
+    reverse_proxy 127.0.0.1:3001 {
+        # Replace any untrusted client-supplied forwarding chain.
+        header_up X-Forwarded-For {remote_host}
+    }
+}
