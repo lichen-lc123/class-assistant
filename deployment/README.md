@@ -1,6 +1,6 @@
 # 代码上传与网站部署
 
-代码已于 2026-11-05 首次上传至 https://github.com/lichen-lc123/class-assistant，主分支为 main。服务器为腾讯云，具体实例、系统和域名尚待确认；尚未连接服务器或发布网站。以下是 Linux + systemd + Nginx 的部署模板；确认服务器系统后再采用对应步骤。网站和后续小程序共用同一套后端和数据库。
+代码已于 2026-11-05 首次上传至 https://github.com/lichen-lc123/class-assistant，主分支为 main。服务器已确认是腾讯云上海轻量应用服务器、OpenCloudOS 9.6、x86_64。用户已在服务器验证 Node.js v24.22.2 与内置 SQLite，运行文件位于 `/opt/class-assistant-runtime/node-v24.22.2-linux-x64/bin/node`。域名尚待确认，尚未发布网站。以下是 Linux + systemd + Nginx 的部署模板。网站和后续小程序共用同一套后端和数据库。
 
 ## 1. Git 上传
 
@@ -18,7 +18,11 @@ origin 已设置为上述仓库，main 已跟踪 origin/main。仓库可见性�
 npm run build
 ```
 
-把 dist、server、shared、package.json 上传到服务器的 `/opt/homework/current`。生产进程仅使用 Node 内置模块，因此这份构建不需要在服务器安装 npm 依赖。如果在服务器构建，才需要用锁定文件安装构建依赖。
+把发布程序放在服务器的 `/opt/homework/releases/<版本号>`；后续通过 `/opt/homework/current` 指向已验证版本。生产进程仅使用 Node 内置模块，因此不需要在服务器安装 npm 依赖。如果在服务器构建，才需要用锁定文件安装构建依赖。
+
+发布分支 `deploy` 在对应源码版本的基础上额外保存已构建的 dist。服务器可获取该分支并核对提交号，无需安装 npm 依赖或自行构建。源码日常维护仍在 main；新版本发布时必须重新构建并更新发布分支。运行还需要三份提示词/校历资源，不能只复制 dist、server、shared；获取完整发布分支可保留这些文件。
+
+部署后先在发布目录执行 `node scripts/check-release.mjs`。检查使用独立内存数据库，验证前端资源、登录、权限和主要读取接口，包括课表及校历提示词。它不初始化或修改真实数据库，不启动常驻服务，也不开放公网端口。
 
 生产数据库单独保存为 `/var/lib/homework/homework.sqlite`，不放入代码目录。这样更新代码不覆盖数据。首次部署前先确定是迁移当前数据，还是新建空系统；不要自行复制真实用户数据到其他服务器，也不要在已有系统重复初始化管理员。
 
@@ -26,7 +30,7 @@ npm run build
 
 将根目录 `.env.example` 作为模板，在服务器创建 `/etc/homework/homework.env`，替换真实 HTTPS 域名和数据库路径。环境文件不会自动加载；下方 systemd 服务读取该文件。它不应放入 Git。
 
-需要专用系统用户和组 `homework`；应用目录允许该用户读取，数据库目录允许写入，环境文件由 root 管理并只允许必要用户读取。模板假定 Node 的实际路径是 `/usr/bin/node`，使用前通过 `command -v node` 核对。
+需要专用系统用户和组 `homework`；应用目录允许该用户读取，数据库目录允许写入，环境文件由 root 管理并只允许必要用户读取。模板假定 Node 的实际路径是 `/usr/bin/node`；本次服务器使用 `/opt/class-assistant-runtime/node-v24.22.2-linux-x64/bin/node`，配置服务时须替换 ExecStart。全局 PATH 尚未配置，命令中直接使用完整路径。
 
 ### 进程与 HTTPS
 
