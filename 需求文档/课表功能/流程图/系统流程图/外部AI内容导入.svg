@@ -50,13 +50,13 @@
 </text>
 <polygon points="290.0,833 510,895.0 290.0,957 70,895.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="889.5">后端｜该用户本学期允许</tspan>
-<tspan x="290.0" y="912.5">使用当前来源？</tspan>
+<tspan x="290.0" y="889.5">后端｜本次新增课程时间</tspan>
+<tspan x="290.0" y="912.5">与已有安排均不重复？</tspan>
 </text>
 <rect x="645" y="855.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="889.5">已有其他来源时拒绝</tspan>
-<tspan x="837.5" y="912.5">提示先删除原课表</tspan>
+<tspan x="837.5" y="889.5">提示课程时间重复及具体时段</tspan>
+<tspan x="837.5" y="912.5">整批不保存，不能确认绕过</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
@@ -81,13 +81,13 @@
 </text>
 <rect x="70" y="1521" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1552.5">后端｜生成日期预览及待确认项</tspan>
-<tspan x="290.0" y="1575.5">保留原文；未绑定班号不自动关联作业</tspan>
+<tspan x="290.0" y="1552.5">后端｜展开明确日期并合并课次</tspan>
+<tspan x="290.0" y="1575.5">检查本批及本人已有时段占用</tspan>
 </text>
 <rect x="70" y="1693" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1724.5">前端｜显示预览与问题清单</tspan>
-<tspan x="290.0" y="1747.5">用户确认个人信息与匹配结果</tspan>
+<tspan x="290.0" y="1724.5">前端｜展示全部课次及未纳入原文</tspan>
+<tspan x="290.0" y="1747.5">用户核对日期处理与待确认问题</tspan>
 </text>
 <path d="M70 1878 A220.0 13 0 0 1 510 1878 L510 1926 A220.0 13 0 0 1 70 1926 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 1878 A220.0 13 0 0 0 510 1878" stroke="#8A9CA6" fill="none"/>

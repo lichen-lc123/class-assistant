@@ -30,8 +30,8 @@
 </text>
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">网站｜识别多工作表、作业</tspan>
-<tspan x="290.0" y="543.5">考核说明及相关图片</tspan>
+<tspan x="290.0" y="520.5">网站｜识别正文与单元格图片</tspan>
+<tspan x="290.0" y="543.5">内容为无不生成作业卡片</tspan>
 </text>
 <polygon points="290.0,661 510,723.0 290.0,785 70,723.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
@@ -46,7 +46,7 @@
 <rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="864.5">网站｜展示导入预览</tspan>
-<tspan x="290.0" y="887.5">保留原截止说明和警告</tspan>
+<tspan x="290.0" y="887.5">显示截止时间、正文和核对警告</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

@@ -1,6 +1,6 @@
 import { inflateRawSync } from 'node:zlib';
 import { posix } from 'node:path';
-import { matchesSemester, problem, trim, validDate } from './schedule.mjs';
+import { problem, trim, validDate } from './schedule.mjs';
 
 const u16=(b,o=0)=>b.readUInt16LE(o),u32=(b,o=0)=>b.readUInt32LE(o);
 function xlsSheets(buffer) {
@@ -96,17 +96,25 @@ function remarkDates(text,term){
   const result=[];
   for(const sentence of text.split(/[。；;\n]/)){
     const numbers=sentence.match(/第([\d、,，]+)次(?:课)?/);const lessons=numbers?numbers[1].split(/[、,，]/).map(Number):[];
-    const matches=[...sentence.matchAll(/(?<!\d)(\d{1,2})[.月/](\d{1,2})(?:日)?/g)];
+    const matches=[...sentence.matchAll(/(?<![\d.\/年-])(?:(\d{4})[年.\/-])?(\d{1,2})[.月/\-](\d{1,2})(?:日)?(?!\d|节|人|周)/g)].filter(m=>m[1]||!m[0].includes('-'));
     for(const [index,m] of matches.entries()){
-      const candidates=term.startsOn?[Number(term.startsOn.slice(0,4)),Number(term.endsOn.slice(0,4))]:[];
-      const dates=[...new Set(candidates.map(y=>`${y}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`).filter(d=>validDate(d)&&d>=term.startsOn&&d<=term.endsOn))];
-      result.push({date:dates.length===1?dates[0]:null,lesson_number:lessons[index]||null,kind:/实践|调研/.test(sentence)?'practice':/调课|改为/.test(sentence)?'reschedule':lessons.length||/补课/.test(sentence)?'supplement':'lecture',raw:sentence});
+      const candidates=m[1]?[Number(m[1])]:String(term.academicYear||'').split('-').map(Number).filter(y=>y>=1900&&y<=2200);
+      const dates=[...new Set(candidates.map(y=>`${y}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`).filter(validDate))];
+      // A management boundary helps disambiguate the year; it never filters out an explicit lesson.
+      const inside=term.startsOn&&term.endsOn?dates.filter(d=>d>=term.startsOn&&d<=term.endsOn):[];
+      let date=m[1]&&dates.length===1?dates[0]:inside.length===1?inside[0]:null;
+      if(!date&&inside.length===0&&term.startsOn&&term.endsOn){
+        const distance=d=>Math.min(Math.abs(Date.parse(d)-Date.parse(term.startsOn)),Math.abs(Date.parse(d)-Date.parse(term.endsOn)))/86400000;
+        const nearby=dates.filter(d=>distance(d)<=90);
+        if(nearby.length===1)date=nearby[0];
+      }
+      result.push({date,lesson_number:lessons[index]||null,kind:/实践|调研/.test(sentence)?'practice':/调课|改为/.test(sentence)?'reschedule':lessons.length||/补课/.test(sentence)?'supplement':'lecture',raw:sentence});
     }
   }
   return result;
 }
 export function coursesFromFiles(files,term){
-  if(!Array.isArray(files)||!files.length||files.length>5)problem('请选择 1—5 个同学期的 Excel 文件。');
+  if(!Array.isArray(files)||!files.length||files.length>5)problem('请选择 1—5 个需要合并到当前学期的 Excel 文件。');
   const courses=[];const warnings=[];
   let totalBytes=0;
   for(const file of files){
@@ -122,19 +130,22 @@ export function coursesFromFiles(files,term){
       const header=sheet.rows[headerIndex].map(c=>String(c||'').trim());
       const column=(row,names)=>{const at=header.findIndex(h=>names.includes(h));return at<0?'':String(row[at]??'').trim();};
       const heading=sheet.rows.slice(0,headerIndex).flat().filter(Boolean).join(' ');
-      const year=heading.match(/(\d{4})[-—](\d{4})学年/);if(year&&`${year[1]}-${year[2]}`!==term.academicYear)problem(`${file.name} 不属于所选学年。`);
+      const yearPattern=/(\d{4})\s*[-—–]\s*(\d{4})/g;
+      const checkYear=text=>{const years=[...text.matchAll(yearPattern)].map(m=>`${m[1]}-${m[2]}`);if(years.some(y=>y!==term.academicYear))problem(`${trim(file.name,100)} 不属于所选学年。`);return years[0]||null;};
+      const headingYear=checkYear(heading);
       for(let index=headerIndex+1;index<sheet.rows.length;index++){
         const row=sheet.rows[index];if(!row)continue;
         const course_name=column(row,['课程名称']);if(!course_name)continue;recognized++;
-        const semester=column(row,['学期','学季']);if(semester&&!matchesSemester(semester,term))problem(`${file.name} 中“${course_name}”属于 ${semester}，请按学期分别导入或先配置学季别名。`);
+        const semester=column(row,['学期','学季','学年学期']);
         const rawSchedule=column(row,['上课时间地点','上课时间']),room=column(row,['上课地点','教室']);
+        const sourceYear=checkYear([column(row,['学年']),semester,rawSchedule].join(' '))||headingYear;
         const remarks=column(row,['备注']);const rules=[];
         const re=/([^\n]*?)\(第([\d,，、\-~～]+)周\)\s*\/\/\s*星期([一二三四五六日天])\s*\/\/\s*(\d+)\s*[-~]\s*(\d+)节\s*\/\/\s*([^/\n]+)/g;
         for(const m of rawSchedule.matchAll(re))rules.push({calendar_name:m[1].trim(),weeks:parseWeeks(m[2]),weekday:'一二三四五六日'.indexOf(m[3]==='天'?'日':m[3])+1,period_start:Number(m[4]),period_end:Number(m[5]),room:m[6].trim(),raw:m[0]});
         if(!rules.length){const m=rawSchedule.match(/星期([一二三四五六日天])\s*(?:第)?(\d+)\s*[-~]\s*(\d+)节/);if(m)rules.push({weeks:[],weekday:'一二三四五六日'.indexOf(m[1]==='天'?'日':m[1])+1,period_start:Number(m[2]),period_end:Number(m[3]),room:room||null,week_parity_raw:column(row,['单双周']),raw:rawSchedule});}
         courses.push({course_name,teacher:column(row,['主讲教师','任课老师','任课教师'])||null,
           course_code:column(row,['课程编号'])||null,teaching_class_code:rawSchedule.match(/班级编号\s*([\w-]+)/)?.[1]||column(row,['上课班编号','班级编号'])||null,
-          academic_year:year?`${year[1]}-${year[2]}`:null,semester:semester||null,seasons:semester?[semester]:[],room:room&&!/待|通知/.test(room)?room:null,
+          academic_year:sourceYear,semester:term.name,extra_fields:semester?{'原表标注':[semester]}:{},room:room&&!/待|通知/.test(room)?room:null,
           weekly_rules:rules,special_dates:remarkDates(remarks,term),remarks_raw:remarks,schedule_raw:rawSchedule||room,
           credits:column(row,['学分'])||null,college:column(row,['开课学院']),required_or_elective:column(row,['必修/选修']),course_category:column(row,['课程性质']),
           source_rows:[{source:`${trim(file.name,100)} / ${sheet.name}`,row:index+1,raw:JSON.stringify(row)}],

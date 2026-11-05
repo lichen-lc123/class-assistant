@@ -21,6 +21,33 @@ test('作业表解析保留合并单元格、空单元格后的图片与不同�
   const result=homeworkFromFile(fixture(),term);assert.equal(result.records.length,3);assert.equal(result.records.filter(r=>r.kind==='assignment').length,1);assert.equal(result.assets.length,1);assert.equal(result.assets[0].id,imageId);assert.deepEqual(result.sheets,['第一次课']);assert.deepEqual(result.ignoredSheets,['秋冬校历']);
   const work=result.records.find(r=>r.kind==='assignment');assert.equal(work.teacher,'甲老师');assert.equal(work.content,'阅读第一章');assert.equal(work.due_date,'2026-11-13');assert.equal(work.due_time,'22:00');assert.equal(work.attachments[0].field,'content');assert.equal(work.source_rows.length,2);assert.ok(!result.records.find(r=>r.teacher==='乙老师').assessment_rules.includes('40%'));
 });
+const secondImage=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64');
+function floatingFixture({firstContent='',assessment=false,unbound=false,external=false}={}){
+  const files={'xl/workbook.xml':'<workbook><sheets><sheet name="图片作业甲" r:id="r1"/><sheet name="图片作业乙" r:id="r2"/></sheets></workbook>','xl/_rels/workbook.xml.rels':'<Relationships><Relationship Id="r1" Target="worksheets/sheet1.xml"/><Relationship Id="r2" Target="worksheets/sheet2.xml"/></Relationships>','xl/media/image1.png':image,'xl/media/image2.png':secondImage};
+  for(const i of [1,2]){
+    const header=row(2,[['B','课程名称'],['D','任课老师'],['E','浮动作业内容'],['F','截止日期'],['H','课程考核规则']]);
+    files['xl/worksheets/sheet'+i+'.xml']='<worksheet><sheetData>'+header+row(3,[['B',i===1?'工程经济学':'系统工程'],['D',i===1?'甲老师':'浮图老师'],['E',i===1?firstContent:''],['F','11月13日 22:00']])+'</sheetData><drawing r:id="rDrawing"/></worksheet>';
+    files['xl/worksheets/_rels/sheet'+i+'.xml.rels']='<Relationships><Relationship Id="rDrawing" Target="../drawings/drawing'+i+'.xml"/></Relationships>';
+    const pic='<xdr:pic><xdr:cNvPr name="Picture 1"/><a:blip '+(external&&i===1?'r:link':'r:embed')+'="rImage"/></xdr:pic>';
+    const anchor=(col,kind='oneCellAnchor')=>'<xdr:'+kind+'><xdr:from><xdr:col>'+col+'</xdr:col><xdr:row>2</xdr:row></xdr:from>'+pic+'</xdr:'+kind+'>';
+    files['xl/drawings/drawing'+i+'.xml']='<xdr:wsDr>'+(unbound&&i===1?'<xdr:absoluteAnchor>'+pic+'</xdr:absoluteAnchor>':anchor(4,i===1?'oneCellAnchor':'twoCellAnchor'))+(assessment&&i===1?anchor(7):'')+'</xdr:wsDr>';
+    files['xl/drawings/_rels/drawing'+i+'.xml.rels']='<Relationships><Relationship Id="rImage" '+(external&&i===1?'TargetMode="External" Target="https://example.invalid/image.png"':'Target="../media/image'+i+'.png"')+'/></Relationships>';
+  }
+  return{name:'浮动图片.xlsx',content:zip(files).toString('base64')};
+}
+test('Excel浮动图片按工作表及锚点归入正文或考核，同名图片不串课程',()=>{
+  const result=homeworkFromFile(floatingFixture({assessment:true}),term),work=result.records.filter(r=>r.kind==='assignment');assert.equal(work.length,2);assert.equal(result.assets.length,2);
+  const a=work.find(r=>r.teacher==='甲老师'),b=work.find(r=>r.teacher==='浮图老师');assert.equal(a.content,'');assert.equal(a.attachments[0].field,'content');assert.equal(a.attachments[0].assetId,imageId);assert.equal(b.attachments[0].assetId,createHash('sha256').update(secondImage).digest('hex'));assert.equal(a.due_time,'22:00');
+  const policy=result.records.find(r=>r.kind==='reference');assert.equal(policy.attachments[0].field,'assessment_rules');assert.equal(policy.attachments[0].assetId,imageId);assert.deepEqual(Buffer.from(result.assets.find(a=>a.id===imageId).content,'base64'),image);
+});
+test('作业内容明确为无时不生成作业卡片，空白图片单元格仍生成图片作业',()=>{
+  for(const text of ['无',' 无。 ','无作业','—']){const result=homeworkFromFile(floatingFixture({firstContent:text}),term);assert.equal(result.records.filter(r=>r.kind==='assignment').length,1);assert.equal(result.records.find(r=>r.kind==='assignment').teacher,'浮图老师');assert.ok(result.warnings.some(w=>w.includes('未归入有效作业字段')));}
+});
+test('无单元格锚点或外部链接图片明确提示，不猜课程归属或下载外链',()=>{
+  const unbound=homeworkFromFile(floatingFixture({unbound:true}),term);assert.equal(unbound.records.filter(r=>r.kind==='assignment').length,1);assert.ok(unbound.warnings.some(w=>w.includes('未绑定单元格')));
+  const external=homeworkFromFile(floatingFixture({external:true}),term);assert.equal(external.assets.length,1);assert.ok(external.warnings.some(w=>w.includes('无法提取的图片')));assert.ok(external.records.find(r=>r.teacher==='甲老师').content.includes('图片待补充'));
+});
+
 test('截止说明跨年推断、日期无时刻和逾期规则保留；歧义日期不编造',()=>{
   assert.equal(parseHomeworkDeadline('1月10日',term).due_date,'2027-01-10');assert.equal(parseHomeworkDeadline('1月10日',term).due_time,null);
   const late=parseHomeworkDeadline('2026.11.8前，延迟会扣分，最晚11.15前',term);assert.equal(late.due_date,'2026-11-08');assert.ok(late.deadline_raw.includes('最晚11.15'));assert.ok(late.warnings.some(w=>w.includes('扣分')));
@@ -77,4 +104,13 @@ test('作业完整流程：管理员预览确认、草稿、班级隔离、附�
   assert.equal((await call('/admin/homework/records','POST',{termId,record:{...draft,title:'错误发布',published:true}},admin)).status,400);
   const missing={...draft,title:'图片缺失',attachments:[{assetId:'0'.repeat(64),field:'content',caption:'缺失'}]};assert.equal((await call('/admin/homework/records','POST',{termId,record:missing},admin)).status,400);assert.equal(db.prepare("SELECT count(*) n FROM homework_records WHERE title='图片缺失'").get().n,0);
   assert.equal((await call('/admin/homework/records/'+work.id,'DELETE',{revision:1,confirm:true},admin)).status,409);assert.equal((await call('/admin/homework/records/'+work.id,'DELETE',{revision:2,confirm:true},admin)).status,200);assert.equal((await fetch(base+imageUrl,{headers:{Cookie:one}})).status,404);
+  const floating=(await call('/admin/homework/preview','POST',{termId,file:floatingFixture()},admin)).data;
+  const imageWork=floating.records.find(r=>r.kind==='assignment'&&r.teacher==='甲老师');
+  const savedImage=await call('/admin/homework/import','POST',{termId,records:[{...imageWork,targetKeys:['code:CLASS-A'],published:true}],assets:floating.assets,confirm:true},admin);assert.equal(savedImage.status,201);assert.equal(savedImage.data.created,1);
+  const visibleImage=(await call('/homework','GET',undefined,one)).data.records.find(r=>r.title===imageWork.title);assert.equal(visibleImage.content,'');assert.equal(visibleImage.attachments[0].field,'content');
+  const picture=await fetch(base+visibleImage.attachments[0].url,{headers:{Cookie:one}});assert.equal(picture.status,200);assert.deepEqual(Buffer.from(await picture.arrayBuffer()),image);
+  assert.equal((await fetch(base+visibleImage.attachments[0].url,{headers:{Cookie:two}})).status,403);
+  const countBefore=db.prepare('SELECT count(*) n FROM homework_records').get().n;
+  const noAssignment=await call('/admin/homework/import','POST',{termId,records:[{...imageWork,title:'明确无作业',content:' 无。 ',attachments:[],targetKeys:['code:CLASS-A'],published:true}],confirm:true},admin);assert.equal(noAssignment.status,201);assert.equal(noAssignment.data.created,0);assert.equal(noAssignment.data.skippedEmpty,1);assert.equal(db.prepare('SELECT count(*) n FROM homework_records').get().n,countBefore);
+
 });

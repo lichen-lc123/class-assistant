@@ -14,3 +14,15 @@ export function moveReference(view:string,date:string,direction:number){
   return shiftDate(date,direction*(view==='week'?7:1));
 }
 export const humanDate=(date:string)=>new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',month:'long',day:'numeric',weekday:'long'}).format(new Date(date+'T12:00:00+08:00'));
+
+export function weekdayNumber(date:string):number|null {
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return null;
+  const parsed=new Date(date+'T00:00:00Z');
+  if(!Number.isFinite(parsed.getTime())||parsed.toISOString().slice(0,10)!==date)return null;
+  return parsed.getUTCDay()||7;
+}
+export function weekdayLabel(date:string){const day=weekdayNumber(date);return day?'星期'+'一二三四五六日'[day-1]:'星期待确认';}
+export function courseWeekdayLabels(sessions:{date:string}[]){
+  const days=new Set(sessions.map(session=>weekdayNumber(session.date)).filter((day):day is number=>day!==null));
+  return [...days].sort((a,b)=>a-b).map(day=>'星期'+'一二三四五六日'[day-1]);
+}

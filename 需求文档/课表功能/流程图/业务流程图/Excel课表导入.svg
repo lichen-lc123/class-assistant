@@ -33,23 +33,23 @@
 </text>
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">学生｜上传属于所选学期的</tspan>
-<tspan x="290.0" y="543.5">一个或多个课表文件</tspan>
+<tspan x="290.0" y="520.5">学生｜一次选择两份Excel</tspan>
+<tspan x="290.0" y="543.5">全部课程合并到当前学期</tspan>
 </text>
 <polygon points="290.0,661 510,723.0 290.0,785 70,723.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="717.5">系统｜来源限制和文件检查</tspan>
-<tspan x="290.0" y="740.5">通过？</tspan>
+<tspan x="290.0" y="717.5">后端｜本次新增课程时间</tspan>
+<tspan x="290.0" y="740.5">与已有安排均不重复？</tspan>
 </text>
 <rect x="645" y="683.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="717.5">提示先删除旧来源</tspan>
-<tspan x="837.5" y="740.5">或修正文件</tspan>
+<tspan x="837.5" y="717.5">提示课程时间重复及具体时段</tspan>
+<tspan x="837.5" y="740.5">整批不保存，不能确认绕过</tspan>
 </text>
 <rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">系统｜展示该学期课程清单</tspan>
-<tspan x="290.0" y="887.5">保留各文件的原始学季与来源</tspan>
+<tspan x="290.0" y="864.5">系统｜合并同班课程并保留来源</tspan>
+<tspan x="290.0" y="887.5">不根据原表时间标签拆分</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

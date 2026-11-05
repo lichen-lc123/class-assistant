@@ -9,7 +9,7 @@
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
 <path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="445.0" font-size="15" fill="#66765D">学期、关键词及学季</text>
+<text x="305.0" y="445.0" font-size="15" fill="#66765D">目标学期与搜索词</text>
 <path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="617.0" font-size="15" fill="#66765D">上课班卡片数据</text>
 <path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
@@ -31,8 +31,8 @@
 </text>
 <rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">前端｜提交学期、搜索词和筛选</tspan>
-<tspan x="290.0" y="371.5">请求公开的上课班卡片</tspan>
+<tspan x="290.0" y="348.5">前端｜提交目标学期和搜索词</tspan>
+<tspan x="290.0" y="371.5">请求已发布的上课班卡片</tspan>
 </text>
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
@@ -51,23 +51,23 @@
 </text>
 <polygon points="290.0,1005 510,1067.0 290.0,1129 70,1067.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="1061.5">后端｜该用户本学期允许</tspan>
-<tspan x="290.0" y="1084.5">使用当前来源？</tspan>
+<tspan x="290.0" y="1061.5">后端｜本次新增课程时间</tspan>
+<tspan x="290.0" y="1084.5">与已有安排均不重复？</tspan>
 </text>
 <rect x="645" y="1027.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="1061.5">已有其他来源时拒绝</tspan>
-<tspan x="837.5" y="1084.5">提示先删除原课表</tspan>
+<tspan x="837.5" y="1061.5">提示课程时间重复及具体时段</tspan>
+<tspan x="837.5" y="1084.5">整批不保存，不能确认绕过</tspan>
 </text>
 <rect x="70" y="1177" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">后端｜检查同班重复、学期</tspan>
-<tspan x="290.0" y="1231.5">并按实际日期检查时间冲突</tspan>
+<tspan x="290.0" y="1208.5">后端｜按个人最终安排检查全部占用</tspan>
+<tspan x="290.0" y="1231.5">重复时间返回错误，不能绕过</tspan>
 </text>
 <rect x="70" y="1349" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">前端｜显示重复、冲突和待安排</tspan>
-<tspan x="290.0" y="1403.5">用户修改或确认保留</tspan>
+<tspan x="290.0" y="1380.5">前端｜展示重复课程及具体时段</tspan>
+<tspan x="290.0" y="1403.5">无冲突才允许添加</tspan>
 </text>
 <path d="M70 1534 A220.0 13 0 0 1 510 1534 L510 1582 A220.0 13 0 0 1 70 1582 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 1534 A220.0 13 0 0 0 510 1534" stroke="#8A9CA6" fill="none"/>

@@ -57,8 +57,8 @@
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">系统｜默认显示今天课程</tspan>
-<tspan x="290.0" y="1059.5">只读查看并标记进行中状态</tspan>
+<tspan x="290.0" y="1036.5">系统｜默认月视图显示本月课程</tspan>
+<tspan x="290.0" y="1059.5">支持日、周、月、学期切换</tspan>
 </text>
 <rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

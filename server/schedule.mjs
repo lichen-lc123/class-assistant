@@ -1,3 +1,4 @@
+import { expandSchedule } from './schedule-expansion.mjs';
 import { normalizeAcademicCalendar } from './academic-calendar.mjs';
 export function problem(message, status = 400) { const error = new Error(message); error.status = status; throw error; }
 export const trim = (value, max = 200) => typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -47,12 +48,13 @@ export function normalizeCourse(raw, term) {
   const course_name = trim(raw.course_name, 120);
   if (!course_name) problem('课程名称不能为空。');
   if (raw.academic_year && normalYear(raw.academic_year) !== term.academicYear) problem(`${course_name} 不属于所选学年。`);
-  if (raw.semester && !matchesSemester(raw.semester, term)) problem(`${course_name} 的学期与当前所选学期不一致，请分别导入或配置学季别名。`);
+  if (raw.semester && !matchesSemester(raw.semester, term)) problem(`${course_name} 的学期与当前所选学期不一致，请核对网站目标学期名称。`);
   for(const [field,max] of [['weekly_rules',30],['special_dates',100],['explicit_sessions',200]]) {
     if(raw[field]!=null&&!Array.isArray(raw[field]))problem(`${course_name} 的 ${field} 必须是数组，请修正导入结果。`);
     if(raw[field]?.length>max)problem(`${course_name} 的 ${field} 条数超过上限 ${max}，请拆分核对，不会自动截断。`);
   }
-  const warnings = list(raw.warnings).filter(x=>typeof x==='string').slice(0,30).map(x=>x.slice(0,250));
+  const source_warnings=list(Array.isArray(raw.source_warnings)?raw.source_warnings:raw.warnings).filter(x=>typeof x==='string').slice(0,30).map(x=>x.slice(0,250));
+  const warnings=[...source_warnings];
   const weekly_rules = list(raw.weekly_rules).slice(0,30).map(rule=>{
     if(!rule||typeof rule!=='object'||Array.isArray(rule))problem('周次安排条目格式不正确。');
     const weeks = [...new Set(list(rule.weeks).map(w=>integer(w,60)).filter(Boolean))].sort((a,b)=>a-b);
@@ -60,7 +62,7 @@ export function normalizeCourse(raw, term) {
     const weekday = rule.weekday == null ? null : integer(rule.weekday,7);
     if (rule.weekday != null && !weekday) problem(`${course_name} 的星期需为 1—7。`);
     for (const field of ['start_time','end_time']) if (rule[field] && !validTime(rule[field])) problem(`${course_name} 的时间需为 HH:mm。`);
-    return { season: trim(rule.season,60)||null, calendar_name: trim(rule.calendar_name,80)||null,
+    return { calendar_name: trim(rule.calendar_name,80)||null,
       weeks, weekday, week_parity_raw:trim(rule.week_parity_raw,100)||null,
       period_start: integer(rule.period_start,30), period_end: integer(rule.period_end,30),
       start_time: rule.start_time || null, end_time: rule.end_time || null,
@@ -70,8 +72,9 @@ export function normalizeCourse(raw, term) {
     if(!s||typeof s!=='object'||Array.isArray(s))problem('备注日期条目格式不正确。');
     if (s.date && !validDate(s.date)) problem(`${course_name} 的日期无效。`);
     for (const field of ['start_time','end_time']) if (s[field] && !validTime(s[field])) problem(`${course_name} 的时间需为 HH:mm。`);
+    if(s.weekday!=null&&!integer(s.weekday,7))problem(`${course_name} 的备注星期需为1—7。`);
     const kind=['lecture','supplement','reschedule','practice','unknown'].includes(s.kind)?s.kind:'unknown';
-    return { date:s.date||null, lesson_number:integer(s.lesson_number,200), kind,
+    return { date:s.date||null, weekday:integer(s.weekday,7), lesson_number:integer(s.lesson_number,200), kind,
       original_date:s.original_date&&validDate(s.original_date)?s.original_date:null,
       start_time:s.start_time||null,end_time:s.end_time||null,
       period_start:integer(s.period_start,30),period_end:integer(s.period_end,30),
@@ -80,77 +83,33 @@ export function normalizeCourse(raw, term) {
   const explicit_sessions = list(raw.explicit_sessions).slice(0,200).map(s=>{
     if(!s||typeof s!=='object'||Array.isArray(s))problem('具体上课安排条目格式不正确。');
     if (!validDate(s.date) || !validTime(s.start_time) || !validTime(s.end_time) || s.start_time===s.end_time) problem(`${course_name} 的具体上课日期与起止时间不完整或无效。`);
-    return {date:s.date,start_time:s.start_time,end_time:s.end_time,room:trim(s.room,120)||null,kind:s.kind==='practice'?'practice':'lecture'};
+    return {date:s.date,start_time:s.start_time,end_time:s.end_time,room:trim(s.room,120)||null,kind:s.kind==='practice'?'practice':'lecture',lesson_number:integer(s.lesson_number,200)};
   });
+  const extra_fields=raw.extra_fields&&typeof raw.extra_fields==='object'&&!Array.isArray(raw.extra_fields)?{...raw.extra_fields}:{};
+  const originalLabels=[...list(raw.seasons),...list(raw.weekly_rules).map(rule=>rule?.season)].filter(v=>typeof v==='string'&&v.trim()).map(v=>trim(v,120));
+  if(originalLabels.length)extra_fields['原表标注']=[...new Set([...(Array.isArray(extra_fields['原表标注'])?extra_fields['原表标注']:[]),...originalLabels])];
+  if(Object.hasOwn(extra_fields,'周次日期冲突处理')){
+    const rows=extra_fields['周次日期冲突处理'];
+    if(!Array.isArray(rows)||rows.length>100)problem('周次日期冲突处理必须为不超过100项的数组。');
+    extra_fields['周次日期冲突处理']=rows.map(row=>{
+      if(!row||typeof row!=='object'||Array.isArray(row)||row.action!=='use_weekly_rule'||!validDate(row.date))problem('冲突处理需包含有效日期及action=use_weekly_rule。');
+      for(const [field,max] of [['lesson_number',200],['special_date_index',100],['weekly_rule_index',30],['week',60]])if(row[field]!=null&&!integer(row[field],max))problem('冲突处理中的课次或规则编号无效。');
+      return{date:row.date,lesson_number:integer(row.lesson_number,200),special_date_index:integer(row.special_date_index,100),weekly_rule_index:integer(row.weekly_rule_index,30),week:integer(row.week,60),action:'use_weekly_rule',reason:trim(row.reason,2000)};
+    });
+  }
   if (!raw.teaching_class_code) warnings.push('缺少上课班编号，暂不能自动关联班级作业。');
   return { course_name,course_code:trim(raw.course_code,60)||null,teaching_class_code:trim(raw.teaching_class_code,80)||null,
-    academic_year:term.academicYear,semester:term.name,seasons:list(raw.seasons).map(s=>trim(s,60)).slice(0,10),
+    academic_year:term.academicYear,semester:term.name,
     teacher:trim(raw.teacher,120)||null,room:trim(raw.room,120)||null,
     required_or_elective:trim(raw.required_or_elective,20)||null,college:trim(raw.college,80)||null,
     course_category:trim(raw.course_category,80)||null,credits:raw.credits==null?null:Number.isFinite(Number(raw.credits))?Number(raw.credits):null,
     enrollment_status:trim(raw.enrollment_status,60)||null,exam_time_raw:trim(raw.exam_time_raw,1000)||null,
     weekly_rules,special_dates,explicit_sessions,schedule_raw:trim(raw.schedule_raw,8000),remarks_raw:trim(raw.remarks_raw,8000),
-    extra_fields:raw.extra_fields&&typeof raw.extra_fields==='object'&&!Array.isArray(raw.extra_fields)?raw.extra_fields:{},
+    extra_fields,
     source_rows:list(raw.source_rows).slice(0,30).map(s=>({source:trim(s.source,120),row:integer(s.row,10000),raw:trim(s.raw,8000)})),
-    warnings:[...new Set(warnings)] };
+    source_warnings,warnings:[...new Set(warnings)] };
 }
-export function expandCourse(course, term) {
-  const warnings = [...course.warnings];
-  if(!term.startsOn||!term.endsOn)warnings.push('学期起止日期尚未配置，无法核验安排是否跨学期，请管理员补充。');
-  let sessions=[];
-  const makeSession=(date,start,end,room,kind='lecture',lesson=null)=>{
-    if(!date||!start||!end) return null;
-    if(start===end) { warnings.push('课程起止时刻相同，请确认。'); return null; }
-    if(term.startsOn && (date<term.startsOn||date>term.endsOn)){warnings.push(`${date} 不在所选学期内，未排入课表。`);return null;}
-    const endDate=end<start?addDays(date,1):date;
-    return {date,start_time:start,end_time:end,start:`${date}T${start}:00+08:00`,end:`${endDate}T${end}:00+08:00`,room:kind==='practice'?null:room||course.room||null,kind,lesson_number:lesson};
-  };
-  const times=rule=>{
-    const start=rule.start_time||term.config.periods?.find(p=>p.number===rule.period_start)?.start;
-    const end=rule.end_time||term.config.periods?.find(p=>p.number===rule.period_end)?.end;
-    return [start,end];
-  };
-  for(const rule of course.weekly_rules){
-    let calendar;
-    if(rule.calendar_name) calendar=term.config.calendars?.find(c=>c.name===rule.calendar_name);
-    else if(term.config.calendars?.length===1) calendar=term.config.calendars[0];
-    const [start,end]=times(rule);
-    if(!rule.weeks.length||!rule.weekday||!calendar||!start||!end){warnings.push(`周次安排尚缺${!rule.weeks.length?'具体周次、':''}${!rule.weekday?'星期、':''}${!calendar?'对应教学周起点、':''}${!start||!end?'节次作息或具体时间':''}，已保留为待确认。`);continue;}
-    const originDay=new Date(calendar.start_date+'T00:00:00Z').getUTCDay()||7;
-    for(const week of rule.weeks){
-      const date=addDays(calendar.start_date,(week-1)*7+rule.weekday-originDay);
-      if(calendar.end_date&&date>calendar.end_date){warnings.push(`${date} 超出 ${calendar.name} 的教学周范围，未按该规则排课。`);continue;}
-      const s=makeSession(date,start,end,rule.room);if(s)sessions.push(s);
-    }
-  }
-  sessions.sort((a,b)=>a.start.localeCompare(b.start));
-  for(const [index,s] of sessions.entries()) s.lesson_number=index+1;
-  for(const special of course.special_dates){
-    if(!special.date){warnings.push('备注中存在年份或日期待确认的安排。');continue;}
-    if(special.kind==='unknown'){warnings.push(`${special.date} 的备注安排类型待确认，未自动覆盖周次安排。`);continue;}
-    const target=sessions.find(s=>s.date===special.date)||sessions.find(s=>s.lesson_number===special.lesson_number);
-    if(special.kind==='supplement'&&special.lesson_number&&target&&target.date!==special.date)warnings.push(`第 ${special.lesson_number} 次课已有 ${target.date} 的安排，备注又给出 ${special.date}，请确认补课还是调课。`);
-    const weeklyTimes=course.weekly_rules.map(times).filter(t=>t[0]&&t[1]);
-    const uniqueTimes=[...new Set(weeklyTimes.map(t=>t.join('|')))];
-    const fallback=target|| (uniqueTimes.length===1?{start_time:uniqueTimes[0].split('|')[0],end_time:uniqueTimes[0].split('|')[1]}:{});
-    const own=times(special);
-    const start=own[0]||fallback.start_time,end=own[1]||fallback.end_time;
-    if(!start||!end){warnings.push(`${special.date} 的备注安排缺少起止时间，已保留待确认。`);continue;}
-    if(special.kind==='reschedule'&&!special.original_date&&!special.lesson_number){warnings.push(`${special.date} 调课缺少原日期或课次，未自动替换。`);continue;}
-    const sameDate=sessions.filter(s=>s.date===special.date);
-    if(special.kind==='practice') sessions=sessions.filter(s=>s.date!==special.date);
-    if(special.kind==='reschedule') sessions=sessions.filter(s=>special.original_date?s.date!==special.original_date:s.lesson_number!==special.lesson_number);
-    if(special.kind!=='reschedule'&&special.kind!=='practice'&&sameDate.length){
-      if(sameDate.some(s=>s.start_time!==start||s.end_time!==end)){warnings.push(`${special.date} 的周次与备注时间有冲突，请确认。`);}
-      else continue;
-    }
-    const s=makeSession(special.date,start,end,special.room||target?.room,special.kind,special.lesson_number);if(s)sessions.push(s);
-  }
-  for(const explicit of course.explicit_sessions){const s=makeSession(explicit.date,explicit.start_time,explicit.end_time,explicit.room,explicit.kind);if(s)sessions.push(s);}
-  const seen=new Set();sessions=sessions.filter(s=>{const key=s.start+s.end+(s.room||'')+s.kind;if(seen.has(key))return false;seen.add(key);return true;}).sort((a,b)=>a.start.localeCompare(b.start));
-  if(!sessions.length) warnings.push('尚无可确定的上课时间，课程保留在待安排中。');
-  return {sessions,warnings:[...new Set(warnings)],schedule_status:!sessions.length?'pending':warnings.length?'needs_review':'ready'};
-}
+export function expandCourse(course, term) { return expandSchedule(course,term,{addDays}); }
 export function findConflicts(courses) {
   const all=courses.flatMap(c=>c.sessions.map(s=>({...s,entryId:c.id,courseName:c.course_name})) ).sort((a,b)=>a.start.localeCompare(b.start));
   const found=[];

@@ -10,15 +10,12 @@
 <path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M510 723.0 L641 723.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="569.5" y="711.0" font-size="15" fill="#66765D">否</text>
-<path d="M290.0 785 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="814.0" font-size="15" fill="#66765D">是</text>
-<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M510 1067.0 L641 1067.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="569.5" y="1055.0" font-size="15" fill="#66765D">否</text>
-<path d="M290.0 1129 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1158.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 895.0 L641 895.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="883.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 957 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="986.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
@@ -28,47 +25,48 @@
 </text>
 <rect x="70" y="317" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">管理员｜统一设置学年、学期</tspan>
-<tspan x="290.0" y="371.5">起止日期与教学作息</tspan>
+<tspan x="290.0" y="348.5">管理员｜维护学期与公共课程</tspan>
+<tspan x="290.0" y="371.5">学生只使用已配置学期</tspan>
 </text>
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">学生｜进入课表管理直接导入</tspan>
-<tspan x="290.0" y="543.5">系统读取当前学期与现有来源</tspan>
+<tspan x="290.0" y="520.5">学生｜选择AI、Excel、模板或卡片</tspan>
+<tspan x="290.0" y="543.5">已有课表也可继续新增</tspan>
 </text>
-<polygon points="290.0,661 510,723.0 290.0,785 70,723.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="729.0">学生｜要更换建立来源？</tspan>
-</text>
-<rect x="645" y="683.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="729.0">继续查看或校对当前课表</tspan>
-</text>
-<rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="661" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="876.0">学生｜请求删除该学期个人课表</tspan>
+<tspan x="290.0" y="692.5">网站｜生成本次课程预览</tspan>
+<tspan x="290.0" y="715.5">按个人最终安排检查占用</tspan>
 </text>
-<polygon points="290.0,1005 510,1067.0 290.0,1129 70,1067.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<polygon points="290.0,833 510,895.0 290.0,957 70,895.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="1073.0">学生｜确认删除原课表？</tspan>
+<tspan x="290.0" y="889.5">网站｜新增课程时段</tspan>
+<tspan x="290.0" y="912.5">均未重复？</tspan>
 </text>
-<rect x="645" y="1027.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<rect x="645" y="855.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="1073.0">取消，保留原课表与来源</tspan>
+<tspan x="837.5" y="889.5">提示重复课程、日期和具体时段</tspan>
+<tspan x="837.5" y="912.5">本次整批不保存</tspan>
+</text>
+<rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1036.5">学生｜查看课程并点击添加</tspan>
+<tspan x="290.0" y="1059.5">模板不显示额外核对清单</tspan>
 </text>
 <rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">系统｜清除该学期个人课表</tspan>
-<tspan x="290.0" y="1231.5">保留公共数据与其他学期</tspan>
+<tspan x="290.0" y="1208.5">网站｜追加本次课程及来源关系</tspan>
+<tspan x="290.0" y="1231.5">原有课程和个人调整保留</tspan>
 </text>
 <rect x="70" y="1349" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">学生｜重新四选一</tspan>
-<tspan x="290.0" y="1403.5">外部 AI / Excel / 模板 / 卡片</tspan>
+<tspan x="290.0" y="1380.5">管理员｜以后更新模板或卡片</tspan>
+<tspan x="290.0" y="1403.5">同步其来源课程，额外追加保留</tspan>
 </text>
 <rect x="70" y="1521" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1564.0">学生｜预览、确认后生成学期课表</tspan>
+<tspan x="290.0" y="1552.5">学生｜可继续任意方式添加</tspan>
+<tspan x="290.0" y="1575.5">也可移除课程或清空本学期</tspan>
 </text>
 <rect x="70" y="1693" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

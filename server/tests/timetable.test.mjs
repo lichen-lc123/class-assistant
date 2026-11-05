@@ -20,7 +20,7 @@ test('周次、节次、跨年补课能准确展开；待确认信息不会编�
 test('实践替换当日教室课程；未知备注不会静默覆盖',()=>{
   const c=normalizeCourse({...raw('理论实践'),weekly_rules:[{calendar_name:'工院秋冬',weeks:[9],weekday:7,period_start:2,period_end:5,room:'旧教室'}],special_dates:[{date:'2026-11-15',kind:'practice'}]},term);
   const r=expandCourse(c,term);assert.equal(r.sessions.length,1);assert.equal(r.sessions[0].room,null);assert.equal(r.sessions[0].kind,'practice');
-  const unknown=expandCourse(normalizeCourse({...raw(),special_dates:[{date:'2026-11-15',kind:'unknown'}]},term),term);assert.equal(unknown.sessions.length,6);assert.ok(unknown.warnings.some(w=>w.includes('类型待确认')));
+  const unknown=expandCourse(normalizeCourse({...raw(),special_dates:[{date:'2026-11-15',kind:'unknown'}]},term),term);assert.equal(unknown.sessions.length,7);assert.ok(unknown.sessions.some(s=>s.date==='2026-11-15'&&s.kind==='unknown'));assert.ok(unknown.warnings.some(w=>w.includes('类型待确认')));
 });
 test('北京时间跨日与学期配置校验',()=>{
   assert.equal(todayShanghai(new Date('2026-11-01T16:01:00Z')),'2026-11-02');
@@ -30,12 +30,57 @@ test('北京时间跨日与学期配置校验',()=>{
 
 // Small stored ZIP test fixture; no external Excel/ZIP dependency or file writes.
 function zip(files){const parts=[],central=[];let offset=0;for(const [name,content]of Object.entries(files)){const n=Buffer.from(name),data=Buffer.from(content),head=Buffer.alloc(30);head.writeUInt32LE(0x04034b50);head.writeUInt16LE(20,4);head.writeUInt32LE(data.length,18);head.writeUInt32LE(data.length,22);head.writeUInt16LE(n.length,26);parts.push(head,n,data);const dir=Buffer.alloc(46);dir.writeUInt32LE(0x02014b50);dir.writeUInt16LE(20,4);dir.writeUInt16LE(20,6);dir.writeUInt32LE(data.length,20);dir.writeUInt32LE(data.length,24);dir.writeUInt16LE(n.length,28);dir.writeUInt32LE(offset,42);central.push(dir,n);offset+=30+n.length+data.length;}const directory=Buffer.concat(central),end=Buffer.alloc(22);end.writeUInt32LE(0x06054b50);end.writeUInt16LE(Object.keys(files).length,8);end.writeUInt16LE(Object.keys(files).length,10);end.writeUInt32LE(directory.length,12);end.writeUInt32LE(offset,16);return Buffer.concat([...parts,directory,end]);}
-test('XLSX 解析保留缺失周次，拒绝损坏和跨学期文件',()=>{
+test('XLSX 解析保留缺失周次及原表标签，拒绝损坏文件',()=>{
   const xml='<worksheet><sheetData><row r="1"><c r="A1" t="inlineStr"><is><t>课程名称</t></is></c><c r="B1" t="inlineStr"><is><t>上课时间</t></is></c><c r="C1" t="inlineStr"><is><t>学期</t></is></c></row><row r="2"><c r="A2" t="inlineStr"><is><t>工程经济学</t></is></c><c r="B2" t="inlineStr"><is><t>星期六 第6-9节</t></is></c><c r="C2" t="inlineStr"><is><t>秋学期</t></is></c></row></sheetData></worksheet>';
   const b=zip({'xl/workbook.xml':'<workbook><sheets><sheet name="课表" r:id="rId1"/></sheets></workbook>','xl/_rels/workbook.xml.rels':'<Relationships><Relationship Id="rId1" Target="worksheets/sheet1.xml"/></Relationships>','xl/worksheets/sheet1.xml':xml});
   const r=coursesFromFiles([{name:'课程.xlsx',content:b.toString('base64')}],term);assert.equal(r.courses.length,1);assert.deepEqual(r.courses[0].weekly_rules[0].weeks,[]);assert.equal(r.courses[0].weekly_rules[0].period_start,6);
   assert.throws(()=>coursesFromFiles([{name:'坏文件.xls',content:Buffer.from('bad').toString('base64')}],term),/真正/);
-  assert.throws(()=>coursesFromFiles([{name:'课表.xlsx',content:b.toString('base64')}],{...term,name:'冬学期',config:{...config,aliases:[]}}),/分别导入/);
+  const merged=coursesFromFiles([{name:'课表.xlsx',content:b.toString('base64')}],{...term,name:'第一学期',config:{...config,aliases:[]}});assert.equal(merged.courses[0].semester,'第一学期');assert.deepEqual(merged.courses[0].extra_fields['原表标注'],['秋学期']);
+});
+
+function combinedWorkbook(label,rows,year='2026-2027'){
+  const headers=['课程名称','学期','学年','任课老师','上课时间地点','备注'];
+  const escape=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const data=[headers,...rows.map(row=>[row[0],label,year,'同一老师',row[1],row[2]||''])];
+  const xml='<worksheet><sheetData>'+data.map((row,i)=>`<row r="${i+1}">${row.map((v,j)=>`<c r="${String.fromCharCode(65+j)}${i+1}" t="inlineStr"><is><t>${escape(v)}</t></is></c>`).join('')}</row>`).join('')+'</sheetData></worksheet>';
+  return {name:label+'.xlsx',content:zip({'xl/workbook.xml':'<workbook><sheets><sheet name="课表" r:id="r1"/></sheets></workbook>','xl/_rels/workbook.xml.rels':'<Relationships><Relationship Id="r1" Target="worksheets/sheet1.xml"/></Relationships>','xl/worksheets/sheet1.xml':xml}).toString('base64')};
+}
+const combinedTerm={academicYear:'2026-2027',name:'第一学期',startsOn:'2026-09-14',endsOn:'2027-01-15',config:{aliases:[],calendars:[{name:'原文周历甲',start_date:'2026-11-09',end_date:'2027-01-01'}],periods:[{number:6,start:'13:25',end:'14:10'},{number:9,start:'16:15',end:'17:00'}]}};
+const combinedFiles=()=>[
+  combinedWorkbook('秋学季',[['共同课程','班级编号SHARED\n原文周历甲(第5,7周)//星期五//6-9节//教室甲','第7、8次课在1月16日、1月23日'],['另一门课程','班级编号OTHER\n时间地点待通知']]),
+  combinedWorkbook('冬学季',[['共同课程','班级编号SHARED\n原文周历甲(第5,7周)//星期五//6-9节//教室甲','第7、8次课在1月16日、1月23日'],['第二份的课程','班级编号SECOND\n时间地点待通知']])
+];
+test('两份Excel的原表标签不分类，跨范围日期按正确年份保留',()=>{
+  const parsed=coursesFromFiles(combinedFiles(),combinedTerm);
+  assert.equal(parsed.courses.length,4);assert.ok(parsed.courses.every(c=>c.semester==='第一学期'));
+  assert.deepEqual(parsed.courses[0].special_dates.map(s=>[s.date,s.lesson_number]),[['2027-01-16',7],['2027-01-23',8]]);
+  assert.deepEqual(parsed.courses[2].extra_fields['原表标注'],['冬学季']);assert.ok(!Object.hasOwn(parsed.courses[0],'seasons'));
+  const dates=coursesFromFiles([combinedWorkbook('原表标签',[['日期课程','班级编号DATES','2027年1月30日；2027-02-06；6-9节，4-5人；上课时间为12.11、12.25、1.8、1.15']])],combinedTerm).courses[0].special_dates;
+  assert.deepEqual(dates.map(s=>s.date),['2027-01-30','2027-02-06','2026-12-11','2026-12-25','2027-01-08','2027-01-15']);
+  const ambiguous=coursesFromFiles([combinedWorkbook('未知年份',[['日期课程','班级编号DATES','1.16']])],{...combinedTerm,startsOn:null,endsOn:null}).courses[0];assert.equal(ambiguous.special_dates[0].date,null);
+});
+test('Excel学年校验覆盖第二个文件、行内学年和原始课程时间',()=>{
+  assert.throws(()=>coursesFromFiles([combinedFiles()[0],combinedWorkbook('第二个文件',[['错误课程','班级编号BAD']],'2025-2026')],combinedTerm),/不属于所选学年/);
+  assert.throws(()=>coursesFromFiles([combinedWorkbook('来源',[['错误课程','2025-2026学年秋学季\n班级编号BAD']])],combinedTerm),/不属于所选学年/);
+});
+test('学生课表和管理员模板均可合并两份Excel，重复班级只保存一次',async t=>{
+  const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'merge-admin','学委','MergeAdminFixture123');
+  db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run('merge-student','同学',await hashPassword('MergeStudentFixture123'));
+  await new Promise(done=>server.listen(0,'127.0.0.1',done));t.after(()=>new Promise(done=>server.close(done)));
+  const base=`http://127.0.0.1:${server.address().port}`;
+  async function call(path,body,cookie){const response=await fetch(base+'/api'+path,{method:'POST',headers:{Origin:base,'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},body:JSON.stringify(body)});return{status:response.status,data:await response.json(),cookie:response.headers.get('set-cookie')?.split(';')[0]};}
+  const admin=(await call('/auth/login',{studentId:'merge-admin',password:'MergeAdminFixture123'})).cookie,student=(await call('/auth/login',{studentId:'merge-student',password:'MergeStudentFixture123'})).cookie;
+  const termId=(await call('/admin/timetable/terms',combinedTerm,admin)).data.id;
+  const input={termId,source:'excel',files:combinedFiles()};
+  const preview=await call('/timetable/preview',input,student);assert.equal(preview.status,200);assert.equal(preview.data.courses.length,3);
+  const shared=preview.data.courses.find(c=>c.teaching_class_code==='SHARED');assert.equal(shared.source_rows.length,2);assert.ok(shared.source_rows.some(s=>s.source.includes('冬学季.xlsx')));
+  assert.deepEqual(shared.sessions.map(s=>s.date),['2026-12-11','2026-12-25','2027-01-16','2027-01-23']);assert.equal(preview.data.courses.find(c=>c.teaching_class_code==='SECOND').schedule_status,'pending');
+  assert.equal(db.prepare('SELECT COUNT(*) n FROM timetables').get().n,0);
+  const saved=await call('/timetable/'+termId,{source:'excel',courses:preview.data.courses,acceptWarnings:true},student);assert.equal(saved.status,200);assert.equal(saved.data.courses.length,3);assert.equal(saved.data.courses.find(c=>c.teaching_class_code==='SHARED').sessions.length,4);
+  const template=await call('/admin/timetable/template-preview',input,admin);assert.equal(template.status,200);assert.equal(template.data.courses.length,3);
+  const published=await call('/admin/timetable/template-import',{termId,source:'excel',name:'双表合并模板',courses:template.data.courses,catalogVersion:template.data.catalogVersion,acceptWarnings:true},admin);assert.equal(published.status,201);assert.equal(published.data.cardsCreated,3);
+  const count=db.prepare('SELECT COUNT(*) n FROM public_courses').get().n;
+  const invalid=await call('/admin/timetable/template-preview',{...input,files:[input.files[0],combinedWorkbook('错学年',[['错误','班级编号BAD']],'2025-2026')]},admin);assert.equal(invalid.status,400);assert.equal(db.prepare('SELECT COUNT(*) n FROM public_courses').get().n,count);
 });
 
 test('课表完整接口与权限流程',async t=>{
@@ -95,15 +140,18 @@ test('课表完整接口与权限流程',async t=>{
     assert.equal((await call('/admin/timetable/courses','POST',{termId,courses:[raw()],generateCards:false,acceptWarnings:true},admin)).data.created,0);
     assert.equal((await call(`/timetable/cards?termId=${termId}`,'GET',undefined,student)).data.length,1);
   });
-  await t.test('模板能使用没有卡片的课程，且成员变动不自动改个人选择',async()=>{
+  await t.test('模板能使用没有卡片的课程，且成员变动同步到个人课表',async()=>{
     const tpl=await call('/admin/timetable/templates','POST',{termId,name:'模板一',courseIds:[courseA,courseB]},admin);assert.equal(tpl.status,201);templateId=tpl.data.id;
-    const p=await call('/timetable/selection-preview','POST',{termId,source:'template',templateId},student);assert.equal(p.status,200);assert.equal(p.data.courses.length,2);assert.ok(p.data.conflicts.length);
+    const p=await call('/timetable/selection-preview','POST',{termId,source:'template',templateId},student);assert.equal(p.status,200);assert.equal(p.data.courses.length,2);assert.ok(p.data.conflicts.length);assert.equal(p.data.importBlocked,true);
+    assert.equal((await call(`/timetable/${termId}`,'POST',{source:'template',templateId,acceptWarnings:true},student)).status,409);
+    const oldB=(await call(`/admin/timetable/courses?termId=${termId}`,'GET',undefined,admin)).data.find(c=>c.id===courseB);
+    assert.equal((await call(`/admin/timetable/courses/${courseB}`,'PUT',{course:{...oldB,weekly_rules:[],special_dates:[],explicit_sessions:[{date:'2026-11-20',start_time:'18:00',end_time:'20:00',room:'另一教室'}]},revision:oldB.revision,cardEnabled:false,acceptWarnings:true},admin)).status,200);
     const s=await call(`/timetable/${termId}`,'POST',{source:'template',templateId,revision:0,acceptWarnings:true},student);assert.equal(s.status,200);assert.equal(s.data.courses.length,2);own=s.data;
     const revision=(await call(`/admin/timetable/templates?termId=${termId}`,'GET',undefined,admin)).data[0].revision;
-    assert.equal((await call(`/admin/timetable/templates/${templateId}`,'PUT',{name:'模板一新版',courseIds:[courseB],revision},admin)).status,200);
-    assert.equal((await call(`/timetable/${termId}`,'GET',undefined,student)).data.courses.length,2);
+    assert.equal((await call(`/admin/timetable/templates/${templateId}`,'PUT',{name:'模板一新版',courseIds:[courseA],revision},admin)).status,200);
+    own=(await call(`/timetable/${termId}`,'GET',undefined,student)).data;assert.equal(own.courses.length,1);assert.equal(own.courses[0].publicCourseId,courseA);
   });
-  await t.test('来源四选一；非卡片课程不能经卡片入口加入',async()=>{
+  await t.test('新增导入拒绝重复时段；非卡片课程不能经卡片入口加入',async()=>{
     assert.equal((await call(`/timetable/${termId}`,'POST',{source:'ai',courses:[raw()],revision:own.timetable.revision,acceptWarnings:true},student)).status,409);
     assert.equal((await call(`/timetable/${termId}`,'POST',{source:'cards',courseIds:[courseB],acceptWarnings:true},other)).status,400);
     const empty=(await call(`/timetable/${termId}`,'GET',undefined,other)).data;assert.equal(empty.timetable,null);
@@ -148,12 +196,12 @@ test('课表完整接口与权限流程',async t=>{
     assert.equal((await call(`/timetable/${termId}`,'GET',undefined,student)).data.timetable,null);
     const imported=await call(`/timetable/${termId}`,'POST',{source:'ai',courses:[raw('私人导入','personal-001')],generateCards:true,acceptWarnings:true},student);assert.equal(imported.status,200);
     assert.equal((await call(`/timetable/cards?termId=${termId}`,'GET',undefined,student)).data.length,1);
-    const duplicate=await call(`/timetable/${termId}`,'POST',{source:'ai',courses:[raw('私人导入','personal-001')],revision:imported.data.timetable.revision,acceptWarnings:true},student);assert.equal(duplicate.status,200);assert.equal(duplicate.data.added,0);assert.equal(duplicate.data.skipped,1);
+    const duplicate=await call(`/timetable/${termId}`,'POST',{source:'ai',courses:[raw('私人导入','personal-001')],revision:imported.data.timetable.revision,acceptWarnings:true},student);assert.equal(duplicate.status,409);assert.match(duplicate.data.message,/课程时间重复/);
   });
   await t.test('卡片去重和选课保存，不触碰公共课程',async()=>{
     const previous=(await call(`/timetable/${termId}`,'GET',undefined,other)).data;
-    const s=await call(`/timetable/${termId}`,'POST',{source:'cards',courseIds:[courseA,courseA],revision:previous.timetable.revision,acceptWarnings:true},other);assert.equal(s.status,200);assert.equal(s.data.courses.length,1);
-    const e=s.data.courses[0];assert.equal((await call(`/timetable/${termId}/entries/${e.id}`,'DELETE',{revision:s.data.timetable.revision},other)).status,200);
+    const s=await call(`/timetable/${termId}`,'POST',{source:'cards',courseIds:[courseA,courseA],revision:previous.timetable.revision,acceptWarnings:true},other);assert.equal(s.status,409);assert.equal(previous.courses.length,1);
+    const e=previous.courses[0];assert.equal((await call(`/timetable/${termId}/entries/${e.id}`,'DELETE',{revision:previous.timetable.revision},other)).status,200);
     assert.equal((await call(`/admin/timetable/courses?termId=${termId}`,'GET',undefined,admin)).data.length,2);
     assert.equal((await call(`/timetable/${termId}`,'GET',undefined,other)).data.timetable.source,'cards');
   });

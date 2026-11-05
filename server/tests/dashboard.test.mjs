@@ -34,7 +34,7 @@ test('工作台仅读取本人课程，支持跨学期，普通用户和管理�
   const today=todayShanghai(),year=Number(today.slice(0,4)),academicYear=year+'-'+(year+1);
   const a=await call('/admin/timetable/terms','POST',{academicYear,name:'当前学期',startsOn:addDays(today,-10),endsOn:addDays(today,30)},admin);assert.equal(a.status,201);
   const b=await call('/admin/timetable/terms','POST',{academicYear,name:'后续学期',startsOn:addDays(today,31),endsOn:addDays(today,120)},admin);assert.equal(b.status,201);
-  const courses=[{course_name:'我的课程',explicit_sessions:[0,2,3,4,6].map(n=>session(addDays(today,n)))},{course_name:'上午课程',explicit_sessions:[session(addDays(today,2),'08:00')]},{course_name:'待通知课程'}];
+  const courses=[{course_name:'我的课程',explicit_sessions:[0,2,3,4,6].map(n=>session(addDays(today,n)))},{course_name:'上午课程',explicit_sessions:[{...session(addDays(today,2),'08:00'),end_time:'10:00'}]},{course_name:'待通知课程'}];
   const personal=await call(`/timetable/${a.data.id}`,'POST',{source:'ai',courses,acceptWarnings:true,revision:0},one);assert.equal(personal.status,200);
   assert.equal((await call(`/timetable/${b.data.id}`,'POST',{source:'ai',courses:[{course_name:'下学期课程',explicit_sessions:[session(addDays(today,35))]}],acceptWarnings:true,revision:0},one)).status,200);
   assert.equal((await call(`/timetable/${a.data.id}`,'POST',{source:'ai',courses:[{course_name:'别人的课程',explicit_sessions:[session(addDays(today,1))]}],acceptWarnings:true,revision:0},two)).status,200);

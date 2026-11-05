@@ -21,38 +21,38 @@
 </text>
 <rect x="70" y="317" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">学委｜进入课表模板选择学期</tspan>
-<tspan x="290.0" y="371.5">命名并导入一位同学的课表</tspan>
+<tspan x="290.0" y="348.5">管理员｜进入课表模板下方</tspan>
+<tspan x="290.0" y="371.5">展开卡片模板</tspan>
 </text>
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">网站｜按学期及上课班去重</tspan>
-<tspan x="290.0" y="543.5">缺少班号时仅保守匹配完整安排</tspan>
+<tspan x="290.0" y="520.5">管理员｜导入课表自动生成</tspan>
+<tspan x="290.0" y="543.5">或点击手动添加卡片</tspan>
 </text>
 <rect x="70" y="661" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">网站｜预览新增与复用课程</tspan>
-<tspan x="290.0" y="715.5">差异安排明确沿用已有卡片</tspan>
+<tspan x="290.0" y="692.5">管理员｜核对课程、时间与教室</tspan>
+<tspan x="290.0" y="715.5">设置是否发布并保存</tspan>
 </text>
 <rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">学委｜核对课程与差异并确认</tspan>
-<tspan x="290.0" y="887.5">不再选择是否生成卡片</tspan>
+<tspan x="290.0" y="864.5">网站｜校验角色和课程身份</tspan>
+<tspan x="290.0" y="887.5">自动导入复用同班，手动重复拒绝</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">网站｜事务保存独立模板</tspan>
-<tspan x="290.0" y="1059.5">自动生成新卡片或复用已有卡片</tspan>
+<tspan x="290.0" y="1036.5">网站｜保存卡片模板</tspan>
+<tspan x="290.0" y="1059.5">手动创建不要求先建整套课表</tspan>
 </text>
 <rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">学委｜继续导入其他同学模板</tspan>
-<tspan x="290.0" y="1231.5">每份保留自己的课程组合</tspan>
+<tspan x="290.0" y="1208.5">学生｜搜索已发布卡片</tspan>
+<tspan x="290.0" y="1231.5">查看具体起止时间并选择</tspan>
 </text>
 <rect x="70" y="1349" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">学生｜整套选择模板或自由组合卡片</tspan>
-<tspan x="290.0" y="1403.5">个人课表按账号保存</tspan>
+<tspan x="290.0" y="1380.5">管理员｜修改卡片模板</tspan>
+<tspan x="290.0" y="1403.5">已选用户和引用模板同步更新</tspan>
 </text>
 <rect x="70" y="1521" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

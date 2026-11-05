@@ -34,12 +34,13 @@
 </text>
 <polygon points="290.0,489 510,551.0 290.0,613 70,551.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="545.5">系统｜没有其他来源的</tspan>
-<tspan x="290.0" y="568.5">本学期课表？</tspan>
+<tspan x="290.0" y="545.5">后端｜本次新增课程时间</tspan>
+<tspan x="290.0" y="568.5">与已有安排均不重复？</tspan>
 </text>
 <rect x="645" y="511.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="557.0">提示先删除原课表再换来源</tspan>
+<tspan x="837.5" y="545.5">提示课程时间重复及具体时段</tspan>
+<tspan x="837.5" y="568.5">整批不保存，不能确认绕过</tspan>
 </text>
 <rect x="70" y="661" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
@@ -57,8 +58,8 @@
 </text>
 <rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">网站｜展示导入预览</tspan>
-<tspan x="290.0" y="1231.5">提示缺失、疑似重复及冲突</tspan>
+<tspan x="290.0" y="1208.5">网站｜展示全部课程及备注日期处理</tspan>
+<tspan x="290.0" y="1231.5">未纳入原文、缺失和冲突均可核对</tspan>
 </text>
 <rect x="70" y="1349" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

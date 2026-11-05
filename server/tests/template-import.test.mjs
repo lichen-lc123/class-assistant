@@ -8,16 +8,26 @@ const course=(name,code,day='2026-11-07',room='教室甲')=>({course_name:name,t
 function zip(files){const parts=[],central=[];let offset=0;for(const [name,content]of Object.entries(files)){const n=Buffer.from(name),data=Buffer.from(content),head=Buffer.alloc(30);head.writeUInt32LE(0x04034b50);head.writeUInt16LE(20,4);head.writeUInt32LE(data.length,18);head.writeUInt32LE(data.length,22);head.writeUInt16LE(n.length,26);parts.push(head,n,data);const dir=Buffer.alloc(46);dir.writeUInt32LE(0x02014b50);dir.writeUInt16LE(20,4);dir.writeUInt16LE(20,6);dir.writeUInt32LE(data.length,20);dir.writeUInt32LE(data.length,24);dir.writeUInt16LE(n.length,28);dir.writeUInt32LE(offset,42);central.push(dir,n);offset+=30+n.length+data.length;}const directory=Buffer.concat(central),end=Buffer.alloc(22);end.writeUInt32LE(0x06054b50);end.writeUInt16LE(Object.keys(files).length,8);end.writeUInt16LE(Object.keys(files).length,10);end.writeUInt32LE(directory.length,12);end.writeUInt32LE(offset,16);return Buffer.concat([...parts,directory,end]);}
 function workbook(){const cell=(ref,value)=>`<c r="${ref}" t="inlineStr"><is><t>${value}</t></is></c>`;return zip({'xl/workbook.xml':'<workbook><sheets><sheet name="课程" r:id="r1"/></sheets></workbook>','xl/_rels/workbook.xml.rels':'<Relationships><Relationship Id="r1" Target="worksheets/sheet1.xml"/></Relationships>','xl/worksheets/sheet1.xml':`<worksheet><sheetData><row r="1">${cell('A1','课程名称')}${cell('B1','课程编号')}<c r="C1"/>${cell('D1','任课老师')}${cell('E1','上课时间地点')}${cell('F1','学期')}</row><row r="2">${cell('A2','Excel课程')}${cell('B2','00123')}<c r="C2"/>${cell('D2','Excel老师')}${cell('E2','班级编号EXCEL-SHARED')}${cell('F2','秋冬学期')}</row></sheetData></worksheet>`}).toString('base64');}
 test('学委导入多份模板时自动生成卡片，重合上课班共用卡片且保留各自组合',async t=>{
-  const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'template-admin','学委','TemplateImportAdmin123');const pw=await hashPassword('TemplateImportStudent123');for(const id of ['template-student','template-peer'])db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run(id,id,pw);
+  const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'template-admin','学委','TemplateImportAdmin123');const pw=await hashPassword('TemplateImportStudent123');for(const id of ['template-student','template-peer','template-import-fixture'])db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run(id,id,pw);
   await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(r)));const base='http://127.0.0.1:'+server.address().port;
   async function call(path,method='GET',body,cookie){const r=await fetch(base+'/api'+path,{method,headers:{...(method==='GET'?{}:{Origin:base,'Content-Type':'application/json'}),...(cookie?{Cookie:cookie}:{})},body:body===undefined?undefined:JSON.stringify(body)});return{status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]};}
   const admin=(await call('/auth/login','POST',{studentId:'template-admin',password:'TemplateImportAdmin123'})).cookie,student=(await call('/auth/login','POST',{studentId:'template-student',password:'TemplateImportStudent123'})).cookie,peer=(await call('/auth/login','POST',{studentId:'template-peer',password:'TemplateImportStudent123'})).cookie;
+  const importStudent=(await call('/auth/login','POST',{studentId:'template-import-fixture',password:'TemplateImportStudent123'})).cookie;
   const termId=(await call('/admin/timetable/terms','POST',semester,admin)).data.id;
   const a=course('工程经济学','SHARED-A'),b=course('系统工程','CLASS-B','2026-11-08'),c=course('工程经济学','OTHER-C','2026-11-09');
-  const inspect=async(courses,extra={})=>call('/admin/timetable/template-preview','POST',{termId,source:'manual',courses,...extra},admin);
-  const save=async(name,p,extra={})=>call('/admin/timetable/template-import','POST',{termId,source:'manual',name,courses:p.courses,catalogVersion:p.catalogVersion,acceptWarnings:true,...extra},admin);
+  const inspect=async(courses,extra={})=>call('/admin/timetable/template-preview','POST',{termId,source:'ai',courses,...extra},admin);
+  const save=async(name,p,extra={})=>call('/admin/timetable/template-import','POST',{termId,source:'ai',name,courses:p.courses,catalogVersion:p.catalogVersion,acceptWarnings:true,...extra},admin);
+  await t.test('管理员模板只支持AI内容与Excel两种导入方式',async()=>{
+    const p=(await inspect([a])).data;
+    for(const source of ['manual','cards','template']){
+      assert.equal((await inspect([a],{source})).status,400);
+      assert.equal((await save('无效导入方式',p,{source})).status,400);
+    }
+    assert.equal(db.prepare('SELECT COUNT(*) n FROM timetable_templates').get().n,0);
+    assert.equal(db.prepare('SELECT COUNT(*) n FROM public_courses').get().n,0);
+  });
   await t.test('预览不写入，未确认、未登录及学生管理请求被拒绝',async()=>{
-    assert.equal((await call('/admin/timetable/template-preview','POST',{termId,source:'manual',courses:[a]})).status,401);assert.equal((await call('/admin/timetable/template-import','POST',{termId},student)).status,403);
+    assert.equal((await call('/admin/timetable/template-preview','POST',{termId,source:'ai',courses:[a]})).status,401);assert.equal((await call('/admin/timetable/template-import','POST',{termId},student)).status,403);
     const p=(await inspect([a,b,a])).data;assert.equal(p.courses.length,2);assert.equal(p.stats.newCourses,2);assert.equal(db.prepare('SELECT COUNT(*) n FROM public_courses').get().n,0);assert.equal(db.prepare('SELECT COUNT(*) n FROM timetable_templates').get().n,0);
     assert.equal((await save('未确认模板',p,{acceptWarnings:false})).status,400);assert.equal(db.prepare('SELECT COUNT(*) n FROM public_courses').get().n,0);
   });
@@ -55,9 +65,43 @@ test('学委导入多份模板时自动生成卡片，重合上课班共用卡�
     assert.equal((await save('下学期模板',other,{termId:nextTerm})).data.created,1);assert.equal(db.prepare("SELECT COUNT(*) n FROM public_courses WHERE class_code='SHARED-A'").get().n,2);
   });
   await t.test('Excel与AI导入共用去重规则，空单元格不丢失后面的老师和班号',async()=>{
-    const p=(await inspect(undefined,{source:'excel',files:[{name:'同学甲.xlsx',content:workbook()}]})).data;assert.equal(p.courses[0].teacher,'Excel老师');assert.equal(p.courses[0].course_code,'00123');assert.equal(p.courses[0].teaching_class_code,'EXCEL-SHARED');
-    assert.equal((await save('Excel同学甲模板',p)).data.created,1);
+    const input={source:'excel',files:[{name:'同学甲.xlsx',content:workbook()}]};
+    const p=(await inspect(undefined,input)).data;assert.equal(p.courses[0].teacher,'Excel老师');assert.equal(p.courses[0].course_code,'00123');assert.equal(p.courses[0].teaching_class_code,'EXCEL-SHARED');
+    const ownPreview=await call('/timetable/preview','POST',{termId,...input},importStudent);assert.equal(ownPreview.status,200);
+    for(const key of ['course_name','course_code','teacher','teaching_class_code','sessions'])assert.deepEqual(p.courses[0][key],ownPreview.data.courses[0][key]);
+    assert.equal((await save('Excel同学甲模板',p,{source:'excel'})).data.created,1);
     const text='【课表开始】'+JSON.stringify({schema_version:'timetable.v1',academic_year:'2026-2027',semester:'秋冬学期',courses:[{course_name:'Excel课程',course_code:'00123',teacher:'Excel老师',teaching_class_code:'EXCEL-SHARED'}]})+'【课表结束】';
     const other=(await inspect(undefined,{source:'ai',text})).data;assert.equal(other.stats.reusedCourses,1);assert.equal((await save('AI同学乙模板',other)).data.created,0);assert.equal(db.prepare("SELECT COUNT(*) n FROM public_courses WHERE class_code='EXCEL-SHARED'").get().n,1);
+    const ownAI=await call('/timetable/preview','POST',{termId,source:'ai',text},importStudent);assert.equal(ownAI.status,200);
+    for(const key of ['course_name','course_code','teacher','teaching_class_code','sessions'])assert.deepEqual(other.courses[0][key],ownAI.data.courses[0][key]);
   });
+  await t.test('同一学年各学期可保存多份模板，不占用或覆盖个人课表',async()=>{
+    const nextTerm=db.prepare('SELECT id FROM terms WHERE academic_year=? AND name=?').get('2026-2027','下一学期').id;
+    const personalBefore=db.prepare('SELECT * FROM timetables ORDER BY id').all();
+    const payload=(await inspect([course('工程经济学','SHARED-A','2027-03-01')],{termId:nextTerm})).data;
+    const second=await save('下学期模板二',payload,{termId:nextTerm});assert.equal(second.status,201);assert.equal(second.data.created,0);assert.equal(second.data.reused,1);
+    const repeatedName=await save('模板一',payload,{termId:nextTerm});assert.equal(repeatedName.status,201);
+    assert.equal(db.prepare('SELECT COUNT(*) n FROM timetable_templates WHERE term_id=?').get(nextTerm).n,3);
+    assert.deepEqual(db.prepare('SELECT * FROM timetables ORDER BY id').all(),personalBefore);
+    assert.ok(db.prepare('SELECT COUNT(*) n FROM timetable_templates JOIN terms ON terms.id=term_id WHERE academic_year=?').get('2026-2027').n>3);
+  });
+  await t.test('管理员单独手动添加卡片，发布后学生可选且自动生成模板复用它',async()=>{
+    const manual={course_name:'手动卡片课程',teacher:'手动老师',teaching_class_code:'MANUAL-ONLY',explicit_sessions:[{date:'2026-11-27',start_time:'11:00',end_time:'12:00',room:'手动教室'},{date:'2026-11-28',start_time:'13:00',end_time:'14:00',room:'手动教室'}]};
+    const body={termId,source:'manual',courses:[manual],generateCards:true,published:false,acceptWarnings:true};
+    assert.equal((await call('/admin/timetable/courses','POST',body)).status,401);
+    assert.equal((await call('/admin/timetable/courses','POST',body,student)).status,403);
+    const created=await call('/admin/timetable/courses','POST',body,admin);assert.equal(created.status,201);assert.equal(created.data.created,1);assert.equal(created.data.cardsCreated,1);
+    let card=(await call('/admin/timetable/courses?termId='+termId,'GET',undefined,admin)).data.find(c=>c.teaching_class_code==='MANUAL-ONLY');assert.equal(card.published,false);
+    assert.deepEqual(card.sessions.map(s=>s.start_time+'-'+s.end_time),['11:00-12:00','13:00-14:00']);
+    assert.ok(!(await call('/timetable/cards?termId='+termId,'GET',undefined,student)).data.some(c=>c.id===card.id));
+    const before=db.prepare('SELECT COUNT(*) n FROM public_courses').get().n;
+    const duplicate=await call('/admin/timetable/courses','POST',body,admin);assert.equal(duplicate.status,409);assert.equal(db.prepare('SELECT COUNT(*) n FROM public_courses').get().n,before);
+    assert.equal((await call('/admin/timetable/courses/'+card.id,'PUT',{course:manual,revision:card.revision,cardEnabled:true,published:true,acceptWarnings:true},admin)).status,200);
+    const available=(await call('/timetable/cards?termId='+termId,'GET',undefined,student)).data.find(c=>c.id===card.id);assert.equal(available.sessions[0].start_time,'11:00');assert.equal(available.sessions[0].end_time,'12:00');
+    const current=(await call('/timetable/'+termId,'GET',undefined,student)).data;
+    const selected=await call('/timetable/'+termId,'POST',{source:'cards',courseIds:[card.id],revision:current.timetable.revision,acceptWarnings:true},student);assert.equal(selected.status,200);assert.ok(selected.data.courses.some(c=>c.publicCourseId===card.id));
+    const p=(await inspect([manual])).data;assert.equal(p.stats.reusedCourses,1);assert.equal(p.stats.newCourses,0);
+    const template=await save('手动卡片组成的模板',p);assert.equal(template.status,201);assert.equal(template.data.created,0);assert.equal(template.data.reused,1);assert.equal(db.prepare('SELECT COUNT(*) n FROM public_courses').get().n,before);
+  });
+
 });

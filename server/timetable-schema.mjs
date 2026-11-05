@@ -18,6 +18,7 @@ export function initTimetableSchema(db) {
     CREATE TABLE IF NOT EXISTS timetable_templates (
       id TEXT PRIMARY KEY, term_id TEXT NOT NULL REFERENCES terms(id),
       name TEXT NOT NULL, description TEXT NOT NULL DEFAULT '', published INTEGER NOT NULL DEFAULT 1,
+      created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
       revision INTEGER NOT NULL DEFAULT 1,
       updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
     );
@@ -45,4 +46,26 @@ export function initTimetableSchema(db) {
     CREATE INDEX IF NOT EXISTS timetable_entries_parent ON timetable_entries(timetable_id);
     CREATE INDEX IF NOT EXISTS timetable_entries_course ON timetable_entries(course_id);
   `);
+  const legacy=!db.prepare('PRAGMA table_info(timetable_entries)').all().some(c=>c.name==='direct_source');
+  const needsTemplateCreator=!db.prepare('PRAGMA table_info(timetable_templates)').all().some(c=>c.name==='created_by');
+  try {db.exec(`
+    BEGIN IMMEDIATE;
+    ${needsTemplateCreator?'ALTER TABLE timetable_templates ADD COLUMN created_by INTEGER REFERENCES users(id) ON DELETE SET NULL;':''}
+    ${legacy?'ALTER TABLE timetable_entries ADD COLUMN direct_source TEXT;':''}
+    CREATE TABLE IF NOT EXISTS timetable_template_subscriptions (
+      timetable_id TEXT NOT NULL REFERENCES timetables(id) ON DELETE CASCADE,
+      template_id TEXT NOT NULL REFERENCES timetable_templates(id) ON DELETE CASCADE,
+      template_revision INTEGER NOT NULL,
+      PRIMARY KEY(timetable_id,template_id)
+    );
+    CREATE TABLE IF NOT EXISTS timetable_entry_templates (
+      entry_id TEXT NOT NULL REFERENCES timetable_entries(id) ON DELETE CASCADE,
+      template_id TEXT NOT NULL REFERENCES timetable_templates(id) ON DELETE CASCADE,
+      PRIMARY KEY(entry_id,template_id)
+    );
+    ${legacy?`UPDATE timetable_entries SET direct_source=(SELECT source FROM timetables WHERE id=timetable_id) WHERE timetable_id IN (SELECT id FROM timetables WHERE source<>'template');
+    INSERT OR IGNORE INTO timetable_template_subscriptions SELECT id,template_id,COALESCE(template_revision,0) FROM timetables WHERE source='template' AND template_id IS NOT NULL;
+    INSERT OR IGNORE INTO timetable_entry_templates SELECT e.id,t.template_id FROM timetable_entries e JOIN timetables t ON t.id=e.timetable_id WHERE t.source='template' AND t.template_id IS NOT NULL AND e.course_id IS NOT NULL;`:''}
+    COMMIT;
+  `);}catch(error){if(db.isTransaction)db.exec('ROLLBACK');throw error;}
 }

@@ -39,13 +39,14 @@ export function unpackHomeworkWorkbook(b){
       rows[r]||=[];rows[r][col]=/DISPIMG/i.test(formula)?'='+formula:type==='s'?strings[Number(value)]||'':type==='inlineStr'?texts(c[2]):value;
     }
     const original=rows.map(r=>r?[...r]:[]);
-    let mergedCells=0;
+    let mergedCells=0;const merges=[];
     for(const merge of source.matchAll(/<mergeCell\b([^>]*)\/?\s*>/g)){
       const parts=attr(merge[1],'ref').split(':');if(parts.length!==2)continue;const [r1,c1]=cell(parts[0]),[r2,c2]=cell(parts[1]);
       if(r2>10000||c2>100||(r2-r1+1)*(c2-c1+1)>20000)problem('合并单元格范围过大。');
+      merges.push({r1,c1,r2,c2});
       const value=rows[r1]?.[c1]||'';for(let r=r1;r<=r2;r++)for(let c=c1;c<=c2;c++){if(++mergedCells>100000)problem('合并单元格过多。');rows[r]||=[];if(!rows[r][c])rows[r][c]=value;}
     }
-    sheets.push({name:attr(m[1],'name'),rows,original});
+    sheets.push({name:attr(m[1],'name'),rows,original,path,source,merges,images:new Map()});
   }
   const imageIds=new Map(),cellRels=relationships('xl/_rels/cellimages.xml.rels');
   const addImage=(name,rid,map,base)=>{const target=map.get(rid);if(target)imageIds.set(name,resolve(base,target));};
@@ -56,12 +57,36 @@ export function unpackHomeworkWorkbook(b){
     const map=relationships(posix.join(posix.dirname(path),'_rels',posix.basename(path)+'.rels'));
     for(const pic of xml(path).matchAll(/<(?:\w+:)?pic\b[^>]*>([\s\S]*?)<\/(?:\w+:)?pic>/g)){const info=pic[1].match(/<(?:\w+:)?cNvPr\b([^>]*)/),blip=pic[1].match(/<(?:\w+:)?blip\b([^>]*)/);if(info&&blip&&!imageIds.has(attr(info[1],'name')))addImage(attr(info[1],'name'),attr(blip[1],'r:embed'),map,posix.dirname(path));}
   }
-  return{sheets,entries,imageIds,date1904:/<workbookPr\b[^>]*date1904=["'](?:1|true)["']/.test(xml('xl/workbook.xml'))};
+  const imageIssues=[];let anchoredImages=0;
+  for(const sheet of sheets){
+    const sheetRels=relationships(posix.join(posix.dirname(sheet.path),'_rels',posix.basename(sheet.path)+'.rels'));
+    for(const drawing of sheet.source.matchAll(/<(?:\w+:)?drawing\b([^>]*)\/?\s*>/g)){
+      const target=sheetRels.get(attr(drawing[1],'r:id'));if(!target){imageIssues.push(`${sheet.name} 有无法读取的图片引用，请核对。`);continue;}
+      const path=resolve(posix.dirname(sheet.path),target),source=xml(path),rels=relationships(posix.join(posix.dirname(path),'_rels',posix.basename(path)+'.rels'));
+      for(const anchor of source.matchAll(/<(?:\w+:)?(oneCellAnchor|twoCellAnchor|absoluteAnchor)\b[^>]*>([\s\S]*?)<\/(?:\w+:)?\1>/g)){
+        const pics=[...anchor[2].matchAll(/<(?:\w+:)?pic\b[^>]*>([\s\S]*?)<\/(?:\w+:)?pic>/g)];if(!pics.length)continue;
+        const from=anchor[2].match(/<(?:\w+:)?from\b[^>]*>([\s\S]*?)<\/(?:\w+:)?from>/)?.[1]||'';
+        let row=Number(from.match(/<(?:\w+:)?row\b[^>]*>(\d+)<\/(?:\w+:)?row>/)?.[1]??NaN),col=Number(from.match(/<(?:\w+:)?col\b[^>]*>(\d+)<\/(?:\w+:)?col>/)?.[1]??NaN);
+        if(!Number.isInteger(row)||!Number.isInteger(col)){imageIssues.push(`${sheet.name} 有未绑定单元格的浮动图片，未自动归入作业，请核对。`);continue;}
+        if(row>10000||col>100)problem('作业图片位置超出可读取范围。');
+        const merged=sheet.merges.find(m=>row>=m.r1&&row<=m.r2&&col>=m.c1&&col<=m.c2);if(merged){row=merged.r1;col=merged.c1;}
+        sheet.rows[row]||=[];
+        for(const pic of pics){
+          if(++anchoredImages>500)problem('浮动图片过多，每次最多读取500张。');
+          const blip=pic[1].match(/<(?:\w+:)?blip\b([^>]*)/),rid=blip?attr(blip[1],'r:embed'):null,imageTarget=rid?rels.get(rid):null;
+          const id=`__drawing_${anchoredImages}`;imageIds.set(id,imageTarget?resolve(posix.dirname(path),imageTarget):'');
+          const key=row+'|'+col;sheet.images.set(key,[...(sheet.images.get(key)||[]),id]);
+        }
+      }
+    }
+  }
+  return{sheets,entries,imageIds,imageIssues,date1904:/<workbookPr\b[^>]*date1904=["'](?:1|true)["']/.test(xml('xl/workbook.xml'))};
 }
 export function imageMime(bytes){if(bytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')))return'image/png';if(bytes[0]===255&&bytes[1]===216&&bytes[2]===255)return'image/jpeg';if(bytes.subarray(0,4).toString()==='RIFF'&&bytes.subarray(8,12).toString()==='WEBP')return'image/webp';return null;}
 export const normalizeCourseName=s=>String(s||'').normalize('NFKC').replace(/\s/g,'').replace(/\((?:秋冬|春夏|秋|冬|春|夏)(?:季|学期|学季)?[^)]*\)$/,'');
 const clean=s=>String(s??'').trim();
-const meaningful=s=>Boolean(clean(s)&&!/^[-/／—无]+$/.test(clean(s)));
+export const noHomework=s=>/^([-\/／—无]+|无作业)$/.test(clean(s).normalize('NFKC').replace(/[\s。.!！,，;；:：]/g,''));
+const meaningful=s=>Boolean(clean(s)&&!noHomework(s));
 export function parseHomeworkDeadline(value,term,date1904=false){
   const raw=clean(value),warnings=[];if(!meaningful(raw))return{due_date:null,due_time:null,deadline_raw:raw,warnings};
   if(/^\d+(?:\.\d+)?$/.test(raw)&&Number(raw)>30000&&Number(raw)<80000){const n=Number(raw),iso=new Date(Date.parse(date1904?'1904-01-01T00:00:00Z':'1899-12-30T00:00:00Z')+n*86400000).toISOString();return{due_date:iso.slice(0,10),due_time:n%1?iso.slice(11,16):null,deadline_raw:raw,warnings:n%1?[]:['原表仅给出截止日期，未注明具体时刻。']};}
@@ -81,10 +106,11 @@ export function homeworkFromFile(file,term){
   if(!file||typeof file.content!=='string'||!/\.xlsx$/i.test(file.name||''))problem('请选择 XLSX 作业表。');
   const bytes=Buffer.from(file.content,'base64');if(!bytes.length||bytes.length>5*1024*1024)problem('作业表不能超过 5 MB。');
   let book;try{book=unpackHomeworkWorkbook(bytes);}catch(e){if(e.status)throw e;problem('表格无法读取，请另存为标准 XLSX 后重试。');}
-  const records=new Map(),policies=new Map(),assets=new Map(),warnings=[],recognized=[],ignored=[];let assetBytes=0;
+  const records=new Map(),policies=new Map(),assets=new Map(),warnings=[...book.imageIssues],recognized=[],ignored=[],usedImages=new Set();let assetBytes=0;
   const part=(value,field,caption)=>{
     const attachments=[];let text=clean(value);
     text=text.replace(/=?\b(?:_xlfn\.)?DISPIMG\(\s*["']([^"']+)["'][^)]*\)/gi,(_,name)=>{
+      usedImages.add(name);
       const path=book.imageIds.get(name),blob=path?book.entries.get(path):null,mime=blob?imageMime(blob):null;
       if(!blob||!mime){warnings.push(`${caption} 有无法提取的图片，请核对原表。`);return'【原表图片待补充】';}
       if(blob.length>2*1024*1024)problem('单张作业图片不能超过 2 MB。');const id=hash(blob);
@@ -108,16 +134,17 @@ export function homeworkFromFile(file,term){
     const auxSeen=new Set();let auxTitle=clean(headers[6])||'补充考核说明';
     for(let row=h+1;row<sheet.rows.length;row++){
       const values=sheet.rows[row];if(!values)continue;const course=isEnglish?englishCourse:clean(values[ci]),teacher=clean(values[ti]);if(!course||!teacher)continue;
+      const fieldValue=col=>[clean(values[col]),...(sheet.images.get(row+'|'+col)||[]).map(id=>`=DISPIMG("${id}",1)`)].filter(Boolean).join('\n');
       const source=`${file.name} / ${sheet.name} / 第${row+1}行`,policy=getPolicy(course,teacher,source);
       const raw=Object.fromEntries(headers.map((v,c)=>[`${clean(v)||'附加列'}（第${c+1}列）`,clean(values[c])]).filter(([,v])=>v));policy.source_rows.push({sheet:sheet.name,row:row+1,raw});
-      for(const [key,col]of [['submission',pi],['assessment_rules',ri],['team_requirement',gi],['notes',ni]])if(col>=0&&meaningful(values[col]))append(policy,key,values[col],source);
+      for(const [key,col]of [['submission',pi],['assessment_rules',ri],['team_requirement',gi],['notes',ni]])if(col>=0&&meaningful(fieldValue(col)))append(policy,key,fieldValue(col),source);
       policy.credits=policy.credits||clean(values[credit]);policy.sequence=policy.sequence||clean(values[sequence]);
-      let content=clean(values[wi]);const title=isEnglish?clean(values[li]).replace('次课','次作业'):clean(headers[wi]).replace('内容','')||'课程作业';
+      let content=noHomework(values[wi])?'':fieldValue(wi);const title=isEnglish?clean(values[li]).replace('次课','次作业'):clean(headers[wi]).replace('内容','')||'课程作业';
       if(hasEnglishDetails&&!isEnglish&&/英语/.test(course)&&/见表格.*英语/.test(content)){append(policy,'notes','作业详情已从“英语秋季课程”表按课次和老师导入。');content='';}
       if(/^已结束$/.test(content)){append(policy,'notes',`${title}：原表标记已结束。`);content='';}
       if(meaningful(content)){
         const key=normalizeCourseName(course)+'|'+teacher+'|'+title;if(!records.has(key))records.set(key,create('assignment',course,teacher,title,source));const item=records.get(key);append(item,'content',content,source);item.source_rows.push({sheet:sheet.name,row:row+1,raw});
-        for(const [field,col]of [['submission',pi],['notes',ni]])if(col>=0&&meaningful(values[col]))append(item,field,values[col]);
+        for(const [field,col]of [['submission',pi],['notes',ni]])if(col>=0&&meaningful(fieldValue(col)))append(item,field,fieldValue(col));
         item.team_requirement=clean(values[gi]);item.credits=clean(values[credit]);item.sequence=clean(values[sequence]);
         if(!item.deadline_raw&&di>=0)Object.assign(item,parseHomeworkDeadline(values[di],term,book.date1904));
       }
@@ -135,6 +162,8 @@ export function homeworkFromFile(file,term){
   }
   const result=[...policies.values()].filter(r=>r.submission||r.assessment_rules||r.team_requirement||r.notes||r.attachments.length).concat([...records.values()]);if(!recognized.length)problem('未找到课程名称、任课老师、作业内容等表头，请使用提供的作业表格式。');if(result.length>500)problem('一次最多导入 500 条作业及考核记录。');
   for(const item of result){item.warnings=[...new Set(item.warnings)];if(item.attachments.length)item.warnings.push('已保留原表图片，请在预览中核对图片内容和适用上课班。');}
+  const unmatched=book.sheets.flatMap(sheet=>[...sheet.images.values()].flat()).filter(id=>!usedImages.has(id));
+  if(unmatched.length)warnings.push(`有 ${unmatched.length} 张浮动图片未归入有效作业字段（可能是非作业列、缺少课程老师或内容标为“无”），请对照原表核对。`);
   if(ignored.length)warnings.push(`未作为作业表处理的工作表：${ignored.join('、')}。`);
   return{records:result,assets:[...assets.values()],warnings:[...new Set(warnings)],sheets:recognized,ignoredSheets:ignored};
 }

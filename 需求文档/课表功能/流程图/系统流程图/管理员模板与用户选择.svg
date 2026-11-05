@@ -25,8 +25,8 @@
 </text>
 <rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">前端｜管理员提交多份命名模板</tspan>
-<tspan x="290.0" y="371.5">每份先预览再确认</tspan>
+<tspan x="290.0" y="348.5">前端｜管理员选择AI内容或Excel</tspan>
+<tspan x="290.0" y="371.5">按学期逐份预览并命名确认</tspan>
 </text>
 <path d="M70 502 A220.0 13 0 0 1 510 502 L510 550 A220.0 13 0 0 1 70 550 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 502 A220.0 13 0 0 0 510 502" stroke="#8A9CA6" fill="none"/>
@@ -36,29 +36,28 @@
 </text>
 <rect x="70" y="661" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">前端｜学生读取本学期已发布模板</tspan>
-<tspan x="290.0" y="715.5">提交选中的模板编号</tspan>
+<tspan x="290.0" y="692.5">前端｜弹框读取本学期已发布模板</tspan>
+<tspan x="290.0" y="715.5">左右切换时自动预览全部课程</tspan>
 </text>
 <rect x="70" y="833" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="864.5">后端｜校验登录、学期、模板发布</tspan>
-<tspan x="290.0" y="887.5">及本人的课表来源互斥</tspan>
+<tspan x="290.0" y="887.5">及已有时段与本批时段无冲突</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">后端｜返回该模板实际课程</tspan>
-<tspan x="290.0" y="1059.5">核对缺失与冲突</tspan>
+<tspan x="290.0" y="1036.5">后端｜返回全部课程及版本摘要</tspan>
+<tspan x="290.0" y="1059.5">前端仅展示课程，不显示核对清单</tspan>
 </text>
-<path d="M70 1190 A220.0 13 0 0 1 510 1190 L510 1238 A220.0 13 0 0 1 70 1238 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
-<path d="M70 1190 A220.0 13 0 0 0 510 1190" stroke="#8A9CA6" fill="none"/>
+<rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">数据库｜确认后保存本人所选成员</tspan>
-<tspan x="290.0" y="1231.5">记录模板编号及版本</tspan>
+<tspan x="290.0" y="1208.5">后端与数据库｜校验当前预览版本</tspan>
+<tspan x="290.0" y="1231.5">点击使用后保存模板同步关系</tspan>
 </text>
 <rect x="70" y="1349" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="1380.5">前端｜显示本人课表</tspan>
-<tspan x="290.0" y="1403.5">模板以后增删不自动改变个人成员</tspan>
+<tspan x="290.0" y="1403.5">模板增删成员自动同步，保留个人调整</tspan>
 </text>
 <rect x="70" y="1521" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

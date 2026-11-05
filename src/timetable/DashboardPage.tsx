@@ -1,25 +1,66 @@
 import {useEffect,useRef,useState} from 'react';
-import {CalendarDays,RefreshCw,Globe,Link as LinkIcon,ClipboardList} from 'lucide-react';
-import {api} from '../services/auth';
-import {today,humanDate} from './date';
+import {CalendarDays,Globe,ClipboardList,ChevronLeft,ChevronRight,Pause,Play,ExternalLink,LogOut} from 'lucide-react';
+import {api,ApiError} from '../services/auth';
+import {humanDate} from './date';
 import {SessionTile} from './TimetablePage';
 import {errorMessage,type DashboardView,type DashboardDay} from './types';
-import {deadlineLabel,deadlineSourceLabel,planLabel,priorityNames,type HomeworkSummary} from '../homework/types';
+import {homeworkChanged,type Homework,type HomeworkSummary} from '../homework/types';
+import {DashboardHomeworkCard} from '../homework/DashboardHomeworkCard';
+import {HomeworkDetailDialog} from '../homework/HomeworkDetailDialog';
 
 export function DashboardDayCards({days,now=Date.now()}:{days:DashboardDay[];now?:number}){
-  return <div className="upcoming-day-grid">{days.map((day,i)=><section className={`upcoming-day-card upcoming-day-${i}`} key={day.date}><header className="upcoming-day-heading"><div><span>第 {i+1} 个上课日</span><h2>{humanDate(day.date)}</h2><p>{day.date} · {day.lessons.length} 次课</p></div><div className="class-countdown"><span>距离上课</span><strong>{day.daysUntil}<small>天</small></strong></div></header><div className="upcoming-lessons">{day.lessons.map((lesson,j)=><div key={lesson.entryId+lesson.start+j}><SessionTile item={lesson} now={now}/><p className="upcoming-term">{lesson.academicYear} · {lesson.termName}</p></div>)}</div></section>)}</div>;
+  const [activeDate,setActiveDate]=useState(days[0]?.date||'');
+  const [playing,setPlaying]=useState(()=>typeof window==='undefined'||!window.matchMedia('(prefers-reduced-motion: reduce)').matches),[hovered,setHovered]=useState(false),[focused,setFocused]=useState(false);
+  const touch=useRef<{x:number;y:number}|null>(null),index=Math.max(0,days.findIndex(day=>day.date===activeDate)),dateKey=days.map(day=>day.date).join('|');
+  function move(step:number){if(days.length)setActiveDate(days[(index+step+days.length)%days.length].date);}
+  useEffect(()=>{if(days.length<2||!playing||hovered||focused)return;const timer=window.setInterval(()=>{if(document.visibilityState==='visible')setActiveDate(days[(index+1)%days.length].date);},4000);return()=>clearInterval(timer);},[dateKey,index,playing,hovered,focused]);
+  return <div className="dashboard-classes" role="region" aria-roledescription="轮播" aria-label="未来三个上课日" onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onFocusCapture={e=>setFocused(e.target.matches(':focus-visible'))} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))setFocused(false);}}>
+    <div className="dashboard-column-heading"><div><CalendarDays size={22}/><h2>上课安排</h2></div>{days.length>1&&<div className="class-carousel-controls"><button type="button" aria-label="上一个上课日" title="上一个上课日" onClick={()=>move(-1)}><ChevronLeft size={18}/></button><button type="button" aria-label={playing?'暂停自动切换':'开启自动切换'} title={playing?'暂停自动切换':'开启自动切换'} aria-pressed={playing} onClick={()=>{setPlaying(value=>!value);setFocused(false);}}>{playing?<Pause size={15}/>:<Play size={15}/>}</button><button type="button" aria-label="下一个上课日" title="下一个上课日" onClick={()=>move(1)}><ChevronRight size={18}/></button></div>}</div>
+    <div className="class-carousel-window" onTouchCancel={()=>{touch.current=null;}} onTouchStart={e=>{const point=e.touches[0];touch.current=point?{x:point.clientX,y:point.clientY}:null;}} onTouchEnd={e=>{const point=e.changedTouches[0],start=touch.current;touch.current=null;if(point&&start){const dx=point.clientX-start.x,dy=point.clientY-start.y;if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.3)move(dx<0?1:-1);}}}>
+      <div className="class-carousel-track" style={{transform:`translateX(-${index*100}%)`}}>{days.map((day,i)=><section className={`upcoming-day-card upcoming-day-${i} class-carousel-slide`} key={day.date} aria-label={humanDate(day.date)} aria-hidden={i!==index} inert={i!==index}><header className="upcoming-day-heading"><div><span>第 {i+1} 个上课日</span><h2>{humanDate(day.date)}</h2></div><div className="class-countdown"><span>距离上课</span><strong>{day.daysUntil}<small>天</small></strong></div></header><div className="upcoming-lessons">{day.lessons.map((lesson,j)=><div key={lesson.entryId+lesson.start+j}><SessionTile item={lesson} now={now} inlineDetails/></div>)}</div></section>)}</div>
+    </div>
+    {days.length>1&&<div className="class-carousel-footer"><div className="class-carousel-dots">{days.map((day,i)=><button type="button" key={day.date} aria-label={`查看${humanDate(day.date)}的课程`} aria-current={index===i?'true':undefined} className={index===i?'active':''} onClick={()=>setActiveDate(day.date)}/>)}</div><span>{index+1} / {days.length}</span></div>}
+  </div>;
 }
-export function DashboardPage({onTimetable,onManage,onHomework}:{onTimetable:()=>void;onManage:()=>void;onHomework:()=>void}){
+export function DashboardPage({onManage,onHomework,onLogout}:{onManage:()=>void;onHomework:(id?:string)=>void;onLogout:()=>void}){
   const [homework,setHomework]=useState<HomeworkSummary|null>(null),[homeworkError,setHomeworkError]=useState('');
-  useEffect(()=>{let active=true;const refresh=()=>{void api<HomeworkSummary>('/homework/summary').then(value=>{if(active){setHomework(value);setHomeworkError('');}}).catch(e=>{if(active)setHomeworkError(errorMessage(e));});};refresh();window.addEventListener('focus',refresh);window.addEventListener('homework-updated',refresh);return()=>{active=false;window.removeEventListener('focus',refresh);window.removeEventListener('homework-updated',refresh);};},[]);
+  const [detailId,setDetailId]=useState<string|null>(null);
+  const [completingId,setCompletingId]=useState<string|null>(null),[completionError,setCompletionError]=useState('');
+  const homeworkRequest=useRef(0),homeworkActive=useRef(false),completionBusy=useRef(false);
+  async function refreshHomework(){const token=++homeworkRequest.current;try{const value=await api<HomeworkSummary>('/homework/summary');if(homeworkActive.current&&token===homeworkRequest.current){setHomework(value);setHomeworkError('');}}catch(e){if(homeworkActive.current&&token===homeworkRequest.current)setHomeworkError(errorMessage(e));}}
+  async function completeHomework(record:Homework){
+    if(!record.id||completionBusy.current)return;
+    completionBusy.current=true;setCompletingId(record.id);setCompletionError('');
+    try{
+      const saved=await api<Homework>(`/homework/records/${record.id}/completion`,'POST',{completed:true,revision:record.revision});
+      if(!homeworkActive.current)return;
+      if(!saved.completed)throw new Error('完成状态未保存，请刷新后重试。');
+      homeworkRequest.current++;
+      setHomework(value=>{const previous=value?.records.find(item=>item.id===record.id);return value&&previous?{...value,records:value.records.filter(item=>item.id!==record.id),pendingCount:Math.max(0,value.pendingCount-1),overdueCount:Math.max(0,value.overdueCount-(previous.overdue?1:0))}:value;});
+      homeworkChanged();
+    }catch(e){if(homeworkActive.current){setCompletionError(errorMessage(e));if(e instanceof ApiError&&e.status===409)homeworkChanged();}}
+    finally{completionBusy.current=false;if(homeworkActive.current)setCompletingId(null);}
+  }
+  useEffect(()=>{homeworkActive.current=true;const refresh=()=>void refreshHomework();refresh();const timer=window.setInterval(()=>{if(document.visibilityState==='visible')refresh();},30000);window.addEventListener('focus',refresh);window.addEventListener('homework-updated',refresh);return()=>{homeworkActive.current=false;homeworkRequest.current++;clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener('homework-updated',refresh);};},[]);
   const [data,setData]=useState<DashboardView|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState('');
-  const request=useRef(0),lastDate=useRef(today());
-  async function load(){const token=++request.current;setLoading(true);setError('');try{const result=await api<DashboardView>('/timetable/dashboard');if(token===request.current){setData(result);lastDate.current=result.today;}}catch(e){if(token===request.current)setError(errorMessage(e));}finally{if(token===request.current)setLoading(false);}}
-  useEffect(()=>{void load();const refresh=()=>void load();window.addEventListener('focus',refresh);window.addEventListener('timetable-updated',refresh);window.addEventListener('timetable-terms-changed',refresh);const timer=window.setInterval(()=>{if(lastDate.current!==today())void load();},30000);return()=>{request.current++;clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener('timetable-updated',refresh);window.removeEventListener('timetable-terms-changed',refresh);};},[]);
-  return <div className="personal-dashboard"><section className="dashboard-intro workspace-card"><div><span className="eyebrow">{data?.today||today()} · 北京时间</span><h2>接下来 3 个上课日</h2><p>从明天起，跳过没有课的日期，按顺序展示你的课程。</p></div><div className="dashboard-actions"><button type="button" className="secondary-button" onClick={onTimetable}>查看完整课表</button><button type="button" className="icon-button" aria-label="刷新工作台" disabled={loading} onClick={()=>void load()}><RefreshCw size={17}/></button></div></section>
+  const request=useRef(0);
+  async function load(quiet=false){const token=++request.current;if(!quiet){setLoading(true);setError('');}try{const result=await api<DashboardView>('/timetable/dashboard');if(token===request.current){setData(result);}}catch(e){if(token===request.current&&!quiet)setError(errorMessage(e));}finally{if(token===request.current)setLoading(false);}}
+  useEffect(()=>{void load();const refresh=()=>void load();window.addEventListener('focus',refresh);window.addEventListener('timetable-updated',refresh);window.addEventListener('timetable-terms-changed',refresh);const timer=window.setInterval(()=>{if(document.visibilityState==='visible')void load(true);},30000);return()=>{request.current++;clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener('timetable-updated',refresh);window.removeEventListener('timetable-terms-changed',refresh);};},[]);
+  return <div className="personal-dashboard"><div className="dashboard-topbar"><DashboardClock/><button type="button" className="secondary-button logout-button" onClick={onLogout}><LogOut size={16}/>退出登录</button></div>
+    <div className="dashboard-columns"><section className="workspace-card dashboard-course-column">
     {error&&<p className="feedback" role="alert">{error}</p>}
     {loading&&!data?<p className="workspace-card empty-state">正在整理后续上课安排…</p>:data?.days.length?<><DashboardDayCards days={data.days}/>{data.days.length<3&&<p className="muted-note">当前只找到 {data.days.length} 个后续上课日，已展示全部已确定安排。</p>}</>:!error&&<section className="workspace-card dashboard-empty"><CalendarDays size={34}/><h2>{data?.timetableCount?'暂无后续已确定的上课安排':'先导入自己的课表'}</h2><p>{data?.timetableCount?'工作台会从你的课表中提取后续上课日。时间待确认的课程不会被排进某一天。':'导入后，这里会自动展示接下来三个有课的日期和倒计时。'}</p><button type="button" className="primary-button compact" onClick={onManage}>{data?.timetableCount?'管理我的课表':'导入课表'}</button></section>}
     {!!data?.pendingCourseCount&&<p className="notice">有 {data.pendingCourseCount} 门课程时间待确认，暂未计入上课日。</p>}
-    <div className="dashboard-reserved-grid"><section className="workspace-card dashboard-homework"><ClipboardList size={23}/><h3>待做作业</h3><p className="muted-note">按优先级、计划完成时间展示前 3 项</p>{homeworkError?<p className="feedback" role="alert">{homeworkError}</p>:<p className="muted-note">{homework?`${homework.pendingCount} 项待完成${homework.overdueCount?` · ${homework.overdueCount} 项已逾期`:''}`:'正在读取作业…'}</p>}<div className="dashboard-homework-list">{homework?.records.map(r=><article key={r.id}><strong>{r.course_name?r.course_name+' · ':''}{r.title}</strong><p>{r.sourceType==='personal'?'个人作业':r.teacher} · {priorityNames[r.priority||'normal']}</p>{r.planned_date&&<p>我的计划：{planLabel(r)}</p>}<time>{deadlineSourceLabel(r)}：{deadlineLabel(r)}</time>{r.deadline_raw&&<p>原始要求：{r.deadline_raw}</p>}</article>)}</div><button className="secondary-button" onClick={onHomework}>查看全部作业</button></section><section className="workspace-card dashboard-reserved"><Globe size={23}/><h3>常用网站</h3><span>已预留</span><p>集中查看常用的学习网站。</p></section><section className="workspace-card dashboard-reserved"><LinkIcon size={23}/><h3>快捷链接</h3><span>已预留</span><p>收藏课程资料与常用入口。</p></section></div>
+    </section>
+    <section className="workspace-card dashboard-homework"><div className="dashboard-column-heading"><div><ClipboardList size={22}/><h2>待做作业</h2></div></div>{homeworkError?<p className="feedback" role="alert">{homeworkError}</p>:<p className="muted-note">{homework?`${homework.pendingCount} 项待完成${homework.overdueCount?` · ${homework.overdueCount} 项已逾期`:''}`:'正在读取作业…'}</p>}{completionError&&<p className="feedback" role="alert">{completionError}</p>}<div className="dashboard-homework-list">{homework?.records.map(r=><DashboardHomeworkCard key={r.id} record={r} onOpen={setDetailId} onComplete={record=>void completeHomework(record)} disabled={completingId!==null} completing={completingId===r.id}/>)}</div>{homework?.pendingCount===0&&<p className="muted-note">暂无待做作业</p>}<button className="secondary-button" onClick={()=>onHomework()}>查看全部作业</button></section><section className="workspace-card dashboard-websites"><div className="dashboard-column-heading"><div><Globe size={22}/><h2>常用网址</h2></div></div><a className="dashboard-website-link" href="https://yjsy.zju.edu.cn/dashboard/analysis" target="_blank" rel="noopener noreferrer"><span><strong>研究生信息管理系统</strong><small>登录后查看学校“我的课程”</small></span><ExternalLink size={17}/></a></section></div>
+    {detailId&&<HomeworkDetailDialog key={detailId} recordId={detailId} onClose={()=>setDetailId(null)} closeLabel="关闭详情"/>}
   </div>;
+}
+
+const clockDate=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'long',day:'numeric',weekday:'long'});
+const clockTime=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});
+function DashboardClock(){
+  const [now,setNow]=useState(()=>new Date());
+  useEffect(()=>{const update=()=>setNow(new Date());const timer=window.setInterval(update,1000);window.addEventListener('focus',update);document.addEventListener('visibilitychange',update);return()=>{clearInterval(timer);window.removeEventListener('focus',update);document.removeEventListener('visibilitychange',update);};},[]);
+  return <div className="dashboard-current-time" aria-label="当前北京时间"><time dateTime={now.toISOString()}><span>{clockDate.format(now)}</span><strong>{clockTime.format(now)}</strong></time><span>北京时间</span></div>;
 }

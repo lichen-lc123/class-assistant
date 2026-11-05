@@ -47,8 +47,8 @@
 </text>
 <rect x="70" y="1177" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">前端｜渲染日期卡片和全部课程</tspan>
-<tspan x="290.0" y="1231.5">不足三天仅展示已有安排</tspan>
+<tspan x="290.0" y="1208.5">前端｜左列轮播实际已有上课日</tspan>
+<tspan x="290.0" y="1231.5">中列作业，右列常用网址</tspan>
 </text>
 <rect x="70" y="1349" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

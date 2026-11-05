@@ -75,7 +75,7 @@
 <path d="M70 1534 A220.0 13 0 0 0 510 1534" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="1552.5">数据库｜事务保存记录和附件</tspan>
-<tspan x="290.0" y="1575.5">相同记录自动跳过</tspan>
+<tspan x="290.0" y="1575.5">相同记录与明确无作业跳过</tspan>
 </text>
 <rect x="70" y="1693" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

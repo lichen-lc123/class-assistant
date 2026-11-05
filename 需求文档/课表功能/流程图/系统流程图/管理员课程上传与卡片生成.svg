@@ -9,19 +9,17 @@
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
 <path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="445.0" font-size="15" fill="#66765D">学期、模板名和一位同学课表</text>
+<text x="305.0" y="445.0" font-size="15" fill="#66765D">学期及课程原始资料</text>
 <path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="617.0" font-size="15" fill="#66765D">解析出的课程和上课班</text>
+<text x="305.0" y="617.0" font-size="15" fill="#66765D">规范化课程与班号</text>
 <path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="789.0" font-size="15" fill="#66765D">去重候选及已有卡片实际安排</text>
+<text x="305.0" y="789.0" font-size="15" fill="#66765D">身份有效的课程及发布状态</text>
 <path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="961.0" font-size="15" fill="#66765D">核对后的课程、名称和版本</text>
-<path d="M510 1067.0 L641 1067.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="569.5" y="1055.0" font-size="15" fill="#66765D">否</text>
-<path d="M290.0 1129 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1158.0" font-size="15" fill="#66765D">是</text>
+<text x="305.0" y="961.0" font-size="15" fill="#66765D">已保存卡片与排课配置</text>
+<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1133.0" font-size="15" fill="#66765D">实际起止时间与课次</text>
 <path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1305.0" font-size="15" fill="#66765D">新建、复用和生成结果</text>
+<text x="305.0" y="1305.0" font-size="15" fill="#66765D">选中卡片及本人课表版本</text>
 <path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
@@ -29,44 +27,39 @@
 </text>
 <rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">前端｜提交目标学期、模板名</tspan>
-<tspan x="290.0" y="371.5">及Excel、外部AI或手动课程</tspan>
+<tspan x="290.0" y="348.5">前端｜提交管理员导入内容</tspan>
+<tspan x="290.0" y="371.5">或手动填写的单门课程</tspan>
 </text>
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">后端｜验证管理员及目标学期</tspan>
-<tspan x="290.0" y="543.5">解析课表并规范化课程</tspan>
+<tspan x="290.0" y="520.5">后端｜校验管理员与学期</tspan>
+<tspan x="290.0" y="543.5">规范化周次、日期、时间和教室</tspan>
 </text>
 <rect x="70" y="661" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">后端｜匹配同班及可证明相同的无班号课程</tspan>
-<tspan x="290.0" y="715.5">返回现有卡片实际安排和摘要</tspan>
+<tspan x="290.0" y="692.5">后端｜检查上课班编号</tspan>
+<tspan x="290.0" y="715.5">模板导入去重，手动重复拒绝</tspan>
 </text>
-<rect x="70" y="833" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<path d="M70 846 A220.0 13 0 0 1 510 846 L510 894 A220.0 13 0 0 1 70 894 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 846 A220.0 13 0 0 0 510 846" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">前端｜核对新增、复用与差异</tspan>
-<tspan x="290.0" y="887.5">提交确认及catalogVersion</tspan>
+<tspan x="290.0" y="864.5">数据库｜保存公共课程及发布状态</tspan>
+<tspan x="290.0" y="887.5">导入时同时关联课表模板</tspan>
 </text>
-<polygon points="290.0,1005 510,1067.0 290.0,1129 70,1067.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="1061.5">后端｜字段、模板名称</tspan>
-<tspan x="290.0" y="1084.5">及课程库摘要仍有效？</tspan>
-</text>
-<rect x="645" y="1027.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="1061.5">前端｜修正错误或重新预览</tspan>
-<tspan x="837.5" y="1084.5">不留下半份模板或课程</tspan>
-</text>
-<path d="M70 1190 A220.0 13 0 0 1 510 1190 L510 1238 A220.0 13 0 0 1 70 1238 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
-<path d="M70 1190 A220.0 13 0 0 0 510 1190" stroke="#8A9CA6" fill="none"/>
+<rect x="70" y="1005" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">数据库｜事务保存模板及成员关系</tspan>
-<tspan x="290.0" y="1231.5">新课程生成卡片，已存在课程复用</tspan>
+<tspan x="290.0" y="1036.5">后端｜展开课程实际日期与时间</tspan>
+<tspan x="290.0" y="1059.5">学生仅可读取已发布卡片</tspan>
 </text>
-<rect x="70" y="1349" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="1177" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">前端｜显示新增与复用数量</tspan>
-<tspan x="290.0" y="1403.5">可继续导入另一位同学的模板</tspan>
+<tspan x="290.0" y="1208.5">前端｜卡片直接展示起止时段</tspan>
+<tspan x="290.0" y="1231.5">多个时段全部显示，不重复列同一时段</tspan>
+</text>
+<rect x="70" y="1349" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1380.5">后端｜学生选课前校验时段占用</tspan>
+<tspan x="290.0" y="1403.5">无冲突才追加到本人课表</tspan>
 </text>
 <rect x="70" y="1521" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

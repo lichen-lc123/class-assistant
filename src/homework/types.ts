@@ -12,6 +12,13 @@ export interface HomeworkSummary {pendingCount:number;overdueCount:number;record
 export const emptyHomework=():Homework=>({kind:'assignment',title:'',course_name:'',teacher:'',content:'',submission:'',assessment_rules:'',team_requirement:'',notes:'',deadline_raw:'',due_date:null,due_time:null,published:false,targetKeys:[],attachments:[],warnings:[]});
 export const homeworkChanged=()=>window.dispatchEvent(new Event('homework-updated'));
 export const deadlineLabel=(r:Homework)=>r.due_date?`${r.due_date}${r.due_time?' '+r.due_time:'（未注明具体时间）'}`:'截止时间待通知';
+export function deadlineCountdown(r:Homework){
+  if(!r.due_date||r.daysUntil==null||!Number.isFinite(r.daysUntil))return null;
+  if(r.daysUntil<0)return `已逾期 ${Math.abs(r.daysUntil)} 天`;
+  if(r.daysUntil===0)return r.overdue?'今天已逾期':'今天截止';
+  return `距截止 ${r.daysUntil} 天`;
+}
 export const priorityNames={high:'高优先级',normal:'普通优先级',low:'低优先级'};
-export const planLabel=(r:Homework)=>r.planned_date?`${r.planned_date}${r.planned_time?' '+r.planned_time:''}`:r.sourceType==='personal'?'沿用作业截止时间':'沿用学委截止时间';
-export const deadlineSourceLabel=(r:Homework)=>r.sourceType==='personal'?'个人作业截止时间':'学委发布的截止时间';
+export const planLabel=(r:Homework)=>r.planned_date?`${r.planned_date}${r.planned_time?' '+r.planned_time:''}`:'';
+
+export function courseTone(name:string){let value=0;for(const character of name.normalize('NFKC').replace(/\s/g,'').toLowerCase())value=(Math.imul(value,31)+character.codePointAt(0)!)>>>0;return value%6;}
