@@ -1,0 +1,3 @@
+Source commit: 3e7837450074a470011357a285faeab09cc3b05d
+Runtime: Node.js 24 or later
+Built frontend included. Production database is not included.
