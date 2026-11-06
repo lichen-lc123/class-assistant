@@ -1,10 +1,11 @@
-import {useEffect,useState} from 'react';
-import {CalendarContent,type DisplaySession} from './CalendarContent';
-import {bounds,shiftDate,today,humanDate} from './date';
+import {classroomText,type DisplaySession} from './CalendarContent';
+import {bounds,shiftDate,today} from './date';
 export function MobileWeekCalendar({date,items,onCourse}:{date:string;items:DisplaySession[];onCourse:(id:string)=>void}){
-  const [selected,setSelected]=useState(date);
-  useEffect(()=>setSelected(date),[date]);
   const [monday]=bounds('week',date);
-  const onDay=(d:string)=>items.filter(s=>Date.parse(s.start)<Date.parse(shiftDate(d,1)+'T00:00:00+08:00')&&Date.parse(s.end)>Date.parse(d+'T00:00:00+08:00'));
-  return <div className="mobile-week-agenda"><div className="mobile-week-strip" role="group" aria-label="选择本周日期">{'一二三四五六日'.split('').map((label,i)=>{const d=shiftDate(monday!,i),lessons=onDay(d);return <button type="button" key={d} aria-pressed={selected===d} className={selected===d?'active':''} onClick={()=>setSelected(d)}><span>周{label}</span><strong>{Number(d.slice(8))}</strong><small>{lessons.length?`${lessons.length}课`:d===today()?'今天':'·'}</small></button>;})}</div><h3>{humanDate(selected)}</h3><CalendarContent view="day" date={selected} items={onDay(selected)} now={Date.now()} onDate={setSelected} onCourse={onCourse}/></div>;
+  const current=today();
+  return <section className="phone-week-overview" aria-label="整周课程"><p className="phone-week-range">{monday} — {shiftDate(monday!,6)}</p>{'一二三四五六日'.split('').map((label,i)=>{
+    const d=shiftDate(monday!,i);
+    const lessons=items.filter(s=>Date.parse(s.start)<Date.parse(shiftDate(d,1)+'T00:00:00+08:00')&&Date.parse(s.end)>Date.parse(d+'T00:00:00+08:00')).sort((a,b)=>a.start.localeCompare(b.start));
+    return <section key={d} className={`phone-week-day ${d===current?'is-today':''} ${!lessons.length?'is-empty':''}`} aria-label={d+' 星期'+label}><header><strong>周{label}</strong><time dateTime={d}>{d.slice(5).replace('-','/')}</time>{d===current&&<small>今天</small>}</header><div className="phone-week-lessons">{lessons.length?lessons.map((lesson,j)=><button type="button" key={lesson.entryId+lesson.start+j} className={`phone-week-course tone-${lesson.index%4}`} onClick={()=>onCourse(lesson.entryId)}><strong>{lesson.courseName}</strong><span className="phone-week-course-time">{lesson.start_time}—{lesson.end_time}</span><span className="phone-week-course-room">{classroomText(lesson)}</span></button>):<p>无课</p>}</div></section>;
+  })}</section>;
 }

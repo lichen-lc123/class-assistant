@@ -58,3 +58,15 @@ test('工作台仅读取本人课程，支持跨学期，普通用户和管理�
   assert.equal((await call(`/timetable/${a.data.id}`,'DELETE',{confirm:true,revision:personal.data.timetable.revision},one)).status,200);
   const future=await call('/timetable/dashboard','GET',undefined,one);assert.equal(future.data.days.length,1);assert.equal(future.data.days[0].daysUntil,35);assert.equal(future.data.days[0].lessons[0].courseName,'下学期课程');
 });
+
+test('手机课程按时刻移除结束课程，正在上课保留，末节结束切至下一个有课日',()=>{
+ const lesson=(date,start,end)=>({...session(date,start),end_time:end,end:date+'T'+end+':00+08:00'});
+ const rows=[table([{id:'one',course_name:'课程',sessions:[lesson('2026-11-06','08:00','10:00'),lesson('2026-11-06','14:00','16:00'),lesson('2026-11-08','09:00','11:00')]}])];
+ const at=time=>upcomingClassDays(rows,'2026-11-06',{mobile:true,now:Date.parse('2026-11-06T'+time+':00+08:00')});
+ assert.equal(at('07:00').days[0].lessons.length,2);
+ assert.equal(at('09:00').days[0].lessons[0].start_time,'08:00');
+ assert.equal(at('10:00').days[0].lessons.length,1);
+ assert.equal(at('10:00').days[0].lessons[0].start_time,'14:00');
+ assert.equal(at('15:00').days[0].lessons[0].start_time,'14:00');
+ assert.equal(at('16:00').days[0].date,'2026-11-08');
+});

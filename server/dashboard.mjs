@@ -1,4 +1,4 @@
-export function upcomingClassDays(timetables,today,{mobile=false}={}){
+export function upcomingClassDays(timetables,today,{mobile=false,now=Date.now()}={}){
   const groups=new Map();
   let pendingCourseCount=0,index=0;
   for(const table of timetables){
@@ -7,7 +7,7 @@ export function upcomingClassDays(timetables,today,{mobile=false}={}){
       if(!course.sessions.length)pendingCourseCount++;
       course.sessions.forEach((s,lessonIndex)=>{
         // A teaching day is a future calendar date, even if today's lesson has not started.
-        if(mobile?s.date<today:s.date<=today)return;
+        if(mobile?(s.date<today||Date.parse(s.end)<=now):s.date<=today)return;
         if(!groups.has(s.date))groups.set(s.date,[]);
         groups.get(s.date).push({...s,entryId:course.id,courseName:course.course_name,teacher:course.teacher||null,index:courseIndex,lessonNumber:s.lesson_number??lessonIndex+1,termName:table.term.name,academicYear:table.term.academicYear});
       });

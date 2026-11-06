@@ -146,8 +146,8 @@
 .personal-dashboard .dashboard-section-empty .primary-button{margin:0}
 .dashboard-section-loading{display:grid;place-items:center;min-height:190px;color:var(--dashboard-muted);font-size:12px;line-height:1.8;margin:0}
 .dashboard-homework-footer:empty{display:none}
-.personal-dashboard .dashboard-homework-footer>.secondary-button{background:#526b48;border-color:#526b48;color:#fffefa;font-weight:600}
-.personal-dashboard .dashboard-homework-footer>.secondary-button:hover{background:#42583a;border-color:#42583a}
+.personal-dashboard .dashboard-homework-footer>.secondary-button{background:#eaf3e7;border-color:#c3d5bd;color:#365635;font-weight:600}
+.personal-dashboard .dashboard-homework-footer>.secondary-button:hover{background:#e1eedc;border-color:#aec6a5;color:#304d2f}
 .dashboard-websites{min-height:180px}
 .dashboard-website-link{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 13px;border:1px solid #d4ddd0;border-radius:10px;background:#f0f4eb;color:#3c5740;text-decoration:none}
 .dashboard-website-link:hover{background:#e5ecde;border-color:#9cb38f}
@@ -170,3 +170,6 @@
 .account-password-input input { width: 100%; padding-right: 48px; }
 .account-password-input .password-eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; display: grid; place-items: center; border: 0; background: transparent; color: #64775e; cursor: pointer; }
 .password-hint { color: #96704d; }
+
+.personal-dashboard .dashboard-homework{display:flex;flex-direction:column}
+.personal-dashboard .dashboard-homework-footer{display:flex;justify-content:center;margin-top:auto;padding-top:16px}
