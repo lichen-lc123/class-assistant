@@ -23,7 +23,7 @@ export function LoginForm({ onResetPassword, onLogin = login, onAuthenticated }:
     event.preventDefault();
     if (inFlight.current) return;
     const nextErrors = {
-      studentId: studentId.trim() ? undefined : '请输入学号',
+      studentId: studentId.trim() ? undefined : '请输入姓名或学号',
       password: password ? undefined : '请输入密码',
     };
     setErrors(nextErrors);
@@ -51,16 +51,16 @@ export function LoginForm({ onResetPassword, onLogin = login, onAuthenticated }:
     <section className="login-card" aria-labelledby="login-title">
       <header className="form-heading">
         <span className="eyebrow">欢迎回来</span>
-        <h2 id="login-title">学号登录</h2>
-        <p>使用管理员分配的账号登录</p>
+        <h2 id="login-title">登录</h2>
+        <p>使用姓名或学号及密码登录</p>
       </header>
       <form onSubmit={handleSubmit} noValidate aria-busy={submitting}>
         <div className="field-group">
-          <label htmlFor="student-id">学号</label>
+          <label htmlFor="student-id">姓名或学号</label>
           <div className={`input-shell ${errors.studentId ? 'input-error' : ''}`}>
             <UserRound size={21} strokeWidth={1.6} aria-hidden="true" />
-            <input ref={studentIdInput} id="student-id" name="username" type="text" autoComplete="username"
-              placeholder="请输入学号" value={studentId} disabled={submitting} required
+            <input ref={studentIdInput} id="student-id" name="username" type="text" autoComplete="username" autoCapitalize="none" spellCheck={false} maxLength={60}
+              placeholder="请输入姓名或学号" value={studentId} disabled={submitting} required
               aria-invalid={Boolean(errors.studentId)} aria-describedby={errors.studentId ? 'student-id-error' : undefined}
               onChange={(event) => { setStudentId(event.target.value); setErrors((current) => ({ ...current, studentId: undefined })); setMessage(''); }} />
           </div>

@@ -46,6 +46,13 @@ export async function createApp({ databasePath, serveStatic = false, allowedOrig
     const row = db.prepare(`SELECT ${publicFields.replaceAll(/\b(id|name|role|created_at|updated_at|student_id|must_change_password)\b/g, 'users.$1')} FROM sessions JOIN users ON users.id = sessions.user_id WHERE token_hash = ? AND expires_at > ?`).get(key, Date.now());
     return row ? { user: publicUser(row), key } : null;
   }
+  function resolveLogin(identifier) {
+    // Student IDs remain unambiguous even when another account has the same name.
+    const account = db.prepare('SELECT * FROM users WHERE student_id = ?').get(identifier);
+    if (account) return { record: account, ambiguous: false };
+    const names = db.prepare('SELECT * FROM users WHERE name = ? LIMIT 2').all(identifier);
+    return { record: names.length === 1 ? names[0] : undefined, ambiguous: names.length > 1 };
+  }
   function setSession(res, userId) {
     const token = randomBytes(32).toString('hex');
     db.prepare('INSERT INTO sessions VALUES (?, ?, ?)').run(tokenHash(token), userId, Date.now() + SESSION_LIFETIME);
@@ -79,18 +86,19 @@ export async function createApp({ databasePath, serveStatic = false, allowedOrig
       }
       if (path === '/api/auth/login' && req.method === 'POST') {
         const body = await readJson(req);
-        const studentId = typeof body.studentId === 'string' ? body.studentId.trim() : '';
+        const identifier = typeof body.studentId === 'string' ? body.studentId.trim() : '';
         const rateKey = clientAddress(req, trustLoopbackProxy);
         const rate = attempts.get(rateKey);
         if (rate && rate.until > Date.now() && rate.count >= 15) fail(429, '尝试次数过多，请 15 分钟后重试。');
-        const record = db.prepare('SELECT * FROM users WHERE student_id = ?').get(studentId);
+        const { record, ambiguous } = resolveLogin(identifier);
         const valid = await verifyPassword(body.password, record?.password_hash || dummyHash);
-        // Re-check after asynchronous hashing so a deleted/reset account cannot obtain a session.
-        const current = record && db.prepare('SELECT * FROM users WHERE id = ?').get(record.id);
-        if (!valid || !current || current.password_hash !== record.password_hash) {
+        // Re-check the identifier after hashing: account edits, resets and newly duplicated names invalidate this attempt.
+        const resolved = resolveLogin(identifier);
+        const current = resolved.record;
+        if (!valid || !current || current.id !== record?.id || current.password_hash !== record?.password_hash) {
           const latest = attempts.get(rateKey);
           const previous = latest && latest.until > Date.now() ? latest : { count: 0, until: Date.now() + 15 * 60000 };
-          attempts.set(rateKey, { ...previous, count: previous.count + 1 }); fail(401, '学号或密码不正确。');
+          attempts.set(rateKey, { ...previous, count: previous.count + 1 }); fail(401, ambiguous || resolved.ambiguous ? '姓名重复，请使用学号登录。' : '姓名、学号或密码不正确。');
         }
         attempts.delete(rateKey);
         const oldSession = session(req); if (oldSession) db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(oldSession.key);

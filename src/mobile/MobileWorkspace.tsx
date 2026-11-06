@@ -16,7 +16,7 @@ export function MobileWorkspace({user,onUpdated,onLogout}:{user:User;onUpdated:(
   const [intent,setIntent]=useState(()=>readCompletionIntent(window.location.search));
   const current=user.mustChangePassword?'account':tab;
   const pages=[['home','首页',House],['homework','作业',ClipboardCheck],['calendar','课表',CalendarDays],['account','我的',UserRound]] as const;
-  useEffect(()=>{window.scrollTo(0,0);document.title=`${pages.find(p=>p[0]===current)?.[1]} · 作业提醒`;},[current,manage]);
+  useEffect(()=>{window.scrollTo(0,0);document.title=`${pages.find(p=>p[0]===current)?.[1]} · MEM2602`;},[current,manage]);
   function closeIntent(){setIntent(null);const url=new URL(location.href);url.searchParams.delete('completeHomework');url.searchParams.delete('homeworkRevision');history.replaceState(null,'',url.pathname+url.search+url.hash);window.dispatchEvent(new Event('homework-updated'));}
   return <div className="workspace mobile-layout mobile-app"><header className="phone-header"><div>{manage&&current==='calendar'?<button className="icon-button" aria-label="返回课表" onClick={()=>setManage(false)}><ArrowLeft/></button>:null}<h1>{current==='home'?`${user.name}，你好`:current==='calendar'&&manage?'添加课程':pages.find(p=>p[0]===current)?.[1]}</h1></div>{current==='home'&&<span>把今天安排好</span>}</header>
     <main className="workspace-main">{error&&<p className="feedback" role="alert">{error}</p>}
