@@ -6,6 +6,16 @@ import {createInitialAdmin,hashPassword} from '../database.mjs';
 import {todayShanghai,addDays} from '../schedule.mjs';
 const session=(date,time='13:25')=>({date,start_time:time,end_time:'17:00',start:date+'T'+time+':00+08:00',end:date+'T17:00:00+08:00',room:'工教二307',kind:'lecture'});
 const table=(courses,name='秋冬学期')=>({term:{name,academicYear:'2026-2027'},courses});
+test('手机首页有今天的课就只显示今天，没有则显示下一个上课日',()=>{
+  const rows=[table([{id:'one',course_name:'课程',sessions:['2026-12-30','2026-12-31','2027-01-02'].map(d=>session(d))}])];
+  const current=upcomingClassDays(rows,'2026-12-31',{mobile:true});
+  assert.deepEqual(current.days.map(d=>d.date),['2026-12-31']);
+  assert.equal(current.days[0].daysUntil,0);
+  const next=upcomingClassDays(rows,'2027-01-01',{mobile:true});
+  assert.deepEqual(next.days.map(d=>d.date),['2027-01-02']);
+  assert.equal(next.days[0].daysUntil,1);
+  assert.deepEqual(upcomingClassDays(rows,'2027-01-03',{mobile:true}).days,[]);
+});
 test('工作台按未来三个有课日期分组，排除今天并跳过无课日',()=>{
   const dates=['2026-11-04','2026-11-06','2026-11-07','2026-11-08','2026-11-10'];
   const t=table([{id:'a',course_name:'工程经济学',teacher:'顾老师',sessions:dates.map(d=>session(d))},{id:'b',course_name:'上午课程',sessions:[session('2026-11-06','08:00')]}]);
@@ -41,6 +51,9 @@ test('工作台仅读取本人课程，支持跨学期，普通用户和管理�
   assert.equal((await call('/timetable/dashboard')).status,401);
   const r=await call('/timetable/dashboard?userId=dash-two','GET',undefined,one);assert.equal(r.status,200);assert.deepEqual(r.data.days.map(d=>d.daysUntil),[2,3,4]);assert.equal(r.data.days[0].lessons.length,2);assert.equal(r.data.pendingCourseCount,1);assert.ok(!JSON.stringify(r.data).includes('别人的课程'));
   assert.equal((await call('/timetable/dashboard','GET',undefined,two)).data.days[0].daysUntil,1);
+  const phone=await call('/timetable/dashboard?view=mobile','GET',undefined,one);
+  assert.equal(phone.status,200);assert.deepEqual(phone.data.days.map(d=>d.daysUntil),[0]);
+  assert.ok(!JSON.stringify(phone.data).includes('别人的课程'));
   assert.equal((await call('/timetable/dashboard','GET',undefined,admin)).data.days.length,0);
   assert.equal((await call(`/timetable/${a.data.id}`,'DELETE',{confirm:true,revision:personal.data.timetable.revision},one)).status,200);
   const future=await call('/timetable/dashboard','GET',undefined,one);assert.equal(future.data.days.length,1);assert.equal(future.data.days[0].daysUntil,35);assert.equal(future.data.days[0].lessons[0].courseName,'下学期课程');

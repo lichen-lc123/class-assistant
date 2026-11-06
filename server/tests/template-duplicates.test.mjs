@@ -27,7 +27,7 @@ test('不同管理员不能重复导入整套模板，部分重合仍复用课�
   assert.equal(db.prepare('SELECT created_by FROM timetable_templates WHERE id=?').get(first.data.id).created_by,adminA);
 
   await t.test('AI及Excel预览均拒绝整套重复，忽略课程顺序、模板名和来源说明',async()=>{
-    for(const source of ['ai','excel']){
+    for(const source of ['ai']){
       const result=await preview([{...b,source_rows:[{source:'另一个文件',row:9,raw:'无关排版'}]},a],bCookie,{source});
       assert.equal(result.status,409);assert.match(result.data.message,/导入失败.*甲同学课表.*完全一致/);
     }
@@ -47,7 +47,7 @@ test('不同管理员不能重复导入整套模板，部分重合仍复用课�
   await t.test('部分课程重合可导入并复用卡片，同名异班不误判',async()=>{
     const next=(await preview([a,c],bCookie)).data,created=await save('乙同学课表',next,bCookie);
     assert.equal(created.status,201);assert.equal(created.data.reused,1);assert.equal(created.data.created,1);
-    const otherClass={...a,teaching_class_code:'CLASS-D'};
+    const otherClass={...a,teaching_class_code:'CLASS-D',explicit_sessions:[{...a.explicit_sessions[0],start_time:'11:00',end_time:'12:00'}]};
     const other=(await preview([otherClass,b],bCookie)).data;
     assert.equal((await save('不同上课班',other,bCookie)).status,201);
   });
@@ -67,7 +67,7 @@ test('不同管理员不能重复导入整套模板，部分重合仍复用课�
 test('模板创建人字段可迁移旧库，历史模板及成员保留且重复启动安全',()=>{
   const db=new DatabaseSync(':memory:');db.exec('PRAGMA foreign_keys=ON;CREATE TABLE users(id INTEGER PRIMARY KEY);INSERT INTO users VALUES(1)');
   initTimetableSchema(db);
-  db.exec("INSERT INTO terms(id,academic_year,name) VALUES('term','2026-2027','第一学期');INSERT INTO public_courses(id,term_id,payload_json) VALUES('course','term','{}');INSERT INTO timetable_templates(id,term_id,name) VALUES('template','term','旧模板');INSERT INTO template_courses VALUES('template','course');ALTER TABLE timetable_templates DROP COLUMN created_by;");
+  db.exec("INSERT INTO terms(id,academic_year,name) VALUES('term','2026-2027','第一学期');INSERT INTO public_courses(id,term_id,payload_json) VALUES('course','term','{}');INSERT INTO timetable_templates(id,term_id,name) VALUES('template','term','旧模板');INSERT INTO template_courses(template_id,course_id) VALUES('template','course');ALTER TABLE timetable_templates DROP COLUMN created_by;");
   initTimetableSchema(db);initTimetableSchema(db);
   assert.equal(db.prepare('SELECT name,created_by FROM timetable_templates').get().name,'旧模板');
   assert.equal(db.prepare('SELECT created_by FROM timetable_templates').get().created_by,null);

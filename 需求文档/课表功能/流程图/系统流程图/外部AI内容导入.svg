@@ -76,7 +76,7 @@
 <path d="M70 1362 A220.0 13 0 0 1 510 1362 L510 1410 A220.0 13 0 0 1 70 1410 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 1362 A220.0 13 0 0 0 510 1362" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">数据库｜读取公共上课班候选</tspan>
+<tspan x="290.0" y="1380.5">数据库｜读取公共课程候选</tspan>
 <tspan x="290.0" y="1403.5">教学日历与节次作息</tspan>
 </text>
 <rect x="70" y="1521" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>

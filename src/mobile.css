@@ -1,0 +1,88 @@
+/* The same account and routes adapt to a phone; management stays on desktop. */
+.workspace.mobile-layout { display: block; min-height: 100svh; }
+.mobile-layout .workspace-main { max-width: 760px; margin: auto; padding: 20px 14px calc(94px + env(safe-area-inset-bottom)); }
+.mobile-layout .workspace-sidebar { position: fixed; inset: auto 0 0; z-index: 20; height: auto; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); background: #fdfdfbf5; border: 0; border-top: 1px solid #dce3d7; backdrop-filter: blur(12px); }
+.mobile-layout .workspace-brand,.mobile-layout .workspace-mode-switch,.mobile-layout .sidebar-footer { display: none; }
+.mobile-layout .workspace-sidebar nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); margin: 0; gap: 4px; overflow: visible; }
+.mobile-layout .workspace-sidebar nav button { display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 9px 2px; font-size: 11px; min-height: 58px; border-radius: 10px; }
+.mobile-layout .workspace-sidebar nav button svg { width: 21px; height: 21px; }
+.mobile-page-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
+.mobile-page-heading strong { font-size: 23px; color: #2f4240; }
+.mobile-page-heading span { color: #72816e; font-size: 13px; overflow-wrap: anywhere; }
+.mobile-layout button { touch-action: manipulation; }
+.mobile-layout .primary-button,.mobile-layout .secondary-button,.mobile-layout .icon-button { min-height: 44px; }
+.mobile-layout .icon-button { min-width: 44px; }
+.mobile-layout input:not([type=checkbox]):not([type=radio]),.mobile-layout select,.mobile-layout textarea { font-size: 16px; max-width: 100%; min-width: 0; }
+.mobile-layout .dashboard-columns { grid-template-columns: minmax(0,1fr); gap: 14px; }
+.mobile-layout .dashboard-columns > section,.mobile-layout .dashboard-columns .dashboard-homework { padding: 16px; min-height: 0; }
+.mobile-layout .dashboard-column-heading { margin-bottom: 12px; }
+.mobile-layout .dashboard-column-heading h2 { font-size: 18px; }
+.mobile-layout .dashboard-topbar { margin-bottom: 14px; }
+.mobile-layout .dashboard-current-time { gap: 8px; }
+.mobile-layout .dashboard-current-time time { gap: 6px 12px; }
+.mobile-layout .dashboard-current-time time > span { font-size: 12px; }
+.mobile-layout .dashboard-current-time strong { font-size: 21px; }
+.mobile-layout .upcoming-day-card { padding: 12px; }
+.mobile-layout .upcoming-day-heading { padding-bottom: 10px; margin-bottom: 12px; }
+.mobile-layout .upcoming-day-heading h2 { margin: 3px 0; font-size: 17px; }
+.mobile-layout .upcoming-lessons { gap: 10px; }
+.mobile-layout .dashboard-section-empty { min-height: 150px; padding: 14px 4px; }
+.mobile-layout .dashboard-homework-list { max-height: none; }
+.mobile-layout .dashboard-website-link small { display: none; }
+.mobile-layout .dashboard-homework-summary { font-size: 10px; }
+.mobile-layout .homework-toolbar { padding: 16px; }
+.mobile-layout .homework-toolbar-personal .homework-controls { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.mobile-layout .homework-controls > label:first-child { grid-column: 1 / -1; }
+.mobile-layout .homework-controls .homework-personal-actions { grid-column: 1 / -1; justify-content: flex-end; }
+.mobile-layout .homework-toolbar .segmented { display: flex; max-width: 100%; overflow-x: auto; }
+.mobile-layout .homework-toolbar .segmented button { flex: 0 0 auto; padding: 10px 12px; min-height: 44px; }
+.mobile-layout .homework-grid { grid-template-columns: minmax(0,1fr); gap: 14px; }
+.mobile-layout .homework-card { padding: 18px 16px; }
+.mobile-layout .homework-card h3 { font-size: 20px; }
+.mobile-layout .mobile-pagination { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.mobile-layout .mobile-pagination span { color: #6e7e65; font-size: 13px; }
+.mobile-layout .mobile-course-manage { margin: 0 0 14px auto; }
+.mobile-layout .timetable-toolbar { gap: 8px; margin-bottom: 12px; }
+.mobile-layout .timetable-toolbar .term-context { flex-basis: 100%; }
+.mobile-layout .calendar-panel { padding: 14px 10px; }
+.mobile-layout .calendar-navigation { gap: 12px; }
+.mobile-layout .calendar-navigation > .segmented { display: flex; width: 100%; }
+.mobile-layout .calendar-navigation > .segmented button { flex: 1; min-height: 44px; padding: 8px; }
+.mobile-layout .date-navigation { width: 100%; justify-content: space-between; }
+.mobile-layout .date-navigation input { flex: 1; }
+.mobile-week-strip { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 3px; }
+.mobile-week-strip button { display: grid; justify-items: center; gap: 6px; padding: 10px 1px; border: 1px solid transparent; border-radius: 10px; background: #f5f7f1; color: #67795d; }
+.mobile-week-strip button.active { background: #526b48; color: #fff; border-color: #526b48; }
+.mobile-week-strip span { font-size: 11px; }
+.mobile-week-strip strong { font-size: 18px; }
+.mobile-week-strip small { font-size: 10px; }
+.mobile-week-agenda > h3 { font-size: 14px; margin: 18px 3px 12px; color: #53694a; }
+.mobile-week-agenda .agenda-row { grid-template-columns: minmax(0,1fr); }
+.mobile-week-agenda .agenda-date { display: none; }
+.mobile-layout .source-options { grid-template-columns: minmax(0,1fr); gap: 10px; margin-top: 14px; }
+.mobile-layout .source-options button { padding: 14px; gap: 8px; }
+.mobile-layout .card-builder { grid-template-columns: minmax(0,1fr); }
+.mobile-layout .available-cards { max-height: 290px; grid-template-columns: repeat(2,minmax(0,1fr)); }
+.mobile-layout .my-course-drop { min-height: 120px; max-height: 220px; }
+.mobile-layout .profile-summary { padding: 18px; gap: 12px; margin-bottom: 14px; }
+.mobile-layout .password-card { padding: 20px 18px; }
+.mobile-layout .mobile-logout { width: 100%; justify-content: center; margin-top: 18px; }
+.mobile-layout .manage-dialog { position: fixed; inset: auto 0 0; margin: 0 auto; width: 100%; max-width: 760px; max-height: 91dvh; border-radius: 18px 18px 0 0; }
+.mobile-layout .manage-dialog-content { padding: 20px 16px calc(22px + env(safe-area-inset-bottom)); }
+.mobile-layout .dialog-heading { margin-bottom: 18px; }
+.mobile-layout .dialog-heading h2 { font-size: 20px; }
+.mobile-layout .form-grid { grid-template-columns: minmax(0,1fr); }
+.mobile-layout .modal-actions { flex-wrap: wrap; gap: 10px; }
+.mobile-layout .homework-card footer { gap: 10px; }
+.mobile-layout .homework-card footer button { min-height: 44px; }
+@media(prefers-reduced-motion:reduce) { .mobile-layout * { scroll-behavior: auto; } }
+.mobile-layout .workspace-sidebar nav button { position: relative; }
+.mobile-layout .homework-menu-badge { position: absolute; top: 2px; left: calc(50% + 8px); margin: 0; height: 18px; min-width: 18px; font-size: 10px; }
+.mobile-layout .homework-update-badge { min-height: 28px; }
+.mobile-app .phone-header{max-width:760px;margin:auto;padding:24px 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.phone-header>div{display:flex;align-items:center;gap:8px}.phone-header h1{font-size:24px;margin:0;color:#2c4037;letter-spacing:-.5px}.phone-header>span{font-size:12px;color:#7d897b}
+.mobile-app .workspace-main{padding-top:8px}.phone-navigation{position:fixed;z-index:20;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:#fffffff5;border-top:1px solid #e0e6dc;padding:8px 12px calc(8px + env(safe-area-inset-bottom));backdrop-filter:blur(15px)}
+.phone-navigation>button{position:relative;display:grid;justify-items:center;gap:5px;border:0;background:transparent;color:#8a9387;padding:6px;font-size:11px;min-height:52px}.phone-navigation>button[aria-current=page]{color:#476241;background:#edf2e8;border-radius:14px}.phone-navigation .homework-menu-badge{position:absolute;top:0;left:calc(50% + 8px);margin:0}
+.mobile-app .phone-filters-hidden{display:none!important}.phone-work-toolbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px}.mobile-app .homework-controls .homework-personal-actions{display:none}.mobile-app .homework-toolbar{border:0;padding:0;background:transparent;box-shadow:none;margin-bottom:16px}.mobile-app .homework-controls{padding:14px;background:white;border-radius:14px}.mobile-app .homework-filters{background:transparent;padding:0;gap:6px}.mobile-app .homework-filters button{border-radius:20px;background:#f0f2ec;font-size:12px}.mobile-app .homework-filters button.active{background:#526b48;color:white}
+.phone-homework{position:relative;border:1px solid var(--homework-border,#dce4d5);border-radius:18px;background:var(--homework-bg,#fff);overflow:hidden}.phone-homework-main{display:block;position:relative;width:100%;border:0;background:transparent;text-align:left;padding:18px 52px 16px 18px;color:#34453a}.phone-course{display:block;font-size:13px;color:var(--homework-ink,#526b48);font-weight:650;padding-right:52px}.phone-course small{display:block;font-weight:400;color:#778273;margin-top:3px;font-size:11px}.phone-homework-main>strong{display:block;font-size:19px;line-height:1.5;margin-top:10px}.phone-homework-main p{font-size:13px;line-height:1.7;color:#6c796a;margin:6px 0 12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}.phone-deadline{font-size:12px;font-weight:650;color:#865d4a}.phone-priority{font-size:10px;margin-left:8px;color:#8b5157}.phone-update{position:absolute;right:16px;top:17px;font-size:10px;color:#ad5237;background:#fff1e8;border-radius:10px;padding:3px 7px}.phone-card-arrow{position:absolute;right:17px;top:50%;color:#87917f}.phone-complete{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;width:100%;border:0;border-top:1px solid var(--homework-border,#dce4d5);background:#ffffff80;color:#526b48;font-size:12px}.phone-complete.done{color:#8b9486}
+.mobile-app .dashboard-current-time time>strong,.mobile-app .dashboard-current-time>span{display:none}.mobile-app .dashboard-current-time time>span{font-size:13px}.mobile-app .dashboard-columns>section{border-radius:20px;background:#fff}.mobile-app .dashboard-websites .dashboard-column-heading{display:none}.mobile-app .dashboard-website-link{padding:12px;border:0;background:#f3f6ef}.mobile-app .upcoming-day-card{background:#f5f7f1;border:0}.mobile-app .calendar-range-summary,.mobile-app .view-caption,.mobile-app .calendar-panel>.muted-note{display:none}.mobile-app .mobile-week-strip{margin-top:18px}.mobile-app .source-panel>p{display:none}.mobile-app .source-panel{padding:18px}.mobile-app .homework-card h2{font-size:20px}.mobile-app .homework-card{border-radius:14px}.mobile-app .month-scroll-container>.month-grid{min-width:0}.mobile-app .month-course-room,.mobile-app .month-course-meta{display:none!important}.mobile-app .month-course .month-course-name{font-size:10px}.mobile-app .month-course .month-course-time{font-size:9px}.mobile-app .month-day{padding:4px 2px;min-height:72px}.mobile-app .month-day button.month-course{padding:3px 1px}.mobile-app .month-date-button{font-size:12px}

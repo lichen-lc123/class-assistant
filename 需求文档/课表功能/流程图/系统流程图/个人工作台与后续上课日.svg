@@ -9,11 +9,17 @@
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
 <path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="445.0" font-size="15" fill="#66765D">登录会话及工作台请求</text>
 <path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="617.0" font-size="15" fill="#66765D">本人用户标识及课表范围</text>
 <path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="789.0" font-size="15" fill="#66765D">课程基值、个人安排及学期</text>
 <path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="961.0" font-size="15" fill="#66765D">合成后的实际日期时间</text>
 <path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1133.0" font-size="15" fill="#66765D">未来三个上课日及倒计时</text>
 <path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1305.0" font-size="15" fill="#66765D">当前展示日期及刷新事件</text>
 <path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
@@ -32,7 +38,7 @@
 <path d="M70 674 A220.0 13 0 0 1 510 674 L510 722 A220.0 13 0 0 1 70 722 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 674 A220.0 13 0 0 0 510 674" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">数据库｜返回本人选班关系</tspan>
+<tspan x="290.0" y="692.5">数据库｜返回本人选课关系</tspan>
 <tspan x="290.0" y="715.5">个人覆盖与公共课程基值</tspan>
 </text>
 <rect x="70" y="833" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>

@@ -53,7 +53,7 @@ export function normalizeCourse(raw, term) {
     if(raw[field]!=null&&!Array.isArray(raw[field]))problem(`${course_name} 的 ${field} 必须是数组，请修正导入结果。`);
     if(raw[field]?.length>max)problem(`${course_name} 的 ${field} 条数超过上限 ${max}，请拆分核对，不会自动截断。`);
   }
-  const source_warnings=list(Array.isArray(raw.source_warnings)?raw.source_warnings:raw.warnings).filter(x=>typeof x==='string').slice(0,30).map(x=>x.slice(0,250));
+  const source_warnings=list(Array.isArray(raw.source_warnings)?raw.source_warnings:raw.warnings).filter(x=>typeof x==='string'&&!/上课班编号|班号|班级编号/.test(x)).slice(0,30).map(x=>x.slice(0,250));
   const warnings=[...source_warnings];
   const weekly_rules = list(raw.weekly_rules).slice(0,30).map(rule=>{
     if(!rule||typeof rule!=='object'||Array.isArray(rule))problem('周次安排条目格式不正确。');
@@ -83,7 +83,11 @@ export function normalizeCourse(raw, term) {
   const explicit_sessions = list(raw.explicit_sessions).slice(0,200).map(s=>{
     if(!s||typeof s!=='object'||Array.isArray(s))problem('具体上课安排条目格式不正确。');
     if (!validDate(s.date) || !validTime(s.start_time) || !validTime(s.end_time) || s.start_time===s.end_time) problem(`${course_name} 的具体上课日期与起止时间不完整或无效。`);
-    return {date:s.date,start_time:s.start_time,end_time:s.end_time,room:trim(s.room,120)||null,kind:s.kind==='practice'?'practice':'lecture',lesson_number:integer(s.lesson_number,200)};
+    if(s.lesson_number!=null&&!integer(s.lesson_number,200))problem('第几次课只能填写 1—200 的整数。');
+    if(s.week!=null&&!integer(s.week,60))problem('上课周次只能填写 1—60 的整数。');
+    const weekday=new Date(s.date+'T00:00:00Z').getUTCDay()||7;
+    if(s.weekday!=null&&Number(s.weekday)!==weekday)problem('星期与上课日期不一致，请核对。');
+    return {date:s.date,start_time:s.start_time,end_time:s.end_time,room:trim(s.room,120)||null,kind:s.kind==='practice'?'practice':'lecture',lesson_number:integer(s.lesson_number,200),...(s.week!=null?{week:integer(s.week,60)}:{}),...(s.weekday!=null?{weekday}:{})};
   });
   const extra_fields=raw.extra_fields&&typeof raw.extra_fields==='object'&&!Array.isArray(raw.extra_fields)?{...raw.extra_fields}:{};
   const originalLabels=[...list(raw.seasons),...list(raw.weekly_rules).map(rule=>rule?.season)].filter(v=>typeof v==='string'&&v.trim()).map(v=>trim(v,120));
@@ -97,7 +101,6 @@ export function normalizeCourse(raw, term) {
       return{date:row.date,lesson_number:integer(row.lesson_number,200),special_date_index:integer(row.special_date_index,100),weekly_rule_index:integer(row.weekly_rule_index,30),week:integer(row.week,60),action:'use_weekly_rule',reason:trim(row.reason,2000)};
     });
   }
-  if (!raw.teaching_class_code) warnings.push('缺少上课班编号，暂不能自动关联班级作业。');
   return { course_name,course_code:trim(raw.course_code,60)||null,teaching_class_code:trim(raw.teaching_class_code,80)||null,
     academic_year:term.academicYear,semester:term.name,
     teacher:trim(raw.teacher,120)||null,room:trim(raw.room,120)||null,

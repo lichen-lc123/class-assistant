@@ -5,7 +5,7 @@
 <rect width="1100" height="1857" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">个人作业新增与维护 · 系统流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-04 · 作业功能 · 已实现</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-06 · 作业功能 · 已实现</text>
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
 <path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
@@ -13,7 +13,7 @@
 <path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="617.0" font-size="15" fill="#66765D">已验证字段与创建者ID</text>
 <path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="789.0" font-size="15" fill="#66765D">私人归属与公共班级关系</text>
+<text x="305.0" y="789.0" font-size="15" fill="#66765D">私人归属与公共课程关系</text>
 <path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="961.0" font-size="15" fill="#66765D">本人可见的两类作业</text>
 <path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
@@ -37,18 +37,18 @@
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="520.5">后端｜校验学期及字段</tspan>
-<tspan x="290.0" y="543.5">从会话确定唯一创建者</tspan>
+<tspan x="290.0" y="543.5">从会话识别本人并验证已选课程</tspan>
 </text>
 <path d="M70 674 A220.0 13 0 0 1 510 674 L510 722 A220.0 13 0 0 1 70 722 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 674 A220.0 13 0 0 0 510 674" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="692.5">数据库｜保存 owner_id 私人记录</tspan>
-<tspan x="290.0" y="715.5">不创建公共班级关联</tspan>
+<tspan x="290.0" y="715.5">不创建公共课程关联</tspan>
 </text>
 <rect x="70" y="833" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="864.5">后端｜读取本人私人记录</tspan>
-<tspan x="290.0" y="887.5">及已选班级的已发布作业</tspan>
+<tspan x="290.0" y="887.5">及已选课级的已发布作业</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

@@ -16,7 +16,7 @@
 <path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1305.0" font-size="15" fill="#66765D">模板课程和上课班信息</text>
+<text x="305.0" y="1305.0" font-size="15" fill="#66765D">模板课程和课程信息</text>
 <path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="1477.0" font-size="15" fill="#66765D">学生确认的模板成员</text>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
@@ -25,14 +25,14 @@
 </text>
 <rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">前端｜管理员选择AI内容或Excel</tspan>
+<tspan x="290.0" y="348.5">前端｜管理员选择AI内容</tspan>
 <tspan x="290.0" y="371.5">按学期逐份预览并命名确认</tspan>
 </text>
 <path d="M70 502 A220.0 13 0 0 1 510 502 L510 550 A220.0 13 0 0 1 70 550 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 502 A220.0 13 0 0 0 510 502" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="520.5">数据库｜保存模板与去重卡片引用</tspan>
-<tspan x="290.0" y="543.5">不复制重复上课班</tspan>
+<tspan x="290.0" y="543.5">不复制重复课程</tspan>
 </text>
 <rect x="70" y="661" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

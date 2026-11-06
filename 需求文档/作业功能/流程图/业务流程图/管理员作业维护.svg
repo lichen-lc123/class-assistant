@@ -5,7 +5,7 @@
 <rect width="1100" height="1685" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">管理员作业维护 · 业务流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-04 · 作业功能 · 已实现</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-06 · 作业功能 · 已实现</text>
 <text x="70" y="116" font-size="13" fill="#788371">使用者操作与业务判断；右侧为本次处理的其他结果。</text>
 <path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
@@ -30,16 +30,16 @@
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="520.5">学委｜搜索并选择本学期课程</tspan>
-<tspan x="290.0" y="543.5">带入老师和上课班，填写作业字段</tspan>
+<tspan x="290.0" y="543.5">带入老师和课程，填写作业字段</tspan>
 </text>
 <rect x="70" y="661" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">学委｜选择课程对应上课班</tspan>
+<tspan x="290.0" y="692.5">学委｜选择课程对应课程</tspan>
 <tspan x="290.0" y="715.5">核对学委截止说明</tspan>
 </text>
 <polygon points="290.0,833 510,895.0 290.0,957 70,895.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="889.5">学委｜适用上课班</tspan>
+<tspan x="290.0" y="889.5">学委｜适用课程</tspan>
 <tspan x="290.0" y="912.5">已经明确？</tspan>
 </text>
 <rect x="645" y="855.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
@@ -55,7 +55,7 @@
 <rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="1208.5">学生｜在个人作业页查看</tspan>
-<tspan x="290.0" y="1231.5">本人已选上课班的发布内容</tspan>
+<tspan x="290.0" y="1231.5">本人已选课程的发布内容</tspan>
 </text>
 <rect x="70" y="1349" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

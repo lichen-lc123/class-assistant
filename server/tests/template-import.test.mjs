@@ -19,7 +19,7 @@ test('学委导入多份模板时自动生成卡片，重合上课班共用卡�
   const save=async(name,p,extra={})=>call('/admin/timetable/template-import','POST',{termId,source:'ai',name,courses:p.courses,catalogVersion:p.catalogVersion,acceptWarnings:true,...extra},admin);
   await t.test('管理员模板只支持AI内容与Excel两种导入方式',async()=>{
     const p=(await inspect([a])).data;
-    for(const source of ['manual','cards','template']){
+    for(const source of ['excel','manual','cards','template']){
       assert.equal((await inspect([a],{source})).status,400);
       assert.equal((await save('无效导入方式',p,{source})).status,400);
     }
@@ -34,7 +34,7 @@ test('学委导入多份模板时自动生成卡片，重合上课班共用卡�
   let templateOne,templateTwo,idA;
   await t.test('甲模板含甲乙课程，乙模板含甲丙课程；甲课程仅一张卡片',async()=>{
     const p=(await inspect([a,b])).data,one=await save('模板一',p);assert.equal(one.status,201);assert.equal(one.data.created,2);assert.equal(one.data.cardsCreated,2);templateOne=one.data.id;
-    const next=(await inspect([{...a,explicit_sessions:[{...a.explicit_sessions[0],room:'新文件中的不同地点'}]},c])).data;assert.equal(next.stats.reusedCourses,1);assert.equal(next.stats.newCourses,1);assert.ok(next.warnings.some(w=>w.includes('沿用已有卡片')));assert.equal(next.courses.find(x=>x.teaching_class_code==='SHARED-A').sessions[0].room,'教室甲');
+    const next=(await inspect([{...a,explicit_sessions:[{...a.explicit_sessions[0],room:'新文件中的不同地点'}]},c])).data;assert.equal(next.stats.reusedCourses,1);assert.equal(next.stats.newCourses,1);assert.ok(!next.warnings.some(w=>w.includes('沿用已有卡片')));assert.equal(next.courses.find(x=>x.teaching_class_code==='SHARED-A').sessions[0].room,'教室甲');
     const two=await save('模板二',next);assert.equal(two.status,201);assert.equal(two.data.created,1);assert.equal(two.data.reused,1);assert.equal(two.data.cardsCreated,1);templateTwo=two.data.id;
     const cards=(await call('/timetable/cards?termId='+termId,'GET',undefined,student)).data;assert.equal(cards.length,3);idA=cards.find(x=>x.teaching_class_code==='SHARED-A').id;assert.equal(cards.filter(x=>x.course_name==='工程经济学').length,2);
     const templates=(await call('/timetable/templates?termId='+termId,'GET',undefined,student)).data;const first=templates.find(x=>x.id===templateOne),second=templates.find(x=>x.id===templateTwo);assert.equal(first.courseIds.length,2);assert.equal(second.courseIds.length,2);assert.deepEqual(first.courseIds.filter(id=>second.courseIds.includes(id)),[idA]);
@@ -42,38 +42,31 @@ test('学委导入多份模板时自动生成卡片，重合上课班共用卡�
   });
   await t.test('相同课程组合可以成为另一模板，不新增卡片；重名拒绝且不留下孤立课程',async()=>{
     const p=(await inspect([a,b])).data,result=await save('模板三',p);assert.equal(result.data.created,0);assert.equal(result.data.reused,2);assert.equal(result.data.cardsCreated,0);
-    const duplicate=(await inspect([course('不应留下的新课','ROLLBACK-D')])).data;assert.equal((await save('模板一',duplicate)).status,409);assert.equal(db.prepare("SELECT id FROM public_courses WHERE class_code='ROLLBACK-D'").get(),undefined);assert.equal(db.prepare('SELECT COUNT(*) n FROM timetable_templates').get().n,3);
+    const duplicate=(await inspect([course('不应留下的新课','ROLLBACK-D')])).data;assert.equal((await save('模板一',duplicate)).status,409);assert.equal(db.prepare("SELECT id FROM public_courses WHERE json_extract(payload_json,'$.teaching_class_code')='ROLLBACK-D'").get(),undefined);assert.equal(db.prepare('SELECT COUNT(*) n FROM timetable_templates').get().n,3);
     assert.equal((await call('/admin/timetable/templates','POST',{termId,name:'模板一',courseIds:[idA]},admin)).status,409);
     const second=(await call('/admin/timetable/templates?termId='+termId,'GET',undefined,admin)).data.find(x=>x.id===templateTwo);assert.equal((await call('/admin/timetable/templates/'+templateTwo,'PUT',{name:'模板一',courseIds:second.courseIds,revision:second.revision},admin)).status,409);
   });
   await t.test('导入期间卡片变动需重新预览，同班不同课程老师不允许错误合并',async()=>{
     const stale=(await inspect([a])).data,old=(await call('/admin/timetable/courses?termId='+termId,'GET',undefined,admin)).data.find(x=>x.id===idA);
-    assert.equal((await call('/admin/timetable/courses/'+idA,'PUT',{course:{...a,teaching_class_code:'DO-NOT-REPURPOSE'},revision:old.revision,acceptWarnings:true},admin)).status,400);
     assert.equal((await call('/admin/timetable/courses/'+idA,'PUT',{course:{...a,explicit_sessions:[{...a.explicit_sessions[0],room:'正式更新教室'}]},revision:old.revision,acceptWarnings:true},admin)).status,200);
-    assert.equal((await save('旧预览不能保存',stale)).status,409);assert.equal((await inspect([{...a,teacher:'另一位老师'}])).status,409);assert.equal((await inspect([a,{...a,teacher:'冲突老师'}])).status,400);
+    assert.equal((await save('旧预览不能保存',stale)).status,409);assert.equal((await inspect([{...a,teacher:'另一位老师'}])).status,200);assert.equal((await inspect([a,{...a,teacher:'冲突老师'}])).status,200);
   });
   await t.test('无班号仅在老师与完整排课一致时去重；待通知课程不能凭名称合并',async()=>{
     const noCode=course('没有班号的明确课程',null,'2026-11-15');const first=await save('无班号模板甲',(await inspect([noCode])).data);assert.equal(first.data.created,1);
     const second=await save('无班号模板乙',(await inspect([{...noCode,remarks_raw:'来自另一位同学的备注'}])).data);assert.equal(second.data.created,0);assert.equal(second.data.reused,1);
-    const pending={course_name:'时间待通知课程',teacher:'任课老师'};const p=(await inspect([pending])).data;assert.ok(p.warnings.some(w=>w.includes('不能仅凭名称去重')));assert.equal((await save('待通知模板甲',p)).data.created,1);assert.equal((await save('待通知模板乙',(await inspect([pending])).data)).data.created,1);
+    const pending={course_name:'时间待通知课程',teacher:'任课老师'};const p=(await inspect([pending])).data;assert.ok(p.warnings.some(w=>w.includes('暂不自动匹配')));assert.equal((await save('待通知模板甲',p)).data.created,1);assert.equal((await save('待通知模板乙',(await inspect([pending])).data)).data.created,1);
   });
   await t.test('恢复已有未生成或下架的卡片，不创建另一张；不同学期不混合去重',async()=>{
     const legacy=course('旧课程卡片','LEGACY-CLASS','2026-11-20');assert.equal((await call('/admin/timetable/courses','POST',{termId,courses:[legacy],generateCards:false,acceptWarnings:true},admin)).status,201);
-    let row=db.prepare("SELECT * FROM public_courses WHERE class_code='LEGACY-CLASS'").get();db.prepare('UPDATE public_courses SET published=0 WHERE id=?').run(row.id);
+    let row=db.prepare("SELECT * FROM public_courses WHERE json_extract(payload_json,'$.teaching_class_code')='LEGACY-CLASS'").get();db.prepare('UPDATE public_courses SET published=0 WHERE id=?').run(row.id);
     const p=(await inspect([legacy])).data;assert.ok(p.warnings.some(w=>w.includes('恢复发布')));const result=await save('恢复卡片的模板',p);assert.equal(result.data.created,0);assert.equal(result.data.reused,1);assert.equal(result.data.cardsCreated,1);row=db.prepare('SELECT * FROM public_courses WHERE id=?').get(row.id);assert.equal(row.card_enabled,1);assert.equal(row.published,1);
     const nextTerm=(await call('/admin/timetable/terms','POST',{...semester,name:'下一学期',startsOn:'2027-02-01',endsOn:'2027-06-30'},admin)).data.id;const other=(await inspect([course('工程经济学','SHARED-A','2027-03-01')],{termId:nextTerm})).data;
-    assert.equal((await save('下学期模板',other,{termId:nextTerm})).data.created,1);assert.equal(db.prepare("SELECT COUNT(*) n FROM public_courses WHERE class_code='SHARED-A'").get().n,2);
+    assert.equal((await save('下学期模板',other,{termId:nextTerm})).data.created,1);assert.equal(db.prepare("SELECT COUNT(*) n FROM public_courses WHERE json_extract(payload_json,'$.teaching_class_code')='SHARED-A'").get().n,2);
   });
-  await t.test('Excel与AI导入共用去重规则，空单元格不丢失后面的老师和班号',async()=>{
-    const input={source:'excel',files:[{name:'同学甲.xlsx',content:workbook()}]};
-    const p=(await inspect(undefined,input)).data;assert.equal(p.courses[0].teacher,'Excel老师');assert.equal(p.courses[0].course_code,'00123');assert.equal(p.courses[0].teaching_class_code,'EXCEL-SHARED');
-    const ownPreview=await call('/timetable/preview','POST',{termId,...input},importStudent);assert.equal(ownPreview.status,200);
-    for(const key of ['course_name','course_code','teacher','teaching_class_code','sessions'])assert.deepEqual(p.courses[0][key],ownPreview.data.courses[0][key]);
-    assert.equal((await save('Excel同学甲模板',p,{source:'excel'})).data.created,1);
-    const text='【课表开始】'+JSON.stringify({schema_version:'timetable.v1',academic_year:'2026-2027',semester:'秋冬学期',courses:[{course_name:'Excel课程',course_code:'00123',teacher:'Excel老师',teaching_class_code:'EXCEL-SHARED'}]})+'【课表结束】';
-    const other=(await inspect(undefined,{source:'ai',text})).data;assert.equal(other.stats.reusedCourses,1);assert.equal((await save('AI同学乙模板',other)).data.created,0);assert.equal(db.prepare("SELECT COUNT(*) n FROM public_courses WHERE class_code='EXCEL-SHARED'").get().n,1);
-    const ownAI=await call('/timetable/preview','POST',{termId,source:'ai',text},importStudent);assert.equal(ownAI.status,200);
-    for(const key of ['course_name','course_code','teacher','teaching_class_code','sessions'])assert.deepEqual(other.courses[0][key],ownAI.data.courses[0][key]);
+  await t.test('Excel模板导入已停用，预览和保存都拒绝',async()=>{
+    const p=(await inspect([a])).data;
+    assert.equal((await inspect(undefined,{source:'excel',files:[{name:'课表.xlsx',content:workbook()}]})).status,400);
+    assert.equal((await save('不能再导入Excel',p,{source:'excel'})).status,400);
   });
   await t.test('同一学年各学期可保存多份模板，不占用或覆盖个人课表',async()=>{
     const nextTerm=db.prepare('SELECT id FROM terms WHERE academic_year=? AND name=?').get('2026-2027','下一学期').id;

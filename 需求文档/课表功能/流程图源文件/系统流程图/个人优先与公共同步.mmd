@@ -1,42 +1,30 @@
 %% 个人优先与公共同步 · 系统流程图 · V1.0 · 2026-11-02
 flowchart TD
     N0(["开始"])
-    N1[("数据库｜按会话用户查询选班关系<br/>读取关联公共课程最新版本")]
-    N2["后端｜分别读取个人安排覆盖<br/>公共基值与个人来源记录"]
-    N3{"后端｜目标字段存在个人覆盖？"}
-    B3["使用公共新值<br/>其他字段仍逐项处理"]
-    N4["后端｜按时间组与地点映射合成<br/>个人安排优先，生成更新提示"]
-    N5["后端｜校验合成后的完整时段<br/>缺失或冲突进入提示清单"]
-    N6["前端｜展示本人最终课表<br/>公共变动和个人覆盖提示"]
-    N7{"学生｜选择保留个人覆盖？"}
-    B7["数据库｜清除该课程个人排课覆盖<br/>重新采用公共安排"]
-    N8[("数据库｜保留个人覆盖<br/>仅影响当前用户课表")]
-    N9(["结束"])
+    N1["前端｜提交来源、模板或卡片ID<br/>课程字段、成员和当前版本"]
+    N2["后端｜校验管理员及归属学期<br/>检查模板与课程版本"]
+    N3["后端｜自动课程写共享基值<br/>手动模板课程写独立快照"]
+    N4[("数据库｜事务保存课程和成员<br/>同步订阅并保留个人覆盖")]
+    N5["后端｜按来源合成本人课表<br/>直接卡片与模板副本各自更新"]
+    N6["后端｜新导入展开实际日期时间<br/>冲突返回409，禁止确认绕过"]
+    N7(["结束"])
     N0 --> N1
-    N1 -->|公共新值与受影响用户| N2
-    N2 -->|公共基值及个人覆盖| N3
-    N3 -->|否| B3
-    N3 -->|是| N4
-    N4 -->|合成后的完整排课信息| N5
-    N5 -->|最终课表、差异和冲突提示| N6
+    N1 -->|管理员会话、来源及当前版本| N2
+    N2 -->|验证后的课程修改与成员| N3
+    N3 -->|共享基值或独立课程快照| N4
+    N4 -->|本人选课、来源及个人覆盖| N5
+    N5 -->|本人最终安排与新增候选| N6
     N6 --> N7
-    N7 -->|否| B7
-    N7 -->|是| N8
-    N8 --> N9
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
     classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
     classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
     class N0 terminal;
-    class N1 database;
+    class N1 normal;
     class N2 normal;
-    class N3 decision;
-    class B3 exception;
-    class N4 normal;
+    class N3 normal;
+    class N4 database;
     class N5 normal;
     class N6 normal;
-    class N7 decision;
-    class B7 exception;
-    class N8 database;
-    class N9 terminal;
+    class N7 terminal;

@@ -1,0 +1,36 @@
+%% 作业图片与附件 · 业务流程图 · V1.0 · 2026-11-06
+flowchart TD
+    N0(["开始"])
+    N1["用户或管理员｜进入对应作业编辑<br/>选择图片或附件"]
+    N2["网站｜读取并展示文件列表<br/>可预览图片和移除误选文件"]
+    N3{"网站｜文件类型和大小<br/>符合限制？"}
+    B3["提示具体文件问题<br/>保持原作业不变"]
+    N4["用户或管理员｜确认作业内容<br/>点击保存"]
+    N5["网站｜保存作业及图片附件<br/>私人或课程权限随作业生效"]
+    N6["授权用户｜打开作业卡片或详情<br/>查看图片、下载附件"]
+    N7["用户或管理员｜再次编辑时<br/>保留或移除原有附件"]
+    N8(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 -->|否| B3
+    N3 -->|是| N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    N7 --> N8
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 decision;
+    class B3 exception;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 normal;
+    class N8 terminal;

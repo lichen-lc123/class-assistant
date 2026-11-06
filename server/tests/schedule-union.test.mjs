@@ -82,7 +82,7 @@ test('冲突处理字段和原文星期做校验，信息说明不误标为排�
   assert.throws(()=>normalizeCourse({...base,special_dates:[{date:'2027-01-08',weekday:9}]},term),/星期/);
 });
 
-test('AI导入保留未纳入内容、同班原始行和无班号疑似重复，预览与保存课次数一致',async t=>{
+test('AI导入保留未纳入内容、不同时间独立课程和信息不足的疑似重复，预览与保存课次数一致',async t=>{
   const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'union-admin','学委','UnionAdminFixture123');
   db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run('union-student','同学',await hashPassword('UnionStudentFixture123'));
   await new Promise(done=>server.listen(0,'127.0.0.1',done));t.after(()=>new Promise(done=>server.close(done)));
@@ -92,14 +92,14 @@ test('AI导入保留未纳入内容、同班原始行和无班号疑似重复，
   const termId=(await call('/admin/timetable/terms','POST',term,admin)).data.id;
   const data={schema_version:'timetable.v1',academic_year:term.academicYear,semester:term.name,courses:[{...base,weekly_rules:[{...rule,weeks:[5]}],special_dates:[dated('2026-12-11')],source_rows:[{source:'学校页面',row:1,raw:'第5周原文'}],remarks_raw:'第一条备注'},{...base,weekly_rules:[{...rule,weeks:[7]}],special_dates:[{date:'2026-12-26',kind:'lecture',raw:'同课次冲突日期原文'}],source_rows:[{source:'学校页面',row:2,raw:'第7周原文'}],remarks_raw:'第二条备注',extra_fields:{'周次日期冲突处理':[{date:'2026-12-26',weekly_rule_index:1,week:7,special_date_index:1,action:'use_weekly_rule',reason:'同一次课明确矛盾'}]}},{course_name:'待通知课程'},{course_name:'待通知课程'}],unparsed_items:[{raw:'原文明示属于春夏学期的课程',reason:'不属于当前目标学期'}],warnings:['请核对未纳入内容']};
   const preview=await call('/timetable/preview','POST',{termId,source:'ai',text:'【课表开始】\n'+JSON.stringify(data)+'\n【课表结束】'},student);
-  assert.equal(preview.status,200);assert.equal(preview.data.courses.length,3);assert.equal(preview.data.courses[0].sessions.length,2);
-  assert.ok(!preview.data.courses[0].sessions.some(s=>s.date==='2026-12-26'));assert.equal(preview.data.courses[0].source_rows.length,2);
-  assert.ok(preview.data.courses[0].remarks_raw.includes('第二条备注'));assert.equal(preview.data.unparsedItems[0].reason,'不属于当前目标学期');
+  assert.equal(preview.status,200);assert.equal(preview.data.courses.length,4);assert.equal(preview.data.courses[0].sessions.length,1);
+  assert.ok(!preview.data.courses[0].sessions.some(s=>s.date==='2026-12-26'));assert.equal(preview.data.courses[0].source_rows.length,1);
+  assert.ok(preview.data.courses[1].remarks_raw.includes('第二条备注'));assert.equal(preview.data.unparsedItems[0].reason,'不属于当前目标学期');
   assert.ok(preview.data.warnings.some(w=>w.includes('疑似重复')));assert.equal(db.prepare('SELECT COUNT(*) n FROM timetables').get().n,0);
   const reviewed=await call('/timetable/preview','POST',{termId,source:'ai',courses:preview.data.courses,unparsedItems:preview.data.unparsedItems,importWarnings:preview.data.importWarnings},student);
   assert.equal(reviewed.status,200);assert.deepEqual(reviewed.data.unparsedItems,preview.data.unparsedItems);
   const saved=await call('/timetable/'+termId,'POST',{source:'ai',courses:reviewed.data.courses,acceptWarnings:true},student);
-  assert.equal(saved.status,200);assert.equal(saved.data.courses.length,3);assert.equal(saved.data.added,3);assert.equal(saved.data.skipped,0);
-  assert.equal(saved.data.courses.find(c=>c.teaching_class_code==='000CLASS').sessions.length,2);
+  assert.equal(saved.status,200);assert.equal(saved.data.courses.length,4);assert.equal(saved.data.added,4);assert.equal(saved.data.skipped,0);
+  assert.equal(saved.data.courses.find(c=>c.teaching_class_code==='000CLASS').sessions.length,1);
   const prompt=(await call('/timetable/prompt','GET',undefined,student)).data.text;assert.ok(prompt.includes('并集'));assert.ok(prompt.includes('周次日期冲突处理'));assert.ok(!prompt.includes('网站目标学年：2026-2027'));
 });

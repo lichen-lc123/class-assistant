@@ -6,6 +6,7 @@ import './workspace.css';
 import './timetable.css';
 import './homework/homework.css';
 import './reminders/reminders.css';
+import './mobile.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode><App /></React.StrictMode>,

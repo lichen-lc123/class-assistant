@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1857" viewBox="0 0 1100 1857" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="997" viewBox="0 0 1100 997" role="img" aria-labelledby="title desc">
 <title id="title">Excel课表导入 · 业务流程图</title>
 <desc id="desc">一期已实现功能。业务流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
 <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
-<rect width="1100" height="1857" fill="#F7F5F0"/>
+<rect width="1100" height="997" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">Excel课表导入 · 业务流程图</text>
 <text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-02 · 课表功能 · 已实现</text>
@@ -10,72 +10,29 @@
 <path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M510 723.0 L641 723.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="569.5" y="711.0" font-size="15" fill="#66765D">否</text>
-<path d="M290.0 785 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="814.0" font-size="15" fill="#66765D">是</text>
-<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M510 1411.0 L641 1411.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="569.5" y="1399.0" font-size="15" fill="#66765D">否</text>
-<path d="M290.0 1473 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1502.0" font-size="15" fill="#66765D">是</text>
-<path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="188.0">开始</tspan>
 </text>
 <rect x="70" y="317" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">学生｜直接上传本人 Excel 课表</tspan>
-<tspan x="290.0" y="371.5">自动沿用管理员设置的当前学期</tspan>
+<tspan x="290.0" y="348.5">学生或管理员｜进入课表导入</tspan>
+<tspan x="290.0" y="371.5">选择AI整理、模板或课程卡片</tspan>
 </text>
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">学生｜一次选择两份Excel</tspan>
-<tspan x="290.0" y="543.5">全部课程合并到当前学期</tspan>
+<tspan x="290.0" y="520.5">网站｜不展示课表Excel入口</tspan>
+<tspan x="290.0" y="543.5">已有历史课表继续可查看</tspan>
 </text>
-<polygon points="290.0,661 510,723.0 290.0,785 70,723.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="717.5">后端｜本次新增课程时间</tspan>
-<tspan x="290.0" y="740.5">与已有安排均不重复？</tspan>
-</text>
-<rect x="645" y="683.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="717.5">提示课程时间重复及具体时段</tspan>
-<tspan x="837.5" y="740.5">整批不保存，不能确认绕过</tspan>
-</text>
-<rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="661" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">系统｜合并同班课程并保留来源</tspan>
-<tspan x="290.0" y="887.5">不根据原表时间标签拆分</tspan>
+<tspan x="290.0" y="692.5">用户｜使用外部AI整理学校课程</tspan>
+<tspan x="290.0" y="715.5">粘贴结果后预览核对保存</tspan>
 </text>
-<rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="833" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">学生｜确认疑似重复和上课班</tspan>
-<tspan x="290.0" y="1059.5">补充周次或明确日期</tspan>
+<tspan x="290.0" y="876.0">结束</tspan>
 </text>
-<rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">系统｜结合日历与作息</tspan>
-<tspan x="290.0" y="1231.5">预览课表、冲突和待安排课程</tspan>
-</text>
-<polygon points="290.0,1349 510,1411.0 290.0,1473 70,1411.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="1417.0">学生｜确认保存？</tspan>
-</text>
-<rect x="645" y="1371.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="1417.0">取消，不替换原课表</tspan>
-</text>
-<rect x="70" y="1521" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1564.0">系统｜保存一份学期个人课表</tspan>
-</text>
-<rect x="70" y="1693" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1736.0">结束</tspan>
-</text>
-<text x="70" y="1827" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+<text x="70" y="967" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
 </g></svg>

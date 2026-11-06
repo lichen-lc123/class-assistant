@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createApp} from '../app.mjs';
+import {createInitialAdmin,hashPassword} from '../database.mjs';
+test('重复导入更新内容，保留个人状态，更新标识按用户及版本确认',async t=>{
+ const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'admin-test','管理员','Testing123');
+ const hash=await hashPassword('Testing123');for(const name of ['one','two','outsider'])db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run(name,name,hash);
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(r)));const base='http://127.0.0.1:'+server.address().port;
+ async function call(path,method='GET',body,cookie){const r=await fetch(base+'/api'+path,{method,headers:{...(method==='GET'?{}:{Origin:base,'Content-Type':'application/json'}),...(cookie?{Cookie:cookie}:{})},body:body===undefined?undefined:JSON.stringify(body)});return{status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]};}
+ const login=async id=>(await call('/auth/login','POST',{studentId:id,password:'Testing123'})).cookie;
+ const admin=await login('admin-test'),one=await login('one'),two=await login('two'),outsider=await login('outsider');
+ const termId=(await call('/admin/timetable/terms','POST',{academicYear:'2026-2027',name:'第一学期'},admin)).data.id;
+ await call('/admin/timetable/courses','POST',{termId,source:'manual',courses:[{course_name:'系统工程',teacher:'老师',explicit_sessions:[{date:'2026-11-14',start_time:'08:00',end_time:'10:00'}]}],acceptWarnings:true},admin);
+ const course=(await call('/admin/timetable/courses?termId='+termId,'GET',undefined,admin)).data[0];
+ for(const cookie of [one,two])assert.equal((await call('/timetable/'+termId,'POST',{source:'cards',courseIds:[course.id],revision:0,acceptWarnings:true},cookie)).status,200);
+ const record={kind:'assignment',title:'第一次作业',course_name:'系统工程',teacher:'老师',content:'旧正文',due_date:'2026-12-01',targetKeys:['course:'+course.id],published:true,attachments:[]};
+ const importRows=rows=>call('/admin/homework/import','POST',{termId,records:rows,confirm:true},admin);
+ assert.equal((await importRows([record])).data.created,1);
+ const get=async cookie=>(await call('/homework','GET',undefined,cookie)).data.records[0];
+ const original=await get(one);assert.equal(original.hasUpdates,false);
+ await call('/homework/records/'+original.id+'/preferences','PUT',{revision:1,priority:'high',planned_date:'2026-11-20',planned_time:'18:00'},one);
+ await call('/homework/records/'+original.id+'/completion','POST',{revision:1,completed:true},one);
+ const before=await get(one);
+ const revised={...record,title:'第1次作业',content:'新的正文',due_date:'2026-12-03'};
+ const result=await importRows([revised]);assert.equal(result.status,201);assert.equal(result.data.updated,1);assert.equal(result.data.created,0);
+ const a=await get(one),b=await get(two);assert.equal(a.id,original.id);assert.equal(a.completed,true);assert.equal(a.completedAt,before.completedAt);assert.equal(a.planned_date,'2026-11-20');assert.equal(a.priority,'high');assert.equal(a.content,'新的正文');assert.equal(a.hasUpdates,true);assert.equal(b.completed,false);assert.equal(b.hasUpdates,true);
+ assert.equal((await call('/homework/summary','GET',undefined,one)).data.pendingCount,0);assert.equal((await call('/homework/summary','GET',undefined,two)).data.pendingCount,1);
+ assert.equal((await get(two)).hasUpdates,true); // Reading lists does not acknowledge updates.
+ assert.equal((await call('/homework/records/'+a.id+'/read','POST',{revision:2},outsider)).status,403);
+ assert.equal((await call('/homework/records/'+a.id+'/read','POST',{revision:1},one)).status,409);
+ assert.equal((await call('/homework/records/'+a.id+'/read','POST',{revision:2},one)).data.hasUpdates,false);
+ assert.equal((await get(two)).hasUpdates,true);
+ assert.equal((await importRows([revised])).data.skipped,1);assert.equal((await get(one)).revision,2);assert.equal((await get(one)).hasUpdates,false);
+ assert.equal((await call('/homework/records/'+a.id+'/completion','POST',{revision:2,completed:true},two)).data.hasUpdates,false);
+ const next=await importRows([{...revised,content:'再次更新'}]);assert.equal(next.data.updated,1);assert.equal((await get(two)).completed,true);assert.equal((await get(one)).hasUpdates,true);
+ assert.equal((await call('/homework/records/'+a.id+'/read','POST',{revision:2},one)).status,409);assert.equal((await get(one)).hasUpdates,true);
+ assert.equal((await importRows([{...revised,content:'过期覆盖',existingRevision:2}])).status,409);assert.equal((await get(one)).content,'再次更新');
+ assert.equal((await importRows([{...record,title:'第二次作业'}])).data.created,1);
+ assert.equal((await importRows([{...record,teacher:'另一老师',targetKeys:[],published:false}])).data.created,1);
+ const term2=(await call('/admin/timetable/terms','POST',{academicYear:'2026-2027',name:'第二学期'},admin)).data.id;
+ assert.equal((await call('/admin/homework/import','POST',{termId:term2,records:[{...record,targetKeys:[],published:false}],confirm:true},admin)).data.created,1);
+});

@@ -7,7 +7,7 @@ export interface Term { id: string; academicYear: string; name: string; startsOn
 export interface TermList { terms: Term[]; currentTermIds: string[]; today: string; timeZone: string }
 export interface WeeklyRule { calendar_name?: string | null; weeks: number[]; weekday: number | null; period_start?: number | null; period_end?: number | null; start_time?: string | null; end_time?: string | null; room?: string | null; raw?: string }
 export interface SpecialDate { date: string | null; weekday?:number|null; lesson_number?: number | null; kind: string; original_date?: string | null; period_start?: number | null; period_end?: number | null; start_time?: string | null; end_time?: string | null; room?: string | null; raw?: string }
-export interface ExplicitSession { date: string; start_time: string; end_time: string; room: string | null; kind?: string;lesson_number?:number|null }
+export interface ExplicitSession { date: string; start_time: string; end_time: string; room: string | null; kind?: string;lesson_number?:number|null;week?:number|null;weekday?:number|null }
 export interface DateReview {date:string|null;lesson_number:number|null;action:'added'|'merged'|'weekly_preferred'|'pending';reason:string;weekly_date?:string}
 export interface WeeklyDateResolution {date:string;lesson_number:number|null;special_date_index?:number|null;weekly_rule_index?:number|null;week?:number|null;action:'use_weekly_rule';reason:string}
 export interface Session extends ExplicitSession { start: string; end: string; lesson_number?: number | null }
@@ -18,7 +18,7 @@ export interface CourseData {
   weekly_rules: WeeklyRule[]; special_dates: SpecialDate[]; explicit_sessions: ExplicitSession[];
   schedule_raw?: string; remarks_raw?: string; warnings?: string[];source_warnings?:string[];extra_fields?:Record<string,unknown>;source_rows?:{source:string;row:number|null;raw:string}[];
 }
-export interface Course extends CourseData { id: string; sessions: Session[]; warnings: string[];notices?:string[];date_reviews?:DateReview[]; schedule_status: string; cardEnabled?: boolean; published?: boolean; revision?: number; publicCourseId?: string | null; publicRevision?:number; hasOverride?: boolean; hasPersonalData?: boolean; publicChanged?: boolean; matchedCourseId?: string | null;importAction?:'reuse'|'new' }
+export interface Course extends CourseData { id: string; origin?:'template'|'manual'; sessions: Session[]; warnings: string[];notices?:string[];date_reviews?:DateReview[]; schedule_status: string; cardEnabled?: boolean; published?: boolean; revision?: number; publicCourseId?: string | null; publicRevision?:number; hasOverride?: boolean; hasPersonalData?: boolean; publicChanged?: boolean; matchedCourseId?: string | null;importAction?:'reuse'|'new' }
 export interface Conflict { date: string; first: string; second: string; start: string; end?: string }
 export interface Preview { courses: Course[]; warnings: string[]; conflicts: Conflict[];importConflicts?:Conflict[];importBlocked?:boolean;importError?:string|null;unparsedItems?:{raw:string;reason:string|null}[];importWarnings?:string[];catalogVersion?:string;selectionVersion?:string;templateName?:string;stats?:{newCourses:number;reusedCourses:number} }
 export interface Timetable { id: string; source: Source; revision: number; templateId?: string | null; templateRevision?: number | null }
@@ -26,7 +26,7 @@ export interface TimetableView { term: Term; timetable: Timetable | null; course
 export interface DashboardLesson extends Session { entryId:string;courseName:string;teacher:string|null;index:number;lessonNumber:number;termName:string;academicYear:string }
 export interface DashboardDay { date:string;daysUntil:number;lessons:DashboardLesson[] }
 export interface DashboardView { today:string;timeZone:string;days:DashboardDay[];pendingCourseCount:number;timetableCount:number }
-export interface Template { id: string; termId: string; name: string; description: string; published: boolean; revision: number; courseIds: string[] }
-export const sourceNames: Record<Source,string> = { ai:'外部 AI 结果', excel:'Excel 导入', template:'管理员模板', cards:'课程卡片' };
+export interface Template { id: string; termId: string; name: string; description: string; published: boolean; revision: number; courseIds: string[]; subscriberNames?:string[]; courses?:Course[] }
+export const sourceNames: Record<Source,string> = { ai:'外部 AI 结果', excel:'历史表格导入', template:'管理员模板', cards:'课程卡片' };
 export function emptyCourse(): CourseData { return { course_name:'',teacher:'',course_code:'',teaching_class_code:'',weekly_rules:[],special_dates:[],explicit_sessions:[],room:'',schedule_raw:'',remarks_raw:'' }; }
 export const errorMessage=(error:unknown)=>error instanceof Error?error.message:'操作失败，请重试。';

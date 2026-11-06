@@ -1,7 +1,7 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   color: #303a35;
-  background: #f5f3ee;
+  background: #faf9f6;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -99,7 +99,7 @@ h1 { margin: 22px 0 20px; font-family: "Noto Serif SC", "Songti SC", SimSun, ser
   h1 { font-size: clamp(38px, 3.7vw, 55px); line-height: 1.45; }
 }
 @media (max-width: 760px) {
-  .login-page { display: flex; flex-direction: column; min-height: 100svh; max-width: 580px; margin: 0 auto; padding: 0 24px; background: #f5f3ee; }
+  .login-page { display: flex; flex-direction: column; min-height: 100svh; max-width: 580px; margin: 0 auto; padding: 0 24px; background: #faf9f6; }
   .story-panel { display: block; padding: 36px 8px 24px; background: transparent; overflow: visible; }
   .story-panel::after, .brand, .story-kicker, .desktop-title, .desktop-copy, .story-footnote { display: none; }
   .story-content { padding: 0; margin: 0; min-height: 137px; display: flex; flex-direction: column; justify-content: center; }

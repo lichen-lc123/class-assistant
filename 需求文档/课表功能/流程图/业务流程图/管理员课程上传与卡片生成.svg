@@ -37,7 +37,7 @@
 <rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="864.5">网站｜校验角色和课程身份</tspan>
-<tspan x="290.0" y="887.5">自动导入复用同班，手动重复拒绝</tspan>
+<tspan x="290.0" y="887.5">自动导入复用相同课程，手动重复拒绝</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

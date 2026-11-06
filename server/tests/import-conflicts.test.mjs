@@ -31,7 +31,7 @@ function excel(date,name='表格课程',code='EXCEL'){
   return[{name:'课表.xlsx',content:Buffer.concat([...parts,directory,end]).toString('base64')}];
 }
 
-test('四种来源均可追加，重复时间整批拒绝，模板同步不删除额外课程',async t=>{
+test('三种来源均可追加，重复时间整批拒绝，模板同步不删除额外课程',async t=>{
   const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'append-admin','学委','AppendAdminFixture123');
   const pw=await hashPassword('AppendStudentFixture123');for(const id of ['one','two','other'])db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run('append-'+id,id,pw);
   await new Promise(done=>server.listen(0,'127.0.0.1',done));t.after(()=>new Promise(done=>server.close(done)));const base=`http://127.0.0.1:${server.address().port}`;
@@ -48,18 +48,18 @@ test('四种来源均可追加，重复时间整批拒绝，模板同步不删�
   const get=async(cookie=cookies.one)=>(await call('/timetable/'+termId,'GET',undefined,cookie)).data;
   const save=async(input,cookie=cookies.one)=>call('/timetable/'+termId,'POST',{...input,revision:(await get(cookie)).timetable?.revision||0,acceptWarnings:true},cookie);
   const preview=(input,cookie=cookies.one)=>call(input.source==='template'||input.source==='cards'?'/timetable/selection-preview':'/timetable/preview','POST',{termId,...input},cookie);
-  await t.test('模板起步后追加AI、真实Excel、另一模板和卡片，其他用户独立',async()=>{
+  await t.test('模板起步后追加AI、另一批AI、模板和卡片，其他用户独立',async()=>{
     assert.equal((await save({source:'template',templateId:template})).status,200);
     assert.equal((await save({source:'cards',courseIds:[ids.BASE]},cookies.two)).status,200);
-    for(const input of [{source:'ai',courses:[raw('AI新增','AI','2026-11-08')]},{source:'excel',files:excel('2026-11-09')},{source:'template',templateId:second},{source:'cards',courseIds:[ids.CARD]}]){
+    for(const input of [{source:'ai',courses:[raw('AI新增','AI','2026-11-08')]},{source:'ai',courses:[raw('第二批AI','EXCEL','2026-11-09')]},{source:'template',templateId:second},{source:'cards',courseIds:[ids.CARD]}]){
       const p=await preview(input);assert.equal(p.status,200);assert.equal(p.data.importBlocked,false);assert.equal((await save(input)).status,200);
     }
     assert.equal((await get()).courses.length,5);assert.equal((await get(cookies.two)).courses.length,1);assert.equal((await get(cookies.other)).timetable,null);
     assert.equal((await save({source:'ai',courses:[raw('卡片后的AI','TWO-AI','2026-11-08')]},cookies.two)).status,200);
   });
-  await t.test('四类导入均提示重复时段，确认标记不能绕过，整批不留半份数据',async()=>{
+  await t.test('三类导入均提示重复时段，确认标记不能绕过，整批不留半份数据',async()=>{
     const before=await get(),rows=db.prepare('SELECT * FROM timetable_entries ORDER BY id').all(),subs=db.prepare('SELECT * FROM timetable_template_subscriptions').all();
-    const inputs=[{source:'ai',courses:[raw('本可添加','OK','2026-11-21'),raw('冲突AI','BAD-AI','2026-11-07','09:00','11:00')]},{source:'excel',files:excel('2026-11-07','冲突Excel','BAD-EXCEL')},{source:'template',templateId:blocked},{source:'cards',courseIds:[ids.BLOCK]}];
+    const inputs=[{source:'ai',courses:[raw('本可添加','OK','2026-11-21'),raw('冲突AI','BAD-AI','2026-11-07','09:00','11:00')]},{source:'template',templateId:blocked},{source:'cards',courseIds:[ids.BLOCK]}];
     for(const input of inputs){const p=await preview(input);assert.equal(p.status,200);assert.equal(p.data.importBlocked,true);assert.match(p.data.importError,/课程时间重复/);assert.match(p.data.importError,/2026-11-07/);assert.ok(p.data.importError.includes('最初课程'));assert.equal((await save(input)).status,409);}
     assert.equal((await get()).timetable.revision,before.timetable.revision);assert.deepEqual(db.prepare('SELECT * FROM timetable_entries ORDER BY id').all(),rows);assert.deepEqual(db.prepare('SELECT * FROM timetable_template_subscriptions').all(),subs);
   });
@@ -103,7 +103,7 @@ test('旧数据库迁移保留模板关系和个人资料，重复初始化不�
   db.exec(`INSERT INTO terms(id,academic_year,name) VALUES('term','2026-2027','第一学期');
     INSERT INTO public_courses(id,term_id,payload_json) VALUES('course','term','{}');
     INSERT INTO timetable_templates(id,term_id,name) VALUES('template','term','旧模板');
-    INSERT INTO template_courses VALUES('template','course');
+    INSERT INTO template_courses(template_id,course_id) VALUES('template','course');
     INSERT INTO timetables(id,user_id,term_id,source,template_id,template_revision) VALUES('tpl',1,'term','template','template',1),('own',2,'term','ai',NULL,NULL);
     INSERT INTO timetable_entries(id,timetable_id,course_id,private_json,override_json) VALUES('old-tpl','tpl','course',NULL,'{"room_overrides":{"0":"个人教室"}}'),('old-own','own',NULL,'{"course_name":"个人课程"}',NULL);
     DROP TABLE timetable_entry_templates;DROP TABLE timetable_template_subscriptions;ALTER TABLE timetable_entries DROP COLUMN direct_source;`);

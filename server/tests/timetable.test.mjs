@@ -63,7 +63,7 @@ test('Excel学年校验覆盖第二个文件、行内学年和原始课程时间
   assert.throws(()=>coursesFromFiles([combinedFiles()[0],combinedWorkbook('第二个文件',[['错误课程','班级编号BAD']],'2025-2026')],combinedTerm),/不属于所选学年/);
   assert.throws(()=>coursesFromFiles([combinedWorkbook('来源',[['错误课程','2025-2026学年秋学季\n班级编号BAD']])],combinedTerm),/不属于所选学年/);
 });
-test('学生课表和管理员模板均可合并两份Excel，重复班级只保存一次',async t=>{
+test('课表和管理员模板的Excel入口均已停用，拒绝预览和保存',async t=>{
   const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'merge-admin','学委','MergeAdminFixture123');
   db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run('merge-student','同学',await hashPassword('MergeStudentFixture123'));
   await new Promise(done=>server.listen(0,'127.0.0.1',done));t.after(()=>new Promise(done=>server.close(done)));
@@ -72,15 +72,11 @@ test('学生课表和管理员模板均可合并两份Excel，重复班级只保
   const admin=(await call('/auth/login',{studentId:'merge-admin',password:'MergeAdminFixture123'})).cookie,student=(await call('/auth/login',{studentId:'merge-student',password:'MergeStudentFixture123'})).cookie;
   const termId=(await call('/admin/timetable/terms',combinedTerm,admin)).data.id;
   const input={termId,source:'excel',files:combinedFiles()};
-  const preview=await call('/timetable/preview',input,student);assert.equal(preview.status,200);assert.equal(preview.data.courses.length,3);
-  const shared=preview.data.courses.find(c=>c.teaching_class_code==='SHARED');assert.equal(shared.source_rows.length,2);assert.ok(shared.source_rows.some(s=>s.source.includes('冬学季.xlsx')));
-  assert.deepEqual(shared.sessions.map(s=>s.date),['2026-12-11','2026-12-25','2027-01-16','2027-01-23']);assert.equal(preview.data.courses.find(c=>c.teaching_class_code==='SECOND').schedule_status,'pending');
+  for(const [path,cookie] of [['/timetable/preview',student],['/timetable/'+termId,student],['/admin/timetable/template-preview',admin],['/admin/timetable/template-import',admin]]){
+    const result=await call(path,input,cookie);assert.equal(result.status,400);assert.match(result.data.message,/Excel|AI/);
+  }
   assert.equal(db.prepare('SELECT COUNT(*) n FROM timetables').get().n,0);
-  const saved=await call('/timetable/'+termId,{source:'excel',courses:preview.data.courses,acceptWarnings:true},student);assert.equal(saved.status,200);assert.equal(saved.data.courses.length,3);assert.equal(saved.data.courses.find(c=>c.teaching_class_code==='SHARED').sessions.length,4);
-  const template=await call('/admin/timetable/template-preview',input,admin);assert.equal(template.status,200);assert.equal(template.data.courses.length,3);
-  const published=await call('/admin/timetable/template-import',{termId,source:'excel',name:'双表合并模板',courses:template.data.courses,catalogVersion:template.data.catalogVersion,acceptWarnings:true},admin);assert.equal(published.status,201);assert.equal(published.data.cardsCreated,3);
-  const count=db.prepare('SELECT COUNT(*) n FROM public_courses').get().n;
-  const invalid=await call('/admin/timetable/template-preview',{...input,files:[input.files[0],combinedWorkbook('错学年',[['错误','班级编号BAD']],'2025-2026')]},admin);assert.equal(invalid.status,400);assert.equal(db.prepare('SELECT COUNT(*) n FROM public_courses').get().n,count);
+  assert.equal(db.prepare('SELECT COUNT(*) n FROM public_courses').get().n,0);
 });
 
 test('课表完整接口与权限流程',async t=>{

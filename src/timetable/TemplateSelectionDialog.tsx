@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, MapPin, Clock3 } from 'lucide-react';
 import { api } from '../services/auth';
 import { Modal } from '../components/Modal';
+import { TemplateUsers } from './TemplateUsers';
 import { CourseWeekdays } from './CourseWeekdays';
 import { weekdayLabel } from './date';
 import { errorMessage, type Course, type Preview, type Template, type Term, type TimetableView } from './types';
@@ -57,7 +58,7 @@ export function TemplateSelectionDialog({term,current,onClose,onSaved}:{term:Ter
       {loading?<p className="empty-state" role="status">正在加载模板…</p>:template?<>
         <div className="template-carousel-navigation">
           <button type="button" className="icon-button template-arrow" aria-label="上一个模板" title="上一个模板" disabled={saving||index===0} onClick={()=>navigate(-1)}><ChevronLeft size={23}/></button>
-          <div className="template-carousel-heading" aria-live="polite"><span>模板 {index+1} / {templates.length}</span><h3>{preview?.templateName||template.name}</h3><p>{preview?.courses.length??template.courseIds.length} 门课程</p></div>
+          <div className="template-carousel-heading" aria-live="polite"><span>模板 {index+1} / {templates.length}</span><h3>{preview?.templateName||template.name}</h3><TemplateUsers names={template.subscriberNames}/><p>{preview?.courses.length??template.courseIds.length} 门课程</p></div>
           <button type="button" className="icon-button template-arrow" aria-label="下一个模板" title="下一个模板" disabled={saving||index===templates.length-1} onClick={()=>navigate(1)}><ChevronRight size={23}/></button>
         </div>
         <div className={`template-carousel-slide template-slide-${direction}`} key={template.id}>
@@ -79,7 +80,7 @@ function TemplateCourse({course,index}:{course:Course;index:number}){
   return <article className="template-preview-course">
     <div className="template-course-title"><span>{index+1}</span><h4>{course.course_name}</h4></div><CourseWeekdays sessions={course.sessions}/>
     {first?<><p className="template-course-time"><Clock3 size={15}/><span>{first.date} · {weekdayLabel(first.date)} · {first.start_time}—{first.end_time}<small>第 {first.lesson_number??1} 次课</small></span></p><p className="template-course-room"><MapPin size={15}/><strong>{first.kind==='practice'?'实践活动，不在教室授课':first.room||'教室待通知'}</strong></p></>:<><p className="pending-status">上课时间待安排</p><p className="template-course-room"><MapPin size={15}/><strong>{course.room||'教室待通知'}</strong></p></>}
-    <p className="template-course-meta">{course.teacher||'老师待确认'} · 班号 {course.teaching_class_code||'待确认'} · {course.sessions.length} 次已确定安排</p>
+    <p className="template-course-meta">{course.teacher||'老师待确认'} · {course.sessions.length} 次已确定安排</p>
     {course.sessions.length>0&&<details className="template-lesson-details"><summary>查看全部 {course.sessions.length} 次上课安排</summary><ol>{course.sessions.map((session,i)=><li key={`${session.start}-${i}`}><strong>第 {session.lesson_number??i+1} 次课</strong><time dateTime={session.start}>{session.date} · {weekdayLabel(session.date)} · {session.start_time}—{session.end_time}</time><span>{session.kind==='practice'?'实践活动，不在教室授课':session.room||'教室待通知'}</span></li>)}</ol></details>}
   </article>;
 }

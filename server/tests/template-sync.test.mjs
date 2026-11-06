@@ -1,3 +1,4 @@
+import {courseTarget} from './fixtures/course-target.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createApp} from '../app.mjs';
@@ -37,7 +38,7 @@ test('模板成员与卡片更新同步到已选用户，保留个人安排并�
     const edited=await call(`/timetable/${termId}/entries/${retainedEntry.id}`,'PATCH',{revision:own.timetable.revision,publicRevision:retainedEntry.publicRevision,sessions:retainedEntry.sessions.map(s=>({...s,room:'我的教室'}))},cookies.template);
     assert.equal(edited.status,200);own=edited.data;
     for(const [code,name]of [['SYNC-B','移除课程'],['SYNC-C','新增课程']]){
-      const result=await call('/admin/homework/records','POST',{termId,record:{kind:'assignment',course_name:name,teacher:'原老师',title:name+'作业',content:'完成课程练习',targetKeys:['code:'+code],published:true}},admin);assert.equal(result.status,201);
+      const result=await call('/admin/homework/records','POST',{termId,record:{kind:'assignment',course_name:name,teacher:'原老师',title:name+'作业',content:'完成课程练习',targetKeys:[courseTarget(db,code)],published:true}},admin);assert.equal(result.status,201);
       if(code==='SYNC-B')homeworkB=result.data.id;else homeworkC=result.data.id;
     }
   });

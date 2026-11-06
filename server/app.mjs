@@ -105,7 +105,7 @@ export async function createApp({ databasePath, serveStatic = false, allowedOrig
       }
       if (path === '/api/auth/password' && req.method === 'POST') {
         const body = await readJson(req);
-        if (!validPassword(body.newPassword)) fail(400, '新密码需为 8—128 位。');
+        if (typeof body.newPassword!=='string'||!/^(?=.*[A-Za-z])(?=.*[0-9])[^\s]{8,32}$/.test(body.newPassword)) fail(400, '新密码需为 8—32 位，包含字母和数字，可使用符号，不含空格。');
         if (body.oldPassword === body.newPassword) fail(400, '新密码不能与原密码相同。');
         const original = db.prepare('SELECT password_hash FROM users WHERE id = ?').get(user.id);
         if (!await verifyPassword(body.oldPassword, original.password_hash)) fail(400, '当前密码不正确。');

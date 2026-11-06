@@ -63,7 +63,7 @@
 </text>
 <rect x="70" y="1349" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">学生｜核对上课班并补充信息</tspan>
+<tspan x="290.0" y="1380.5">学生｜核对课程并补充信息</tspan>
 <tspan x="290.0" y="1403.5">或将问题内容带回外部 AI 修正</tspan>
 </text>
 <polygon points="290.0,1521 510,1583.0 290.0,1645 70,1583.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>

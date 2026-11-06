@@ -5,7 +5,7 @@
 <rect width="1100" height="2029" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">Excel作业导入 · 系统流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-04 · 作业功能 · 已实现</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-06 · 作业功能 · 已实现</text>
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
 <path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
@@ -15,7 +15,7 @@
 <path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="789.0" font-size="15" fill="#66765D">课程、老师、原文、图片</text>
 <path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="961.0" font-size="15" fill="#66765D">预览记录与班级候选</text>
+<text x="305.0" y="961.0" font-size="15" fill="#66765D">预览记录与课程候选</text>
 <path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="1133.0" font-size="15" fill="#66765D">核对后的所选草稿</text>
 <path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
@@ -49,7 +49,7 @@
 <rect x="70" y="833" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="864.5">后端｜归一日期并按课程老师</tspan>
-<tspan x="290.0" y="887.5">生成班级候选及核对警告</tspan>
+<tspan x="290.0" y="887.5">生成课程候选及核对警告</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
@@ -63,7 +63,7 @@
 </text>
 <polygon points="290.0,1349 510,1411.0 290.0,1473 70,1411.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="1405.5">后端｜权限、字段、班级</tspan>
+<tspan x="290.0" y="1405.5">后端｜权限、字段、课程</tspan>
 <tspan x="290.0" y="1428.5">图片及确认均有效？</tspan>
 </text>
 <rect x="645" y="1371.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>

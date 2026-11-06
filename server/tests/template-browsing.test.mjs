@@ -26,6 +26,8 @@ test('浏览模板返回全部课程且不写个人课表，只保存确认的�
   }
   const first=await create('模板一',[shared,course('模板一独有课程','BROWSE-FIRST','2026-11-08')]);
   const second=await create('模板二',[shared,course('模板二独有课程','BROWSE-SECOND','2026-11-09')]);
+  const templateList=async cookie=>(await call('/timetable/templates?termId='+termId,'GET',undefined,cookie)).data;
+  assert((await templateList(student)).every(template=>template.subscriberNames.length===0));
   const preview = id => call('/timetable/selection-preview','POST',{termId,source:'template',templateId:id},student);
   const one=await preview(first),two=await preview(second);
   assert.equal(one.status,200);assert.equal(two.status,200);
@@ -34,6 +36,7 @@ test('浏览模板返回全部课程且不写个人课表，只保存确认的�
   assert.ok(two.data.selectionVersion);assert.notEqual(one.data.selectionVersion,two.data.selectionVersion);
   for(const c of two.data.courses){assert.equal(c.teacher,'课程老师');assert.equal(c.sessions[0].room,'工教二201');assert.equal(c.sessions[0].start_time,'08:00');}
   assert.equal(db.prepare('SELECT COUNT(*) n FROM timetables').get().n,0);
+  assert((await templateList(student)).every(template=>template.subscriberNames.length===0));
   const own=two.data.courses.find(c=>c.teaching_class_code==='BROWSE-SECOND');
   const edited=await call('/admin/timetable/courses/'+own.id,'PUT',{course:{...course('模板二独有课程','BROWSE-SECOND','2026-11-09'),explicit_sessions:[{date:'2026-11-09',start_time:'08:00',end_time:'10:00',room:'更新教室'}]},revision:own.revision,acceptWarnings:true},admin);
   assert.equal(edited.status,200);
@@ -52,4 +55,35 @@ test('浏览模板返回全部课程且不写个人课表，只保存确认的�
   assert.equal(saved.status,200);assert.equal(saved.data.timetable.templateId,second);
   assert.deepEqual(saved.data.courses.map(c=>c.course_name).sort(),['共同课程','模板二独有课程']);
   assert.equal(saved.data.courses.find(c=>c.teaching_class_code==='BROWSE-SECOND').sessions[0].room,'更新教室');
+  await t.test('模板名称下的使用名单来自实际订阅，仅显示账号姓名',async()=>{
+    const list=await templateList(student);
+    assert.deepEqual(list.find(x=>x.id===second).subscriberNames,['测试同学']);
+    assert.deepEqual(list.find(x=>x.id===first).subscriberNames,[]);
+    const adminList=(await call('/admin/timetable/templates?termId='+termId,'GET',undefined,admin)).data;
+    assert.deepEqual(adminList.find(x=>x.id===second).subscriberNames,['测试同学']);
+    assert.equal((await call('/timetable/templates?termId='+termId)).status,401);
+    assert(!JSON.stringify(list).includes('browse-student'));
+    db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run('browse-card','卡片同学',await hashPassword('BrowseStudentFixture123'));
+    const cardUser=(await call('/auth/login','POST',{studentId:'browse-card',password:'BrowseStudentFixture123'})).cookie;
+    assert.equal((await call('/timetable/'+termId,'POST',{source:'cards',courseIds:saved.data.courses.map(c=>c.publicCourseId),acceptWarnings:true},cardUser)).status,200);
+    assert.deepEqual((await templateList(student)).find(x=>x.id===second).subscriberNames,['测试同学']);
+  });
+  await t.test('管理员兼学生身份计入，混合追加多个模板分别统计',async()=>{
+    assert.equal((await call('/timetable/'+termId,'POST',{source:'template',templateId:first,acceptWarnings:true},admin)).status,200);
+    const third=await create('模板三',[course('第三模板独有课','BROWSE-THIRD','2026-11-10')]);
+    assert.equal((await call('/timetable/'+termId,'POST',{source:'template',templateId:third,revision:saved.data.timetable.revision,acceptWarnings:true},student)).status,200);
+    const list=await templateList(student);
+    assert.deepEqual(list.find(x=>x.id===first).subscriberNames,['学委']);
+    assert.deepEqual(list.find(x=>x.id===second).subscriberNames,['测试同学']);
+    assert.deepEqual(list.find(x=>x.id===third).subscriberNames,['测试同学']);
+    db.prepare('UPDATE users SET name=? WHERE student_id=?').run('更新后的姓名','browse-student');
+    assert.deepEqual((await templateList(student)).find(x=>x.id===third).subscriberNames,['更新后的姓名']);
+  });
+  await t.test('清空本人课表后从所有使用名单移除，其他人名单保留',async()=>{
+    const own=(await call('/timetable/'+termId,'GET',undefined,student)).data;
+    assert.equal((await call('/timetable/'+termId,'DELETE',{revision:own.timetable.revision,confirm:true},student)).status,200);
+    const list=await templateList(student);
+    assert.deepEqual(list.find(x=>x.id===first).subscriberNames,['学委']);
+    assert(list.filter(x=>x.id!==first).every(x=>x.subscriberNames.length===0));
+  });
 });

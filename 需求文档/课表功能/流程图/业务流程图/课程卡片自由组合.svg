@@ -48,8 +48,8 @@
 </text>
 <rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">学生｜搜索课程名、老师、课程编号</tspan>
-<tspan x="290.0" y="887.5">或上课班编号</tspan>
+<tspan x="290.0" y="864.5">学生｜搜索课程名、老师</tspan>
+<tspan x="290.0" y="887.5">及课程编号</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
@@ -58,8 +58,8 @@
 </text>
 <rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">系统｜提示重复、具体日期冲突</tspan>
-<tspan x="290.0" y="1231.5">以及时间待通知的课程</tspan>
+<tspan x="290.0" y="1208.5">网站｜确认添加时自动检查</tspan>
+<tspan x="290.0" y="1231.5">正常直接保存，缺失信息提示核对</tspan>
 </text>
 <polygon points="290.0,1349 510,1411.0 290.0,1473 70,1411.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">

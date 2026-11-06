@@ -35,7 +35,7 @@
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="520.5">后端｜校验会话及目标学期</tspan>
-<tspan x="290.0" y="543.5">解析AI、Excel、模板或卡片</tspan>
+<tspan x="290.0" y="543.5">解析AI、模板或卡片</tspan>
 </text>
 <path d="M70 674 A220.0 13 0 0 1 510 674 L510 722 A220.0 13 0 0 1 70 722 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 674 A220.0 13 0 0 0 510 674" stroke="#8A9CA6" fill="none"/>

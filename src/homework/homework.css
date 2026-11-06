@@ -34,8 +34,61 @@
 .homework-card.homework-completed .homework-deadline{background:#f1eee7;border-color:#d7cfc1}
 .homework-card>.muted-note{color:#667363;font-size:12px;line-height:1.8}
 .homework-card .homework-status{font-weight:600;flex-shrink:0}
+.homework-detail-completion{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:14px 16px;margin-bottom:16px;border:1px solid #dce4d4;border-radius:10px;background:#f6f8f1}
+.homework-detail-completion>span{font-size:13px;font-weight:600;color:#465d3e}
+.homework-detail-completion .segmented button{display:inline-flex;align-items:center;gap:7px}
+.homework-detail-completion>p{flex-basis:100%;font-size:12px;line-height:1.8;color:#667363;margin:0}
+.homework-card footer{flex-wrap:wrap}
 @media(max-width:800px){.homework-course-heading h2{font-size:20px}.homework-teacher>strong{font-size:15px}.homework-main-content{padding:14px}.homework-main-content>.homework-text{font-size:14px}.homework-card .homework-deadline>strong{font-size:19px}}
 
 .manage-dialog:has(.homework-detail-dialog){max-width:900px;width:calc(100% - 32px)}
 .homework-detail-dialog{display:grid;gap:18px;min-width:0}
 @media(max-width:700px){.manage-dialog:has(.homework-detail-dialog){width:calc(100% - 20px)}}
+
+.homework-toolbar-personal .homework-controls{margin-top:0;margin-bottom:14px}
+.homework-personal-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+
+.homework-upload-editor{border:1px solid #dce4d6;border-radius:10px;padding:16px;background:#fafbf7;min-width:0}
+.homework-upload-editor h3,.homework-file-downloads h3{font-size:14px;margin:0 0 12px;color:#465d3e}
+.homework-upload-actions{display:flex;gap:12px;flex-wrap:wrap}.homework-upload-actions label{position:relative;cursor:pointer}.homework-upload-actions input{position:absolute;inset:0;opacity:0;width:100%;height:100%;padding:0;cursor:pointer}.homework-upload-actions label:focus-within{outline:2px solid #627a54;outline-offset:3px}.homework-upload-actions label:has(input:disabled){opacity:.5;cursor:wait}
+.homework-upload-editor>.muted-note{font-size:12px;line-height:1.8;margin:12px 0}
+.homework-upload-list{display:grid;gap:10px}.homework-upload-item{display:flex;align-items:center;gap:12px;padding:10px;background:white;border:1px solid #e0e5da;border-radius:8px;min-width:0}.homework-upload-item>img{width:64px;height:56px;object-fit:cover;border-radius:5px;flex-shrink:0}.homework-upload-item>svg{color:#718468;flex-shrink:0}.homework-upload-item>div{flex:1;min-width:0}.homework-upload-item strong{display:block;font-size:12px;font-weight:500;overflow-wrap:anywhere}.homework-upload-item small{display:block;font-size:11px;color:#7a8573;margin-top:5px}.homework-upload-item>button{flex-shrink:0}
+.homework-file-downloads{margin:16px 0}.homework-file-downloads h3{display:flex;align-items:center;gap:6px}.homework-file-downloads>a{display:flex;align-items:center;gap:10px;padding:12px;margin-top:8px;border:1px solid var(--homework-border,#dce4d6);border-radius:8px;background:#ffffffb3;color:#4d6552;text-decoration:none}.homework-file-downloads>a:hover{background:#fff}.homework-file-downloads>a>span{flex:1;min-width:0}.homework-file-downloads strong{display:block;font-size:13px;font-weight:600;overflow-wrap:anywhere}.homework-file-downloads small{display:block;font-size:11px;color:#778573;margin-top:4px}.homework-file-downloads svg{flex-shrink:0}
+
+.homework-toolbar-personal .homework-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto; align-items: end; }
+.homework-toolbar-personal .homework-controls > label { min-width: 0; }
+.homework-toolbar-personal .homework-controls input,
+.homework-toolbar-personal .homework-controls select { height: 50px; box-sizing: border-box; }
+.homework-controls .homework-personal-actions { margin: 0; flex-wrap: nowrap; align-items: center; height: 50px; }
+.homework-controls .homework-personal-actions .primary-button { height: 50px; white-space: nowrap; }
+@media (max-width: 800px) {
+  .homework-toolbar-personal .homework-controls { grid-template-columns: minmax(0, 1fr); }
+  .homework-controls .homework-personal-actions { justify-content: flex-end; }
+}
+
+/* Web homework filters: semester, course, teacher, actions. */
+.homework-toolbar-personal .homework-controls { grid-template-columns: minmax(130px,1fr) minmax(150px,1.2fr) minmax(130px,1fr) auto; }
+.homework-controls datalist { display: none; }
+.homework-batch-toolbar { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.homework-batch-toolbar > button { margin-left: auto; }
+.homework-record-wrapper { min-width: 0; }
+.homework-record-select { margin: 0 0 10px; }
+.batch-delete-list { max-height: 280px; overflow: auto; line-height: 1.9; }
+.manage-dialog:has(.course-homework-dialog) { width: calc(100vw - 40px); max-width: 960px; }
+.course-detail-teacher { font-weight: 600; margin: 0; }
+.homework-card footer { flex-wrap: wrap; }
+.personal-dashboard .dashboard-homework-list { max-height: 520px; overflow-y: auto; }
+.personal-dashboard .dashboard-homework-list .dashboard-homework-card { padding: 11px 13px; }
+.personal-dashboard .dashboard-homework-list p { margin: 3px 0; line-height: 1.5; }
+.personal-dashboard .dashboard-homework-list time { margin-top: 6px; padding: 5px 7px; }
+.dashboard-columns .dashboard-homework-list { gap: 9px; margin: 12px 0; }
+@media(max-width:1000px) { .homework-toolbar-personal .homework-controls { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:500px) { .homework-toolbar-personal .homework-controls { grid-template-columns: minmax(0,1fr); } }
+.homework-menu-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 5px; margin-left: auto; border-radius: 12px; background: #c94f50; color: white; font-size: 11px; font-weight: 700; line-height: 1; }
+.filter-count { display: inline-flex; min-width: 18px; justify-content: center; margin-left: 5px; font-size: 11px; opacity: .8; }
+.homework-card { position: relative; }
+.homework-card:has(.homework-update-badge) > header { padding-top: 24px; }
+.homework-update-badge { position: absolute; top: 14px; right: 16px; border: 1px solid #e6bfb2; border-radius: 12px; padding: 3px 9px; color: #934b35; background: #fff1e8; font-size: 11px; line-height: 1.5; font-weight: 650; cursor: pointer; }
+.homework-update-badge:focus-visible { outline: 2px solid #934b35; outline-offset: 3px; }
+.dashboard-homework-card .homework-update-badge { top: 13px; right: 48px; }
+.dashboard-homework-card:has(.homework-update-badge) .dashboard-homework-open { padding-right: 105px; }

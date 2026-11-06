@@ -5,13 +5,13 @@
 <rect width="1100" height="2201" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">个人作业安排与工作台排序 · 系统流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-04 · 作业功能 · 已实现</text>
+<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-06 · 作业功能 · 已实现</text>
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
 <path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="445.0" font-size="15" fill="#66765D">本人会话及学期筛选</text>
 <path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="617.0" font-size="15" fill="#66765D">本人班级与发布记录</text>
+<text x="305.0" y="617.0" font-size="15" fill="#66765D">本人课程与发布记录</text>
 <path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="789.0" font-size="15" fill="#66765D">公共字段和个人状态</text>
 <path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
@@ -40,8 +40,8 @@
 </text>
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">后端｜读取本人各学期选班关系</tspan>
-<tspan x="290.0" y="543.5">筛选目标班级已发布记录</tspan>
+<tspan x="290.0" y="520.5">后端｜读取本人各学期选课关系</tspan>
+<tspan x="290.0" y="543.5">筛选目标课程已发布记录</tspan>
 </text>
 <path d="M70 674 A220.0 13 0 0 1 510 674 L510 722 A220.0 13 0 0 1 70 722 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 674 A220.0 13 0 0 0 510 674" stroke="#8A9CA6" fill="none"/>
@@ -71,7 +71,7 @@
 </text>
 <polygon points="290.0,1521 510,1583.0 290.0,1645 70,1583.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="1577.5">后端｜本人班级可见</tspan>
+<tspan x="290.0" y="1577.5">后端｜本人课程可见</tspan>
 <tspan x="290.0" y="1600.5">且版本有效？</tspan>
 </text>
 <rect x="645" y="1543.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>

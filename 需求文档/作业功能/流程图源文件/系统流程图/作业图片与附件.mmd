@@ -1,0 +1,36 @@
+%% 作业图片与附件 · 系统流程图 · V1.0 · 2026-11-06
+flowchart TD
+    N0(["开始"])
+    N1["前端｜读取文件字节与摘要<br/>展示文件名、大小、图片预览"]
+    N2["前端｜随作业提交附件关联<br/>新文件字节、当前版本及会话"]
+    N3["后端｜检查身份、选课与作业权限<br/>校验文件摘要、大小及真实图片类型"]
+    N4[("数据库｜事务保存作业和BLOB<br/>登记附件关联与本作业文件名")]
+    N5["前端｜读取授权附件URL<br/>显示图片和下载入口"]
+    N6["后端｜每次下载校验作业可见范围<br/>及当前附件关联"]
+    N7["后端｜图片按检测格式返回<br/>其他文件强制下载并禁止嗅探"]
+    N8[("数据库｜编辑后更新附件关联<br/>移除的原作业链接失效")]
+    N9(["结束"])
+    N0 --> N1
+    N1 -->|新文件字节、摘要与所选关联| N2
+    N2 -->|会话、作业版本、附件与资料| N3
+    N3 -->|已验证内容与文件权限| N4
+    N4 -->|文件名、大小、MIME及授权URL| N5
+    N5 -->|作业ID、文件ID、登录会话| N6
+    N6 -->|有效附件关联与授权字节| N7
+    N7 -->|后续编辑及保留或移除操作| N8
+    N8 --> N9
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 database;
+    class N5 normal;
+    class N6 normal;
+    class N7 normal;
+    class N8 database;
+    class N9 terminal;

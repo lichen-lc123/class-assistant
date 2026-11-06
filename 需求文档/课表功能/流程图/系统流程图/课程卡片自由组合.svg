@@ -11,9 +11,9 @@
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="445.0" font-size="15" fill="#66765D">目标学期与搜索词</text>
 <path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="617.0" font-size="15" fill="#66765D">上课班卡片数据</text>
+<text x="305.0" y="617.0" font-size="15" fill="#66765D">课程卡片数据</text>
 <path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="789.0" font-size="15" fill="#66765D">个人选择的上课班清单</text>
+<text x="305.0" y="789.0" font-size="15" fill="#66765D">个人选择的课程清单</text>
 <path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <path d="M510 1067.0 L641 1067.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="569.5" y="1055.0" font-size="15" fill="#66765D">否</text>
@@ -32,7 +32,7 @@
 <rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="348.5">前端｜提交目标学期和搜索词</tspan>
-<tspan x="290.0" y="371.5">请求已发布的上课班卡片</tspan>
+<tspan x="290.0" y="371.5">请求已发布的课程卡片</tspan>
 </text>
 <rect x="70" y="489" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
@@ -72,8 +72,8 @@
 <path d="M70 1534 A220.0 13 0 0 1 510 1534 L510 1582 A220.0 13 0 0 1 70 1582 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 1534 A220.0 13 0 0 0 510 1534" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1552.5">数据库｜保存该用户该学期选班关系</tspan>
-<tspan x="290.0" y="1575.5">不删除或修改公共上课班</tspan>
+<tspan x="290.0" y="1552.5">数据库｜保存该用户该学期选课关系</tspan>
+<tspan x="290.0" y="1575.5">不删除或修改公共课程</tspan>
 </text>
 <rect x="70" y="1693" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

@@ -44,3 +44,57 @@
 .course-card-times .card-time-pending{color:#667363;font-size:12px;font-weight:400}
 .card-library-heading{margin-top:22px}
 .chosen-course .course-card-times{font-size:13px;margin:6px 0}
+
+.source-options .source-recommended{background:#e3ece8;color:#405e54;border:1px solid #bfcec5}
+
+.template-tile-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+
+.admin-course-grid .course-tile{min-width:0}
+.course-tile .template-users,.template-carousel-heading .template-users{display:block;max-width:100%;min-width:0;margin:6px 0;color:#7a8573;font-size:11px;line-height:1.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.template-edit-course{display:flex;align-items:center;justify-content:space-between;gap:12px}.template-edit-course>label{flex:1;min-width:0}.template-edit-course>button{flex-shrink:0}.template-edit-course small{display:block;margin-top:5px;font-size:11px;color:#7a8573}
+
+.card-origin{display:inline-block;margin-left:8px}
+
+/* Individual lesson cards in the administrator editor. */
+.lesson-list-heading { margin-top: 6px; gap: 12px; flex-wrap: wrap; }
+.lesson-editor-list { display: grid; gap: 16px; }
+.lesson-editor-card { padding: 20px; border: 1px solid #dce3d7; border-radius: 14px; background: #f8faf6; }
+.lesson-editor-card h3 { margin: 0; color: #465e42; font-size: 18px; }
+.lesson-editor-card .mini-heading { margin-bottom: 16px; }
+.lesson-editor-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.lesson-editor-fields label { min-width: 0; }
+.lesson-editor-fields input { width: 100%; min-width: 0; }
+.lesson-editor-fields input[readonly] { color: #61705e; background: #f0f3ec; }
+.lesson-editor-fields .lesson-room { grid-column: span 2; }
+@media (max-width: 760px) {
+  .lesson-editor-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .lesson-editor-card { padding: 16px; }
+}
+@media (max-width: 420px) {
+  .lesson-editor-fields { grid-template-columns: minmax(0, 1fr); }
+  .lesson-editor-fields .lesson-room { grid-column: auto; }
+}
+
+.available-cards .clickable-course-card { cursor: pointer; transition: border-color .15s, box-shadow .15s, background-color .15s; }
+.available-cards .clickable-course-card:hover { border-color: #8da17f; background: #f3f6ee; box-shadow: 0 3px 10px #52674812; }
+.available-cards .clickable-course-card:focus-visible { outline: 2px solid #708565; outline-offset: 2px; }
+.available-cards .clickable-course-card[aria-disabled="true"] { cursor: wait; opacity: .65; }
+
+.manage-dialog:has(.selection-month-preview) { width: calc(100vw - 48px); max-width: 1240px; }
+.preview-month-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.preview-month-toolbar label { display: flex; align-items: center; gap: 10px; }
+.preview-month-toolbar select { min-width: 160px; }
+.preview-month-toolbar > span { margin-left: auto; color: #607158; font-size: 13px; }
+.preview-day-details { padding: 18px; border: 1px solid #dce3d7; border-radius: 12px; background: #fafbf8; }
+.preview-day-details h3 { margin: 0 0 16px; }
+@media(max-width:700px) {
+  .manage-dialog:has(.selection-month-preview) { width: calc(100vw - 20px); max-width: calc(100vw - 20px); }
+  .preview-month-toolbar { gap: 8px; }
+  .preview-month-toolbar > span { flex-basis: 100%; margin-left: 0; }
+  .preview-day-details { padding: 12px; }
+}
+.month-date-button { border: 0; padding: 3px; background: transparent; color: inherit; text-align: left; font: inherit; font-weight: 600; min-height: 28px; }
+.month-day button.month-course { display: block; width: 100%; border: 0; text-align: left; border-radius: 5px; padding: 5px; background: #edf3e4; color: #53694a; font: inherit; cursor: pointer; }
+.month-day button.month-course:hover { background: #e1e9d8; }
+.month-day button.month-more-courses { background: transparent; border: 0; font-size: 10px; text-align: left; color: #6c805e; padding: 3px; }

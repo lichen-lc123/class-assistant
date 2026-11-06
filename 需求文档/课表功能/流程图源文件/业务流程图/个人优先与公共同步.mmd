@@ -1,26 +1,20 @@
 %% 个人优先与公共同步 · 业务流程图 · V1.0 · 2026-11-02
 flowchart TD
     N0(["开始"])
-    N1["管理员｜更新公共上课班安排"]
-    N2["系统｜本人查看课表时<br/>读取公共新值与个人安排"]
-    N3{"系统｜相应字段<br/>是否有个人修改？"}
-    B3["同步公共新值<br/>并提示公共安排已更新"]
-    N4["系统｜保留个人安排<br/>提示公共安排有更新"]
-    N5["学生｜核对当前个人安排<br/>及缺失或冲突提示"]
-    N6{"学生｜保留个人值？"}
-    B6["清除该课程全部个人排课覆盖<br/>恢复最新公共安排"]
-    N7["系统｜继续使用个人值<br/>不影响其他用户"]
-    N8(["结束"])
+    N1["管理员｜编辑模板生成卡片<br/>或编辑模板内课程"]
+    N2["网站｜更新共享课程<br/>模板、卡片及已选用户同步"]
+    N3["管理员｜编辑独立手动卡片<br/>直接选用卡片的用户同步"]
+    N4["网站｜保留模板中的手动课程<br/>模板及其已选用户独立维护"]
+    N5["学生｜个人时间和地点调整优先<br/>可继续追加其他课程"]
+    N6["网站｜追加课程时检查时间<br/>冲突提示并拒绝整批添加"]
+    N7(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
-    N3 -->|否| B3
-    N3 -->|是| N4
+    N3 --> N4
     N4 --> N5
     N5 --> N6
-    N6 -->|否| B6
-    N6 -->|是| N7
-    N7 --> N8
+    N6 --> N7
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -29,11 +23,8 @@ flowchart TD
     class N0 terminal;
     class N1 normal;
     class N2 normal;
-    class N3 decision;
-    class B3 exception;
+    class N3 normal;
     class N4 normal;
     class N5 normal;
-    class N6 decision;
-    class B6 exception;
-    class N7 normal;
-    class N8 terminal;
+    class N6 normal;
+    class N7 terminal;

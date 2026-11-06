@@ -11,7 +11,7 @@
 <path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="445.0" font-size="15" fill="#66765D">学期及课程原始资料</text>
 <path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="617.0" font-size="15" fill="#66765D">规范化课程与班号</text>
+<text x="305.0" y="617.0" font-size="15" fill="#66765D">规范化课程与完整排课</text>
 <path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <text x="305.0" y="789.0" font-size="15" fill="#66765D">身份有效的课程及发布状态</text>
 <path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
@@ -37,7 +37,7 @@
 </text>
 <rect x="70" y="661" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">后端｜检查上课班编号</tspan>
+<tspan x="290.0" y="692.5">后端｜检查课程名称、教师和完整时间</tspan>
 <tspan x="290.0" y="715.5">模板导入去重，手动重复拒绝</tspan>
 </text>
 <path d="M70 846 A220.0 13 0 0 1 510 846 L510 894 A220.0 13 0 0 1 70 894 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>

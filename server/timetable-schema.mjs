@@ -48,10 +48,17 @@ export function initTimetableSchema(db) {
   `);
   const legacy=!db.prepare('PRAGMA table_info(timetable_entries)').all().some(c=>c.name==='direct_source');
   const needsTemplateCreator=!db.prepare('PRAGMA table_info(timetable_templates)').all().some(c=>c.name==='created_by');
+  const needsOrigin=!db.prepare('PRAGMA table_info(public_courses)').all().some(c=>c.name==='origin');
+  const needsTemplateSnapshot=!db.prepare('PRAGMA table_info(template_courses)').all().some(c=>c.name==='course_snapshot_json');
+  const needsEntrySnapshot=!db.prepare('PRAGMA table_info(timetable_entries)').all().some(c=>c.name==='base_snapshot_json');
   try {db.exec(`
     BEGIN IMMEDIATE;
     ${needsTemplateCreator?'ALTER TABLE timetable_templates ADD COLUMN created_by INTEGER REFERENCES users(id) ON DELETE SET NULL;':''}
     ${legacy?'ALTER TABLE timetable_entries ADD COLUMN direct_source TEXT;':''}
+    ${needsOrigin?`ALTER TABLE public_courses ADD COLUMN origin TEXT NOT NULL DEFAULT 'template' CHECK(origin IN ('template','manual'));
+    UPDATE public_courses SET origin='manual' WHERE NOT EXISTS(SELECT 1 FROM template_courses tc WHERE tc.course_id=public_courses.id);`:''}
+    ${needsTemplateSnapshot?'ALTER TABLE template_courses ADD COLUMN course_snapshot_json TEXT;':''}
+    ${needsEntrySnapshot?'ALTER TABLE timetable_entries ADD COLUMN base_snapshot_json TEXT;':''}
     CREATE TABLE IF NOT EXISTS timetable_template_subscriptions (
       timetable_id TEXT NOT NULL REFERENCES timetables(id) ON DELETE CASCADE,
       template_id TEXT NOT NULL REFERENCES timetable_templates(id) ON DELETE CASCADE,
