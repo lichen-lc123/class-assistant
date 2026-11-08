@@ -95,7 +95,7 @@ test('课表完整接口与权限流程',async t=>{
     assert.equal((await call('/admin/timetable/terms','POST',{academicYear:'2026-2027',name:'秋学期'},student)).status,403);
     const r=await call('/admin/timetable/terms','POST',{...term},admin);assert.equal(r.status,201);termId=r.data.id;
     assert.equal((await call(`/admin/timetable/terms/${termId}`,'PUT',{...term,name:'学生试图改名',revision:r.data.revision},student)).status,403);
-    const configured=(await call('/timetable/terms','GET',undefined,student)).data.terms.find(t=>t.id===termId);assert.equal(configured.name,term.name);assert.deepEqual(configured.config,term.config);
+    const configured=(await call('/timetable/terms','GET',undefined,student)).data.terms.find(t=>t.id===termId);assert.equal(configured.name,term.name);assert.deepEqual(configured.config.calendars,[{name:'学期教学周',start_date:'2026-09-14',end_date:term.endsOn}]);assert.deepEqual(configured.config.sourceCalendars,term.config.calendars);assert.deepEqual(configured.config.periods,term.config.periods);assert.deepEqual(configured.config.aliases,term.config.aliases);
     const w=await call('/admin/timetable/terms','POST',{academicYear:'2026-2027',name:'冬学期',startsOn:'2027-02-01',endsOn:'2027-06-30'},admin);assert.equal(w.status,201);winterId=w.data.id;
     assert.equal((await call('/timetable/terms','GET',undefined,student)).data.terms.length,2);
   });

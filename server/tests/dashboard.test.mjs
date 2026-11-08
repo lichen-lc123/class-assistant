@@ -33,6 +33,8 @@ test('没有足够上课日时仅返回实际日期，待安排课程不编造�
   const r=upcomingClassDays([table([{id:'p',course_name:'待通知',sessions:[]},{id:'q',course_name:'旧课',sessions:[session('2026-11-03')]},{id:'r',course_name:'明天课',sessions:[session('2026-11-05')]}])],'2026-11-04');assert.equal(r.days.length,1);assert.equal(r.pendingCourseCount,1);assert.equal(upcomingClassDays([],'2026-11-04').days.length,0);
 });
 test('工作台仅读取本人课程，支持跨学期，普通用户和管理员数据相互隔离',async t=>{
+  // Keep today's 13:25 lesson in the future regardless of the time the suite runs.
+  t.mock.timers.enable({apis:['Date'],now:Date.parse('2026-11-07T08:00:00+08:00')});
   const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'dash-admin','学委','DashboardAdmin123');
   const password=await hashPassword('DashboardStudent123');for(const id of ['dash-one','dash-two'])db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run(id,id,password);
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));

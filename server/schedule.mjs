@@ -1,5 +1,6 @@
 import { expandSchedule } from './schedule-expansion.mjs';
 import { normalizeAcademicCalendar } from './academic-calendar.mjs';
+import {semesterCalendarConfig} from '../shared/course-week.mjs';
 export function problem(message, status = 400) { const error = new Error(message); error.status = status; throw error; }
 export const trim = (value, max = 200) => typeof value === 'string' ? value.trim().slice(0, max) : '';
 export function validDate(value) {
@@ -30,11 +31,14 @@ export function validateTerm(body) {
   if (calendars.some(c => !c.name || !validDate(c.start_date))) problem('周历名称与第 1 周起点日期均需填写。');
   if (calendars.some(c => c.end_date&&(!validDate(c.end_date)||c.end_date<c.start_date))) problem('教学周结束日期不正确。');
   if (new Set(calendars.map(c=>c.name)).size !== calendars.length) problem('周历名称不能重复。');
+  if(config.sourceCalendars!=null&&(!Array.isArray(config.sourceCalendars)||config.sourceCalendars.length>40))problem('历史教学周资料最多40项。');
+  const sourceCalendars=list(config.sourceCalendars).map(c=>({name:trim(c?.name,80),start_date:c?.start_date,...(c?.end_date?{end_date:c.end_date}:{})}));
+  if(sourceCalendars.some(c=>!c.name||!validDate(c.start_date)||c.end_date&&(!validDate(c.end_date)||c.end_date<c.start_date)))problem('历史教学周资料日期不正确。');
   const periods = list(config.periods).map(p => ({ number: integer(p?.number, 30), start: p?.start, end: p?.end, ...(p?.section?{section:trim(p.section,20)}:{}) }));
   if (periods.some(p => !p.number || !validTime(p.start) || !validTime(p.end) || p.end<=p.start)) problem('节次和起止时间不正确。');
   if (new Set(periods.map(p=>p.number)).size !== periods.length) problem('节次编号不能重复。');
   const schoolCalendar = normalizeAcademicCalendar(config.schoolCalendar);
-  return { academicYear, name, startsOn, endsOn, config: { calendars, periods, aliases: list(config.aliases).map(a=>trim(a,60)).filter(Boolean).slice(0,20), ...(schoolCalendar?{schoolCalendar}:{}) } };
+  return { academicYear, name, startsOn, endsOn, config: semesterCalendarConfig({ calendars, sourceCalendars, periods, aliases: list(config.aliases).map(a=>trim(a,60)).filter(Boolean).slice(0,20), ...(schoolCalendar?{schoolCalendar}:{}) },startsOn,endsOn) };
 }
 const normalYear = v => trim(v).replace(/学年.*/, '').replace(/[—–－]/g, '-');
 export function matchesSemester(value, term) {
@@ -90,6 +94,9 @@ export function normalizeCourse(raw, term) {
     return {date:s.date,start_time:s.start_time,end_time:s.end_time,room:trim(s.room,120)||null,kind:s.kind==='practice'?'practice':'lecture',lesson_number:integer(s.lesson_number,200),...(s.week!=null?{week:integer(s.week,60)}:{}),...(s.weekday!=null?{weekday}:{})};
   });
   const extra_fields=raw.extra_fields&&typeof raw.extra_fields==='object'&&!Array.isArray(raw.extra_fields)?{...raw.extra_fields}:{};
+  const knownRoom=value=>{const room=trim(value,120);return room&&!/^(待通知|待安排|待确认|未知|未定|地点待通知|教室待通知)$/.test(room)?room:null;};
+  const defaultRoom=knownRoom(raw.room)||weekly_rules.map(r=>knownRoom(r.room)).find(Boolean)||[...explicit_sessions,...special_dates].filter(s=>s.kind!=='practice').sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(s=>knownRoom(s.room)).find(Boolean)||null;
+  for(const session of [...weekly_rules,...explicit_sessions,...special_dates])if(session.kind!=='practice'&&!knownRoom(session.room))session.room=defaultRoom;
   const originalLabels=[...list(raw.seasons),...list(raw.weekly_rules).map(rule=>rule?.season)].filter(v=>typeof v==='string'&&v.trim()).map(v=>trim(v,120));
   if(originalLabels.length)extra_fields['原表标注']=[...new Set([...(Array.isArray(extra_fields['原表标注'])?extra_fields['原表标注']:[]),...originalLabels])];
   if(Object.hasOwn(extra_fields,'周次日期冲突处理')){
@@ -103,7 +110,7 @@ export function normalizeCourse(raw, term) {
   }
   return { course_name,course_code:trim(raw.course_code,60)||null,teaching_class_code:trim(raw.teaching_class_code,80)||null,
     academic_year:term.academicYear,semester:term.name,
-    teacher:trim(raw.teacher,120)||null,room:trim(raw.room,120)||null,
+    teacher:trim(raw.teacher,120)||null,room:defaultRoom,
     required_or_elective:trim(raw.required_or_elective,20)||null,college:trim(raw.college,80)||null,
     course_category:trim(raw.course_category,80)||null,credits:raw.credits==null?null:Number.isFinite(Number(raw.credits))?Number(raw.credits):null,
     enrollment_status:trim(raw.enrollment_status,60)||null,exam_time_raw:trim(raw.exam_time_raw,1000)||null,

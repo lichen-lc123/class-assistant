@@ -15,6 +15,9 @@ for (const file of [
   '需求文档/讨论稿/课表AI解析提示词.md',
   '需求文档/课表功能/校历AI提取提示词.md',
   '需求文档/课表功能/校历示例-2026秋冬.json',
+  'shared/course-week.mjs',
+  'server/confirmed-schedule.mjs', 'server/reconcile-courses.mjs',
+  'scripts/reconcile-courses.mjs', 'scripts/verify-production.mjs',
 ]) assert.ok(existsSync(resolve(root, file)), `部署文件缺失：${file}`);
 
 const { server, db } = await createApp({ databasePath: ':memory:', serveStatic: true });

@@ -1,14 +1,17 @@
 // Courses belong to a semester by their source metadata, not by the bounds of
 // the currently published calendars. Explicit dates remain independent of weeks.
+import {courseTeachingWeek} from '../shared/course-week.mjs';
+import {hasConfirmedCompleteDateList} from './confirmed-schedule.mjs';
 export function expandSchedule(course,term,{addDays}) {
   const warnings=[...(course.warnings||[])],notices=[],date_reviews=[];
   const periods=term.config.periods||[],calendars=term.config.calendars||[];
+  const defaultRoom=course.room||[...(course.explicit_sessions||[]),...(course.special_dates||[])].filter(s=>s.kind!=='practice'&&s.room).sort((a,b)=>(a.date||'').localeCompare(b.date||''))[0]?.room||course.weekly_rules.find(r=>r.room)?.room||null;
   const times=rule=>[rule.start_time||periods.find(p=>p.number===rule.period_start)?.start,rule.end_time||periods.find(p=>p.number===rule.period_end)?.end];
   const weekday=date=>new Date(date+'T00:00:00Z').getUTCDay()||7;
   const make=(date,start,end,room,kind='lecture',lesson=null,source='weekly')=>{
     if(!date||!start||!end)return null;
     if(start===end){warnings.push('课程起止时刻相同，请确认。');return null;}
-    return{date,start_time:start,end_time:end,start:`${date}T${start}:00+08:00`,end:`${end<start?addDays(date,1):date}T${end}:00+08:00`,room:kind==='practice'?null:room||course.room||null,kind,lesson_number:lesson,_explicitLesson:Boolean(lesson),_source:source};
+    return{date,start_time:start,end_time:end,start:`${date}T${start}:00+08:00`,end:`${end<start?addDays(date,1):date}T${end}:00+08:00`,room:kind==='practice'?null:room||defaultRoom,kind,lesson_number:lesson,_explicitLesson:Boolean(lesson),_source:source};
   };
   let sessions=[];
   function add(session){
@@ -30,8 +33,13 @@ export function expandSchedule(course,term,{addDays}) {
   }
 
   let incompleteWeekly=false;
+  const completeDateList=hasConfirmedCompleteDateList(course);
   for(const [i,rule] of course.weekly_rules.entries()){
-    const calendar=rule.calendar_name?calendars.find(c=>c.name===rule.calendar_name):calendars.length===1?calendars[0]:null;
+    if(completeDateList)continue;
+    // Consolidating the displayed calendars must not turn an ambiguous legacy
+    // rule into an apparently unambiguous rule with a different date origin.
+    const sources=term.config.sourceCalendars||[];
+    const calendar=rule.calendar_name?[...calendars,...sources].find(c=>c.name===rule.calendar_name):sources.length>1?null:sources.length===1?sources[0]:calendars.length===1?calendars[0]:null;
     const [start,end]=times(rule);
     if(!rule.weeks.length||!rule.weekday||!calendar||!start||!end){
       incompleteWeekly=true;
@@ -70,6 +78,7 @@ export function expandSchedule(course,term,{addDays}) {
     return target;
   }
   const allTimeRules=[...course.weekly_rules,...course.explicit_sessions];
+  if(completeDateList)notices.push('按已确认的8次完整日期清单排课；原始周次记录保留供查阅，不额外生成课次。');
   function fallback(special,target){
     const own=times(special);
     const sameDay=weekly.filter(s=>s.date===special.date&&(!own[0]||s.start_time===own[0])&&(!own[1]||s.end_time===own[1]));
@@ -110,6 +119,7 @@ export function expandSchedule(course,term,{addDays}) {
   for(const resolution of resolutions)if(!validResolutions.has(resolution))warnings.push(`${resolution.date||'未明确日期'} 的冲突标记未匹配到备注，未据此删减任何安排，请核对。`);
   for(const explicit of course.explicit_sessions){
     const session=make(explicit.date,explicit.start_time,explicit.end_time,explicit.room,explicit.kind,explicit.lesson_number,'explicit');
+    if(session&&explicit.week!=null)session.week=explicit.week;
     add(session);
   }
   sessions.sort((a,b)=>a.start.localeCompare(b.start));
@@ -126,6 +136,6 @@ export function expandSchedule(course,term,{addDays}) {
   if(!calendars.length&&sessions.some(s=>s._source!=='weekly'))notices.push('明确日期已独立生成课次，不依赖教学周日历。');
   for(const note of Array.isArray(course.extra_fields?.['日期说明'])?course.extra_fields['日期说明']:[])if(typeof note==='string')notices.push(note.slice(0,2000));
   if(!sessions.length)warnings.push('尚无可确定的上课时间，课程保留在待安排中。');
-  const clean=sessions.map(({_explicitLesson,_source,_rule,_week,_weeklyNumber,...session})=>session);
-  return{sessions:clean,warnings:[...new Set(warnings)],notices:[...new Set(notices)],date_reviews,schedule_status:!clean.length?'pending':warnings.length?'needs_review':'ready'};
+  const clean=sessions.map(({_explicitLesson,_source,_rule,_week,_weeklyNumber,...session})=>({...session,week:courseTeachingWeek(session.date,course,term)??session.week??_week??null,weekday:weekday(session.date)}));
+  return{sessions:clean,review_status:'confirmed',warnings:[...new Set(warnings)],notices:[...new Set(notices)],date_reviews,schedule_status:!clean.length?'pending':warnings.length?'needs_review':'ready'};
 }

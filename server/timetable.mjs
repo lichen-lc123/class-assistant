@@ -8,6 +8,7 @@ import { importConflicts,importConflictMessage } from './import-conflicts.mjs';
 import { upcomingClassDays } from './dashboard.mjs';
 import { templateImportService } from './template-import.mjs';
 import { courseIdentity } from './course-identity.mjs';
+import {semesterCalendarConfig} from '../shared/course-week.mjs';
 
 const SOURCES=['ai','template','cards'];
 const NOW="strftime('%Y-%m-%dT%H:%M:%fZ','now')";
@@ -18,7 +19,7 @@ const templateSelectionVersion=(template,t,courses)=>hash({term:[t.id,t.revision
 const cleanPrivate=payload=>Object.fromEntries(Object.entries(payload).filter(([,v])=>v!=null&&v!==''&&(!Array.isArray(v)||v.length)));
 export function timetableService(db) {
   const transaction=fn=>{db.exec('BEGIN IMMEDIATE');try{const value=fn();db.exec('COMMIT');return value;}catch(error){db.exec('ROLLBACK');throw error;}};
-  function term(id){const row=db.prepare('SELECT * FROM terms WHERE id = ?').get(id);if(!row)problem('学期不存在，请先由管理员建立学期。',404);return{id:row.id,academicYear:row.academic_year,name:row.name,startsOn:row.starts_on,endsOn:row.ends_on,config:parse(row.config_json),revision:row.revision,updatedAt:row.updated_at};}
+  function term(id){const row=db.prepare('SELECT * FROM terms WHERE id = ?').get(id);if(!row)problem('学期不存在，请先由管理员建立学期。',404);return{id:row.id,academicYear:row.academic_year,name:row.name,startsOn:row.starts_on,endsOn:row.ends_on,config:semesterCalendarConfig(parse(row.config_json),row.starts_on,row.ends_on),revision:row.revision,updatedAt:row.updated_at};}
   const table=(userId,termId)=>db.prepare('SELECT * FROM timetables WHERE user_id = ? AND term_id = ?').get(userId,termId);
   const master=id=>db.prepare('SELECT * FROM public_courses WHERE id = ?').get(id);
   const matchingMaster=(course,t,published=false,excludeId=null)=>{const key=courseIdentity(course,t);if(!key)return null;return db.prepare(`SELECT * FROM public_courses WHERE term_id=? ${published?'AND published=1':''} ORDER BY id`).all(t.id).find(row=>row.id!==excludeId&&courseIdentity(parse(row.payload_json),t)===key)||null;};
@@ -46,7 +47,10 @@ export function timetableService(db) {
     };
     if(db.isTransaction)sync();else transaction(sync);
   }
-  function courseView(row,t,payload=null){const c=payload||parse(row.payload_json);return{...c,id:row.id,termId:row.term_id,origin:row.origin,cardEnabled:Boolean(row.card_enabled),published:Boolean(row.published),revision:row.revision,updatedAt:row.updated_at,...expandCourse(c,t)};}
+  function courseView(row,t,payload=null){const c=payload||parse(row.payload_json);
+    const fromTemplate=row.origin==='template'||Boolean(db.prepare('SELECT 1 FROM template_courses WHERE course_id=? LIMIT 1').get(row.id));
+    const creationSources=[...(fromTemplate?['template']:[]),...(row.origin==='manual'?['manual']:[])];
+    return{...c,id:row.id,termId:row.term_id,origin:row.origin,creationSources,cardEnabled:Boolean(row.card_enabled),published:Boolean(row.published),revision:row.revision,updatedAt:row.updated_at,...expandCourse(c,t)};}
   function templateCourses(template,t){return db.prepare('SELECT c.*,tc.course_snapshot_json FROM template_courses tc JOIN public_courses c ON c.id=tc.course_id WHERE tc.template_id=? AND c.term_id=? ORDER BY c.id').all(template.id,t.id).map(row=>courseView(row,t,row.course_snapshot_json?parse(row.course_snapshot_json):null));}
   function entryView(row,t){
     const pub=row.course_id?master(row.course_id):null;
@@ -202,7 +206,7 @@ export function timetableService(db) {
       if(body.source==='manual'&&p.courses.length!==1)problem('手动添加每次只创建一张卡片模板。');
       let created=0,skipped=0,cardsCreated=0;
       transaction(()=>{for(const c of p.courses){const existing=matchingMaster(c,t);
-        if(existing){if(body.source==='manual')problem('课程名称、教师和上课时间已存在，请编辑已有卡片模板，避免重复添加。',409);skipped++;if(body.generateCards!==false&&!existing.card_enabled){db.prepare('UPDATE public_courses SET card_enabled=1 WHERE id=?').run(existing.id);cardsCreated++;}continue;}
+        if(existing){if(body.source==='manual')problem('该课程已经添加过了：课程名称、教师和上课时间一致，请编辑已有卡片模板，避免重复添加。',409);skipped++;if(body.generateCards!==false&&!existing.card_enabled){db.prepare('UPDATE public_courses SET card_enabled=1 WHERE id=?').run(existing.id);cardsCreated++;}continue;}
         db.prepare('INSERT INTO public_courses (id,term_id,class_code,payload_json,card_enabled,published,origin) VALUES (?,?,?,?,?,?,?)').run(randomUUID(),t.id,null,json(normalizeCourse(c,t)),body.generateCards===false?0:1,body.published===false?0:1,body.source==='manual'?'manual':'template');created++;if(body.generateCards!==false)cardsCreated++;
       }});send(201,{created,skipped,cardsCreated});return;
     }
@@ -323,5 +327,5 @@ export function timetableService(db) {
     }
     problem('课表接口不存在。',404);
   }
-  return {handle,get,prepare,term};
+  return {handle,get,prepare,term,entryView};
 }

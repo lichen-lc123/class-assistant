@@ -28,7 +28,7 @@ export function calendarImport(body, validateTerm) {
   } catch { error('校历结果不是合法 JSON，请复制 AI 返回的完整结果。'); }
   if (!raw || raw.schema_version !== 'academic-calendar.v1') error('请使用网站的校历提示词，格式需为 academic-calendar.v1。');
   if (!raw.school_calendar) error('缺少 school_calendar 校历内容。');
-  const term=validateTerm({ academicYear: raw.academic_year, name: raw.semester, startsOn: raw.starts_on, endsOn: raw.ends_on, config: { calendars: raw.calendars, periods: raw.periods, aliases: raw.aliases, schoolCalendar: raw.school_calendar } });
+  const term=validateTerm({ academicYear: raw.academic_year, name: raw.semester, startsOn: raw.starts_on, endsOn: raw.ends_on, config: { calendars: raw.calendars, sourceCalendars:raw.source_calendars, periods: raw.periods, aliases: raw.aliases, schoolCalendar: raw.school_calendar } });
   const school=term.config.schoolCalendar;
   school.title ||= `${school.institution||''}${term.academicYear}学年${term.name}教学日历`;
   school.source_name ||= '外部 AI 校历提取结果';

@@ -17,11 +17,11 @@ test('完整AI结果一次映射全部网站字段，并兼容代码围栏和无
   const completed=calendarImport({data:optional},validateTerm);
   assert.ok(completed.config.schoolCalendar.title.includes(completed.name));assert.equal(completed.config.schoolCalendar.source_name,'外部 AI 校历提取结果');assert.equal(completed.config.schoolCalendar.display_start,completed.startsOn);assert.equal(completed.config.schoolCalendar.display_end,completed.endsOn);
 });
-test('校历图片样例保留14节作息、跨年日期、24个上课日及各学季教学周',()=>{
+test('校历图片样例保留作息与上课日，统一展示完整学期连续周次',()=>{
   const t=draft(),rows=calendarWeekRows(t);
   assert.equal(rows.length,23);assert.equal(rows[0].start,'2026-08-17');assert.equal(rows.at(-1).end,'2027-01-24');
   assert.equal(t.config.periods.length,14);assert.equal(t.config.periods[13].end,'21:15');assert.equal(t.config.periods[5].start,'13:25');assert.equal(t.config.periods[10].section,'晚上');
-  const winter=rows.find(r=>r.start==='2026-11-09');assert.equal(winter.weeks.find(c=>c.name==='工程师学院冬').week,1);assert.equal(winter.weeks.find(c=>c.name==='工程师学院秋冬').week,9);assert.equal(winter.weeks.some(c=>c.name==='工程师学院秋'),false);
+  const winter=rows.find(r=>r.start==='2026-11-09');assert.equal(winter.weeks.length,1);assert.equal(winter.weeks[0].name,'学期教学周');assert.equal(winter.weeks[0].week,9);assert.equal(t.config.sourceCalendars.length,3);
   assert.equal(rows.flatMap(r=>r.days).filter(d=>d.events.some(e=>e.kind==='class')).length,24);
   assert.ok(rows.find(r=>r.start==='2026-12-28').days.find(d=>d.date==='2027-01-01').events.some(e=>e.kind==='holiday'));
   assert.ok(academicCalendarWarnings(t).some(w=>w.includes('同时标记')));

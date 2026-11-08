@@ -13,7 +13,7 @@ export function SelectionDialog(props:SelectionProps){
 }
 function CardSelectionDialog({term,current,onClose,onSaved}:Omit<SelectionProps,'source'>){
   const [cards,setCards]=useState<Course[]>([]),[selected,setSelected]=useState<string[]>([]);
-  const [query,setQuery]=useState(''),[preview,setPreview]=useState<Preview|null>(null),[accepted,setAccepted]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+  const [query,setQuery]=useState(''),[preview,setPreview]=useState<Preview|null>(null),[accepted,setAccepted]=useState(true),[error,setError]=useState(''),[busy,setBusy]=useState(false);
   const [progress,setProgress]=useState('');
   const [checkingSelection,setCheckingSelection]=useState(false);
   const [monthPreview,setMonthPreview]=useState<{preview:Preview;current:TimetableView}|null>(null);
@@ -23,7 +23,7 @@ function CardSelectionDialog({term,current,onClose,onSaved}:Omit<SelectionProps,
   useEffect(()=>{let active=true;setBusy(true);api<Course[]>(`/timetable/cards?termId=${term.id}`).then(c=>{if(active)setCards(c);}).catch(e=>{if(active)setError(errorMessage(e));}).finally(()=>{if(active)setBusy(false);});return()=>{active=false;};},[term.id]);
   const available=new Map(cards.map(c=>[c.id,c]));
   for(const c of current?.courses||[])if(c.publicCourseId&&!available.has(c.publicCourseId))available.set(c.publicCourseId,{...c,id:c.publicCourseId});
-  function toggle(id:string,add:boolean){if(busy||inFlight.current)return;previewRequest.current++;setCheckingSelection(false);setSelected(v=>add?[...new Set([...v,id])]:v.filter(x=>x!==id));setPreview(null);setAccepted(false);setError('');}
+  function toggle(id:string,add:boolean){if(busy||inFlight.current)return;previewRequest.current++;setCheckingSelection(false);setSelected(v=>add?[...new Set([...v,id])]:v.filter(x=>x!==id));setPreview(null);setAccepted(true);setError('');}
   useEffect(()=>{
     let active=true;
     if(!selected.length)return;
@@ -31,7 +31,7 @@ function CardSelectionDialog({term,current,onClose,onSaved}:Omit<SelectionProps,
       if(inFlight.current)return;
       const token=++previewRequest.current;setCheckingSelection(true);
       api<Preview>('/timetable/selection-preview','POST',{termId:term.id,source:'cards',courseIds:selected}).then(p=>{
-        if(active&&token===previewRequest.current){setPreview(p);setAccepted(false);setError(p.importBlocked?p.importError||'课程时间重复，请调整选择。':'');}
+        if(active&&token===previewRequest.current){setPreview(p);setAccepted(true);setError(p.importBlocked?p.importError||'课程时间重复，请调整选择。':'');}
       }).catch(e=>{if(active&&token===previewRequest.current)setError(errorMessage(e));}).finally(()=>{if(active&&token===previewRequest.current)setCheckingSelection(false);});
     },200);
     return()=>{active=false;clearTimeout(timer);};
@@ -40,7 +40,7 @@ function CardSelectionDialog({term,current,onClose,onSaved}:Omit<SelectionProps,
   async function inspect(){
     if(busy||inFlight.current)return;
     if(!selected.length){setError('请先将需要的课程加入右侧“本次新增课程”。');return;}
-    previewRequest.current++;setCheckingSelection(false);inFlight.current=true;setBusy(true);setProgress('正在检查课程…');setError('');setAccepted(false);
+    previewRequest.current++;setCheckingSelection(false);inFlight.current=true;setBusy(true);setProgress('正在检查课程…');setError('');setAccepted(true);
     try{const [table,p]=await Promise.all([api<TimetableView>(`/timetable/${term.id}`),api<Preview>('/timetable/selection-preview','POST',{termId:term.id,source:'cards',courseIds:selected})]);setPreview(p);setMonthPreview({preview:p,current:table});if(p.importBlocked)setError(p.importError||'课程时间重复，请调整选择后重试。');}
     catch(e){setPreview(null);setError(errorMessage(e));}
     finally{inFlight.current=false;setBusy(false);setProgress('');}
@@ -54,8 +54,8 @@ function CardSelectionDialog({term,current,onClose,onSaved}:Omit<SelectionProps,
       // update their schedule while this dialog remains open.
       const p=await api<Preview>('/timetable/selection-preview','POST',{termId:term.id,source:'cards',courseIds:selected});setPreview(p);
       if(p.importBlocked){setError(p.importError||'课程时间重复，请调整选择后重试。');return;}
-      const reviewed=accepted&&preview!==null&&JSON.stringify(preview)===JSON.stringify(p);
-      if(needsReview(p)&&!reviewed){setAccepted(false);setError('所选课程有待核对信息，请点击“检查并预览课程安排”核对，再勾选“我已核对”并确认添加。');requestAnimationFrame(()=>confirmation.current?.focus());return;}
+      const reviewed=accepted;
+      if(needsReview(p)&&!reviewed){setError('请确认已核对所选课程后再添加。');requestAnimationFrame(()=>confirmation.current?.focus());return;}
       setProgress('正在添加课程…');
       await api(`/timetable/${term.id}`,'POST',{source:'cards',courseIds:selected,revision:current?.timetable?.revision||0,acceptWarnings:reviewed});onSaved();onClose();
     }catch(e){setError(errorMessage(e));}
@@ -71,7 +71,7 @@ function CardSelectionDialog({term,current,onClose,onSaved}:Omit<SelectionProps,
     </>
     <button type="button" className="secondary-button" disabled={busy||!selected.length} onClick={()=>void inspect()}>{busy?'正在检查…':'检查并预览课程安排'}</button>
     {checkingSelection&&<p className="muted-note" role="status">正在检查所选课程与已有课表的时间…</p>}
-    {preview&&<>{needsReview(preview)&&!preview.importBlocked&&<label className="checkbox-line"><input ref={confirmation} type="checkbox" disabled={busy} checked={accepted} onChange={e=>{setAccepted(e.target.checked);setError('');}}/><span>我已核对新增课程及缺失信息；时间重复的课程不能导入。</span></label>}</>}
+    {preview&&<>{needsReview(preview)&&!preview.importBlocked&&<label className="checkbox-line"><input ref={confirmation} type="checkbox" disabled={busy} checked={accepted} onChange={e=>{setAccepted(e.target.checked);setError('');}}/><span>默认已核对，可直接添加；时间重复的课程不能导入。</span></label>}</>}
     {error&&<p ref={feedback} role="alert" className="feedback">{error}</p>}<div className="modal-actions"><button type="button" className="secondary-button" disabled={busy} onClick={onClose}>取消</button><button type="button" className="primary-button compact" disabled={busy} onClick={()=>void save()}>{progress||'确认添加课程'}</button></div>
   </div></Modal>{monthPreview&&<SelectionMonthPreview term={term} preview={monthPreview.preview} current={monthPreview.current} onClose={()=>setMonthPreview(null)}/>}</>;
 }

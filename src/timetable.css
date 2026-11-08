@@ -98,3 +98,39 @@
 .month-day button.month-course { display: block; width: 100%; border: 0; text-align: left; border-radius: 5px; padding: 5px; background: #edf3e4; color: #53694a; font: inherit; cursor: pointer; }
 .month-day button.month-course:hover { background: #e1e9d8; }
 .month-day button.month-more-courses { background: transparent; border: 0; font-size: 10px; text-align: left; color: #6c805e; padding: 3px; }
+/* Fixed card editor heading; only the lesson area scrolls. */
+.manage-dialog:has(.card-course-editor){height:90svh;overflow:hidden}
+.manage-dialog:has(.card-course-editor)>.manage-dialog-content{height:100%;min-height:0;box-sizing:border-box;display:flex;flex-direction:column}
+.manage-dialog:has(.card-course-editor)>.manage-dialog-content>.dialog-heading{flex-shrink:0;margin-bottom:18px}
+.manage-form.card-course-editor{display:flex;flex-direction:column;gap:0;flex:1;min-height:0;overflow:hidden}
+.card-course-editor-header{flex-shrink:0;padding-bottom:16px;border-bottom:1px solid #e4eadf}
+.card-course-editor-header .form-grid{margin-bottom:18px}
+.card-course-editor-header .lesson-list-heading{margin:0}
+.card-course-scroll.manage-form{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;align-content:start;padding:16px 6px 6px 0;scroll-padding-top:8px}
+.card-course-scroll .lesson-editor-card{scroll-margin-top:8px}
+@media(max-width:700px){.card-course-editor-header .form-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.card-course-editor-header{padding-bottom:12px}.manage-dialog:has(.card-course-editor)>.manage-dialog-content{padding:18px 14px}.card-course-scroll.manage-form{padding-right:2px}}
+
+.courses-page-tabs{display:flex;gap:6px;padding:5px;background:#eef2e9;border:1px solid #e3e8dd;border-radius:13px;margin:0 0 20px;width:fit-content}
+.courses-page-tabs>[role=tab]{display:flex;align-items:center;justify-content:center;gap:8px;min-width:122px;min-height:44px;padding:10px 24px;border:0;border-radius:9px;background:transparent;color:#798671;font:inherit;font-size:14px}
+.courses-page-tabs>[role=tab][aria-selected=true]{background:#fff;color:#3d583b;font-weight:650;box-shadow:0 2px 7px #3b513b0a}
+.course-catalog-count{font-size:13px;color:#7c8874;margin:0 0 14px}.course-catalog-count strong{color:#4b6346}
+.course-catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:18px;align-items:stretch}
+.course-catalog-card{display:flex;flex-direction:column;align-items:stretch;min-width:0;text-align:left;padding:22px;border:1px solid var(--homework-border,#dfe7d7);border-top:4px solid var(--homework-accent,#819177);border-radius:16px;background:var(--homework-tint,#fafcf8);color:#3d5140;font:inherit;transition:transform .15s ease,box-shadow .15s ease}
+.course-catalog-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px #3b513b0c}
+.course-catalog-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:11px}.course-catalog-title strong{font-size:20px;line-height:1.5;color:var(--homework-accent,#425b3d);overflow-wrap:anywhere}.course-catalog-title>svg{flex-shrink:0;margin-top:5px;opacity:.6}
+.course-catalog-teacher,.course-catalog-time,.course-catalog-room{display:flex;align-items:center;gap:7px;font-size:12px;line-height:1.7;overflow-wrap:anywhere}.course-catalog-card svg{flex-shrink:0}.course-catalog-teacher{color:#7a8574;margin-bottom:10px}.course-catalog-card .course-weekdays{margin:0 0 12px}.course-catalog-time{font-size:14px;font-weight:600;color:#52694c;margin-bottom:6px}.course-catalog-room{color:#73806b;margin-bottom:14px}.course-catalog-pending{font-size:13px;color:#8c947e;padding:7px 0 20px}
+.course-catalog-footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:12px;border-top:1px solid var(--homework-border,#e2e8dc);color:#809075;font-size:11px;line-height:1.7}
+.course-catalog-empty{padding:40px 20px;text-align:center}.course-catalog-empty h2{font-size:18px}.course-catalog-empty .primary-button{margin:14px auto 0}
+@media(max-width:700px){.courses-page-tabs{width:100%;margin-bottom:16px}.courses-page-tabs>[role=tab]{flex:1;min-width:0}.course-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.course-catalog-card{padding:14px 12px;border-radius:14px}.course-catalog-title{gap:5px;margin-bottom:8px}.course-catalog-title strong{font-size:16px}.course-catalog-title>svg{width:15px;margin-top:3px}.course-catalog-teacher,.course-catalog-room{font-size:11px}.course-catalog-time{font-size:12px;gap:4px}.course-catalog-footer{font-size:10px;gap:4px}.course-catalog-card .course-weekdays{gap:4px;margin-bottom:10px}.course-catalog-card .course-weekdays span{font-size:10px;padding:3px 5px}}
+@media(prefers-reduced-motion:reduce){.course-catalog-card{transition:none}.course-catalog-card:hover{transform:none}}
+
+/* A single scrolling lesson area; the dialog and its controls stay still. */
+.manage-dialog:has(.personal-session-dialog){height:90svh;overflow:hidden}
+.manage-dialog:has(.personal-session-dialog)>.manage-dialog-content{height:100%;min-height:0}
+.personal-session-dialog{display:flex;flex-direction:column;flex:1;min-height:0;gap:12px}
+.personal-session-dialog>p{margin:0;flex-shrink:0}
+.personal-session-dialog>.shared-lesson-editor{display:flex;flex-direction:column;flex:1;min-height:0;padding-top:10px}
+.personal-session-dialog .shared-lesson-editor>.mini-heading{flex-shrink:0}
+.personal-session-dialog .shared-lesson-scroll{flex:1;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;align-content:start}
+.personal-session-dialog>.modal-actions{flex-shrink:0;padding-top:8px;border-top:1px solid #e7ece0}
+@media(max-width:700px){.manage-dialog:has(.personal-session-dialog)>.manage-dialog-content{padding:16px}.manage-dialog:has(.personal-session-dialog) .dialog-heading{margin-bottom:12px}}

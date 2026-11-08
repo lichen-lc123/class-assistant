@@ -1,11 +1,21 @@
 import type { CourseData, Course, ExplicitSession, Term } from './types';
+import {courseTeachingWeek} from '../../shared/course-week.mjs';
 
-export function dateWeekday(date:string){return date ? new Date(`${date}T00:00:00Z`).getUTCDay()||7 : null;}
+export function dateWeekday(date:string){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return null;
+  const day=new Date(`${date}T00:00:00Z`);
+  return Number.isFinite(day.getTime())&&day.toISOString().slice(0,10)===date?day.getUTCDay()||7:null;
+}
 export function dateWeek(date:string,term:Term):number|null{
-  if(!date)return null;
-  const weeks=term.config.calendars.filter(c=>date>=c.start_date&&(!c.end_date||date<=c.end_date)).map(c=>Math.floor(((Date.parse(date+'T00:00:00Z')-Date.parse(c.start_date+'T00:00:00Z'))/86400000+(dateWeekday(c.start_date)||1)-1)/7)+1);
-  const unique=[...new Set(weeks.filter(w=>w>=1&&w<=60))];
-  return unique.length===1?unique[0]:null;
+  if(!dateWeekday(date))return null;
+  return courseTeachingWeek(date,{},term);
+}
+export function numberCardLessons<T extends ExplicitSession>(lessons:T[]):T[]{
+  return lessons.map((lesson,index)=>({...lesson,lesson_number:index+1}));
+}
+export function newCardLesson(lessons:ExplicitSession[]):ExplicitSession{
+  const first=lessons[0];
+  return {lesson_number:lessons.length+1,date:'',week:null,weekday:null,room:first?.room||'',start_time:first?.start_time||'',end_time:first?.end_time||'',kind:'lecture'};
 }
 export function lessonTitle(n:number){
   if(!Number.isInteger(n)||n<1||n>200)return '课次待填写';
@@ -21,7 +31,7 @@ export function cardLessons(course:CourseData,term:Term):ExplicitSession[]{
 // weekly date from reappearing after a lesson is moved or removed in the editor.
 export function replaceCardLessons(course:CourseData,lessons:ExplicitSession[],term:Term):CourseData{
   const weekly_rules=course.weekly_rules.flatMap(r=>{
-    const calendar=r.calendar_name?term.config.calendars.find(c=>c.name===r.calendar_name):term.config.calendars.length===1?term.config.calendars[0]:null;
+    const calendar=r.calendar_name?[...term.config.calendars,...(term.config.sourceCalendars||[])].find(c=>c.name===r.calendar_name):term.config.calendars.length===1?term.config.calendars[0]:null;
     const start=r.start_time||term.config.periods.find(p=>p.number===r.period_start)?.start;
     const end=r.end_time||term.config.periods.find(p=>p.number===r.period_end)?.end;
     if(!calendar||!r.weeks.length||!r.weekday||!start||!end||start===end)return [r];

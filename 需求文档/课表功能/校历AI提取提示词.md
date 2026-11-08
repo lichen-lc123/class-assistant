@@ -6,7 +6,7 @@
 1. 提取完整学年与管理学期、实际起止日期、学校学院、校历标题、图上展示范围、各教学周起止、全部节次、全部上课日和其他日期事项、原文备注及待确认问题。图上能识别的字段必须填入实际值，不能用 null、空数组或占位示例代替。
 2. 自动完成所有分类和对应关系：教学日历名称、节次所属上午/下午/晚上，以及每个事项的 kind。不让管理员在网站再次选择。
 3. 一份结果对应一个管理员维护的学期。semester 使用校历上的完整管理学期名称（编辑已有学期时沿用网站目标名称），不预设春、夏、秋、冬等分类，不输出 aliases。原始校历标题和名称照实保留，不能人为拆分或合并管理学期。
-4. calendars 只表示实际教学周起算口径。如校历明确存在多套独立周次，分别保存其原文名称、真实第1周起点和结束日期，供课程周次对应使用；不能仅凭名称猜测日期或额外生成周历。多个表格可以统一导入同一个目标学期，不需要配置标签映射。
+4. calendars 必须只输出一套完整学期教学周，name 固定为“学期教学周”，start_date 是完整学期第1教学周的真实起点，end_date 为完整学期结束日期。整学期按周一至周日连续计数，不能在秋/冬、前半段/后半段重新从第1周开始。比如起点为2026-09-14，则11月9日所在周是第9周，不是第1周。原图中分段起止和假期可以保留在 events、notes；若分段周次用于解释原表课程日期，可另存 source_calendars 作为原始资料，不加入 calendars 或作为网站另一套显示周次。不能猜测缺失的起点。
 5. 逐项提取作息表所有节次及其 number、section、start、end。若图片有第1—14节，periods 必须输出14项，不能只给上午或几条示意。节次编号不重复，开始早于结束。
 6. 根据图例，把每个可辨识上课日、考试日、假期和准备阶段自动归类并全部列出。连续同义日期可用范围，不连续日期分项；不允许让管理员再在网站选择颜色含义或日期类型。
 7. starts_on/ends_on 是学期管理范围；school_calendar.display_start/display_end 是图上展示范围，可以包含前后暑假、寒假和准备阶段。只有明确边界才能确定日期。例如图上明确次日进入寒假，可据此确定前一天为教学结束，但必须在 warnings 标出推导依据，供核对。不能把局部图示的假期终点当成真实假期终点。
@@ -36,12 +36,13 @@
     "starts_on": {"type": ["string", "null"], "format": "date"},
     "ends_on": {"type": ["string", "null"], "format": "date"},
     "calendars": {
-      "type": "array",
+      "type": "array", "minItems": 1, "maxItems": 1,
       "items": {
         "type": "object", "required": ["name", "start_date", "end_date"],
-        "properties": {"name": {"type": "string"}, "start_date": {"type": "string", "format": "date"}, "end_date": {"type": ["string", "null"], "format": "date"}}
+        "properties": {"name": {"const": "学期教学周"}, "start_date": {"type": "string", "format": "date"}, "end_date": {"type": ["string", "null"], "format": "date"}}
       }
     },
+    "source_calendars": {"type": "array", "description": "可选：原图分段周次资料，仅用于解释来源，不作为网站显示周次", "items": {"type": "object", "required": ["name", "start_date"], "properties": {"name": {"type": "string"}, "start_date": {"type": "string", "format": "date"}, "end_date": {"type": ["string", "null"], "format": "date"}}}},
     "periods": {
       "type": "array",
       "items": {

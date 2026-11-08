@@ -64,6 +64,19 @@ test('默认按学委截止时间正序，个人优先级先于计划时间，�
   const records=[{id:'a',title:'默认晚',due_date:'2026-11-13'},{id:'b',title:'默认早',due_date:'2026-11-08'},{id:'c',title:'高优先晚计划',priority:'high',planned_date:'2027-01-01',due_date:'2026-12-01'},{id:'d',title:'个人早计划',planned_date:'2026-11-01',due_date:'2026-12-01'},{id:'e',title:'低优先早截止',priority:'low',due_date:'2026-10-01'},{id:'f',title:'未知截止'}];
   assert.deepEqual(records.sort(compareHomework).map(r=>r.id),['c','d','b','a','f','e']);
 });
+
+test('已完成作业按完成时间倒序，优先级和计划时间不干扰，缺失时间排后',()=>{
+  const records=[
+    {id:'old',title:'旧完成',completed:true,completedAt:'2026-11-06T12:00:00.000Z',priority:'high',planned_date:'2026-11-01'},
+    {id:'new',title:'最新完成',completed:true,completedAt:'2026-11-07T12:00:00.000Z',priority:'low',planned_date:'2027-01-01'},
+    {id:'pending',title:'尚未完成',completed:false,priority:'low'},
+    {id:'unknown',title:'缺失完成时间',completed:true,completedAt:null},
+    {id:'middle',title:'中间完成',completed:true,completedAt:'2026-11-07T08:00:00.000Z'},
+  ];
+  assert.deepEqual(records.sort(compareHomework).map(r=>r.id),['pending','new','middle','old','unknown']);
+  const tied=[{id:'b',title:'同名',completed:true,completedAt:null},{id:'a',title:'同名',completed:true,completedAt:null}];
+  assert.deepEqual(tied.sort(compareHomework).map(r=>r.id),['a','b']);
+});
 test('作业完整流程：管理员预览确认、草稿、班级隔离、附件授权、个人完成和版本保护',async t=>{
   const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'work-admin','学委','HomeworkAdmin123');const pass=await hashPassword('HomeworkStudent123');for(const id of ['work-one','work-two','work-peer'])db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run(id,id,pass);
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));

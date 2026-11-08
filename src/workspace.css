@@ -173,3 +173,17 @@
 
 .personal-dashboard .dashboard-homework{display:flex;flex-direction:column}
 .personal-dashboard .dashboard-homework-footer{display:flex;justify-content:center;margin-top:auto;padding-top:16px}
+
+/* Dialog titles stay outside the scrolling content on every screen size. */
+.manage-dialog{--dialog-max-height:90svh;overflow:hidden}
+.manage-dialog>.manage-dialog-content{display:flex;flex-direction:column;min-height:0;max-height:calc(var(--dialog-max-height) - 2px)}
+.manage-dialog-content>.dialog-heading{flex:0 0 auto;min-width:0}
+.manage-dialog-content>.dialog-heading h2{min-width:0;overflow-wrap:anywhere}
+.manage-dialog-content>.dialog-heading>.icon-button{flex-shrink:0}
+.manage-dialog-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:2px 4px 4px;margin:-2px -4px -4px}
+.manage-dialog-body:has(>.card-course-editor),.manage-dialog-body:has(>.personal-session-dialog){display:flex;flex-direction:column;overflow:hidden;padding:0;margin:0;scrollbar-gutter:auto}
+.manage-dialog.reset-dialog{max-width:420px}
+.manage-dialog.reset-dialog .dialog-content{padding:0}
+
+html{scrollbar-gutter:stable}
+html.has-open-modal{overflow:hidden;overscroll-behavior:none}

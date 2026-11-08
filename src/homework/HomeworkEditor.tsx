@@ -20,7 +20,7 @@ export function HomeworkEditor({record,term,classes,assets=[],onSave,onClose}:{r
     {([['content','作业内容'],['submission','提交平台 / 提交方式'],['assessment_rules','课程考核规则'],['team_requirement','组队要求'],['notes','备注']] as const).map(([key,label])=><label key={key}>{label}<textarea rows={key==='content'||key==='assessment_rules'?4:2} value={r[key]} onChange={e=>patch({[key]:e.target.value})}/></label>)}
     <HomeworkAttachmentsEditor attachments={r.attachments} assets={uploadAssets} disabled={working} onProcessing={setUploading} onChange={(attachments,files)=>{patch({attachments});setUploadAssets(files);}}/>
     {r.kind==='assignment'&&<><div className="homework-date-fields"><label>截止日期<input type="date" value={r.due_date||''} onChange={e=>patch({due_date:e.target.value||null,...(!e.target.value?{due_time:null}:{})})}/></label><label>具体时间（可不填）<input type="time" disabled={!r.due_date} value={r.due_time||''} onChange={e=>patch({due_time:e.target.value||null})}/></label></div></>}
-    {!!r.attachments.length&&<details><summary>核对原表图片</summary><HomeworkCard record={r} assets={uploadAssets}/></details>}
+    {!!r.attachments.length&&<details><summary>核对图片与附件</summary><HomeworkCard record={r} assets={uploadAssets}/></details>}
     {error&&<p className="feedback" role="alert">{error}</p>}<div className="modal-actions"><button className="secondary-button" type="button" disabled={working} onClick={onClose}>取消</button><button className="primary-button compact" disabled={working}>{busy?'保存中…':'保存'}</button></div>
   </form></Modal>;
 }

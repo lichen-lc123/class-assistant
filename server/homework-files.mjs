@@ -1,4 +1,6 @@
 import {inflateRawSync} from 'node:zlib';
+import {workbookAttachments} from './workbook-attachments.mjs';
+import {removeLocalFilePaths,safeHomeworkLink} from '../shared/homework-links.mjs';
 import {createHash} from 'node:crypto';
 import {posix} from 'node:path';
 import {problem,validDate,validTime} from './schedule.mjs';
@@ -18,11 +20,11 @@ export function unpackHomeworkWorkbook(b){
     const flags=u16(b,offset+8),method=u16(b,offset+10),length=u32(b,offset+20),size=u32(b,offset+24),nl=u16(b,offset+28),el=u16(b,offset+30),cl=u16(b,offset+32),local=u32(b,offset+42),name=b.subarray(offset+46,offset+46+nl).toString('utf8');
     total+=size;if(size>16*1024*1024||total>48*1024*1024)problem('表格解压后过大。');
     if(flags&1)problem('加密表格请先解密。');
-    if(/\.(?:xml|rels|png|jpe?g|webp)$/i.test(name)){
+    if(/\.(?:xml|rels|vml|png|jpe?g|webp)$/i.test(name)||/^xl\/embeddings\/[^/]+$/i.test(name)){
       if(![0,8].includes(method)||local+30>b.length||u32(b,local)!==0x04034b50)problem('表格压缩记录无效。');
       const start=local+30+u16(b,local+26)+u16(b,local+28);if(start+length>b.length)problem('表格数据不完整。');
       const raw=method===8?inflateRawSync(b.subarray(start,start+length),{maxOutputLength:16*1024*1024}):b.subarray(start,start+length);
-      if(/\.(xml|rels)$/i.test(name)&&/<!DOCTYPE|<!ENTITY/i.test(raw.toString('utf8')))problem('不支持带外部实体的表格。');entries.set(posix.normalize(name),raw);
+      if(/\.(xml|rels|vml)$/i.test(name)&&/<!DOCTYPE|<!ENTITY/i.test(raw.toString('utf8')))problem('不支持带外部实体的表格。');entries.set(posix.normalize(name),raw);
     }
     offset+=46+nl+el+cl;
   }
@@ -37,6 +39,9 @@ export function unpackHomeworkWorkbook(b){
       const ref=attr(c[1],'r');if(!ref)continue;const [r,col]=cell(ref);if(r>10000||col>100)problem('作业表范围过大。');
       const value=decode(c[2].match(/<v\b[^>]*>([\s\S]*?)<\/v>/)?.[1]),type=attr(c[1],'t'),formula=decode(c[2].match(/<f\b[^>]*>([\s\S]*?)<\/f>/)?.[1]);
       rows[r]||=[];rows[r][col]=/DISPIMG/i.test(formula)?'='+formula:type==='s'?strings[Number(value)]||'':type==='inlineStr'?texts(c[2]):value;
+      const linkFormula=formula.match(/(?:_xlfn\.)?HYPERLINK\(\s*"((?:[^"]|"")*)"(?:\s*[,;]\s*"((?:[^"]|"")*)")?/i);
+      if(linkFormula){const url=safeHomeworkLink(linkFormula[1].replace(/""/g,'"'));rows[r][col]=[linkFormula[2]?.replace(/""/g,'"')||'',url||''].filter(Boolean).join('\n');}
+      rows[r][col]=removeLocalFilePaths(rows[r][col]);
     }
     const original=rows.map(r=>r?[...r]:[]);
     let mergedCells=0;const merges=[];
@@ -80,7 +85,8 @@ export function unpackHomeworkWorkbook(b){
       }
     }
   }
-  return{sheets,entries,imageIds,imageIssues,date1904:/<workbookPr\b[^>]*date1904=["'](?:1|true)["']/.test(xml('xl/workbook.xml'))};
+  const embedded=workbookAttachments({sheets,entries,xml,attr,resolve,cell,relationships});
+  return{sheets,entries,imageIds,imageIssues:[...imageIssues,...embedded.warnings],embeddedFiles:embedded.files,date1904:/<workbookPr\b[^>]*date1904=["'](?:1|true)["']/.test(xml('xl/workbook.xml'))};
 }
 export function imageMime(bytes){if(bytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')))return'image/png';if(bytes[0]===255&&bytes[1]===216&&bytes[2]===255)return'image/jpeg';if(bytes.subarray(0,4).toString()==='RIFF'&&bytes.subarray(8,12).toString()==='WEBP')return'image/webp';return null;}
 export const normalizeCourseName=s=>String(s||'').normalize('NFKC').replace(/\s/g,'').replace(/\((?:秋冬|春夏|秋|冬|春|夏)(?:季|学期|学季)?[^)]*\)$/,'');
@@ -104,18 +110,26 @@ export function parseHomeworkDeadline(value,term,date1904=false){
 
 export function homeworkFromFile(file,term){
   if(!file||typeof file.content!=='string'||!/\.xlsx$/i.test(file.name||''))problem('请选择 XLSX 作业表。');
-  const bytes=Buffer.from(file.content,'base64');if(!bytes.length||bytes.length>5*1024*1024)problem('作业表不能超过 5 MB。');
+  const bytes=Buffer.from(file.content,'base64');if(!bytes.length||bytes.length>20*1024*1024)problem('作业表不能超过 20 MB。');
   let book;try{book=unpackHomeworkWorkbook(bytes);}catch(e){if(e.status)throw e;problem('表格无法读取，请另存为标准 XLSX 后重试。');}
-  const records=new Map(),policies=new Map(),assets=new Map(),warnings=[...book.imageIssues],recognized=[],ignored=[],usedImages=new Set();let assetBytes=0;
+  const records=new Map(),policies=new Map(),assets=new Map(),warnings=[...book.imageIssues],recognized=[],ignored=[],usedImages=new Set(),usedFiles=new Set();let assetBytes=0;
   const part=(value,field,caption)=>{
-    const attachments=[];let text=clean(value);
+    const attachments=[];let text=removeLocalFilePaths(clean(value));
+    text=text.replace(/=?EMBEDFILE\("(embedded_\d+)"\)/g,(_,name)=>{
+      usedFiles.add(name);const file=book.embeddedFiles.get(name);
+      if(!file)return '【原表附件待补充】';
+      const {bytes:blob,filename}=file,mime=imageMime(blob)||'application/octet-stream',id=hash(blob);
+      if(blob.length>10*1024*1024||mime.startsWith('image/')&&blob.length>5*1024*1024)problem('单个附件不能超过10 MB，图片不能超过5 MB。');
+      if(!assets.has(id)){assetBytes+=blob.length;if(assetBytes>20*1024*1024)problem('表格图片与附件合计不能超过20 MB。');assets.set(id,{id,mime,content:blob.toString('base64')});}
+      attachments.push({assetId:id,field:mime.startsWith('image/')&&field!=='attachment'?field:'attachment',caption,filename,mime,size:blob.length});return '';
+    });
     text=text.replace(/=?\b(?:_xlfn\.)?DISPIMG\(\s*["']([^"']+)["'][^)]*\)/gi,(_,name)=>{
       usedImages.add(name);
       const path=book.imageIds.get(name),blob=path?book.entries.get(path):null,mime=blob?imageMime(blob):null;
       if(!blob||!mime){warnings.push(`${caption} 有无法提取的图片，请核对原表。`);return'【原表图片待补充】';}
-      if(blob.length>2*1024*1024)problem('单张作业图片不能超过 2 MB。');const id=hash(blob);
-      if(!assets.has(id)){assetBytes+=blob.length;if(assetBytes>10*1024*1024)problem('作业图片合计不能超过 10 MB。');assets.set(id,{id,mime,content:blob.toString('base64')});}
-      attachments.push({assetId:id,field,caption});return'';
+      if(blob.length>5*1024*1024)problem('单张作业图片不能超过 5 MB。');const id=hash(blob);
+      if(!assets.has(id)){assetBytes+=blob.length;if(assetBytes>20*1024*1024)problem('作业图片与附件合计不能超过 20 MB。');assets.set(id,{id,mime,content:blob.toString('base64')});}
+      attachments.push({assetId:id,field,caption,mime,size:blob.length});return'';
     });
     return{text:text.trim(),attachments};
   };
@@ -134,12 +148,13 @@ export function homeworkFromFile(file,term){
     const auxSeen=new Set();let auxTitle=clean(headers[6])||'补充考核说明';
     for(let row=h+1;row<sheet.rows.length;row++){
       const values=sheet.rows[row];if(!values)continue;const course=isEnglish?englishCourse:clean(values[ci]),teacher=clean(values[ti]);if(!course||!teacher)continue;
-      const fieldValue=col=>[clean(values[col]),...(sheet.images.get(row+'|'+col)||[]).map(id=>`=DISPIMG("${id}",1)`)].filter(Boolean).join('\n');
+      const fieldValue=col=>[clean(values[col]),...(sheet.images.get(row+'|'+col)||[]).map(id=>`=DISPIMG("${id}",1)`),...(sheet.files.get(row+'|'+col)||[]).map(id=>`=EMBEDFILE("${id}")`)].filter(Boolean).join('\n');
       const source=`${file.name} / ${sheet.name} / 第${row+1}行`,policy=getPolicy(course,teacher,source);
       const raw=Object.fromEntries(headers.map((v,c)=>[`${clean(v)||'附加列'}（第${c+1}列）`,clean(values[c])]).filter(([,v])=>v));policy.source_rows.push({sheet:sheet.name,row:row+1,raw});
       for(const [key,col]of [['submission',pi],['assessment_rules',ri],['team_requirement',gi],['notes',ni]])if(col>=0&&meaningful(fieldValue(col)))append(policy,key,fieldValue(col),source);
       policy.credits=policy.credits||clean(values[credit]);policy.sequence=policy.sequence||clean(values[sequence]);
-      let content=noHomework(values[wi])?'':fieldValue(wi);const title=isEnglish?clean(values[li]).replace('次课','次作业'):clean(headers[wi]).replace('内容','')||'课程作业';
+      const attachmentCols=headers.flatMap((name,col)=>/附件|参考资料|资料文件|下载链接/.test(clean(name))?[col]:[]);
+      let content=noHomework(values[wi])?'':[fieldValue(wi),...attachmentCols.filter(col=>col!==wi).map(fieldValue)].filter(Boolean).join('\n');const title=isEnglish?clean(values[li]).replace('次课','次作业'):clean(headers[wi]).replace('内容','')||'课程作业';
       if(hasEnglishDetails&&!isEnglish&&/英语/.test(course)&&/见表格.*英语/.test(content)){append(policy,'notes','作业详情已从“英语秋季课程”表按课次和老师导入。');content='';}
       if(/^已结束$/.test(content)){append(policy,'notes',`${title}：原表标记已结束。`);content='';}
       if(meaningful(content)){
@@ -161,9 +176,11 @@ export function homeworkFromFile(file,term){
     }
   }
   const result=[...policies.values()].filter(r=>r.submission||r.assessment_rules||r.team_requirement||r.notes||r.attachments.length).concat([...records.values()]);if(!recognized.length)problem('未找到课程名称、任课老师、作业内容等表头，请使用提供的作业表格式。');if(result.length>500)problem('一次最多导入 500 条作业及考核记录。');
-  for(const item of result){item.warnings=[...new Set(item.warnings)];if(item.attachments.length)item.warnings.push('已保留原表图片，请在预览中核对图片内容和适用上课班。');}
+  for(const item of result){item.warnings=[...new Set(item.warnings)];if(item.attachments.length)item.warnings.push('已保留原表图片或附件，请在预览中核对内容及适用课程。');}
   const unmatched=book.sheets.flatMap(sheet=>[...sheet.images.values()].flat()).filter(id=>!usedImages.has(id));
   if(unmatched.length)warnings.push(`有 ${unmatched.length} 张浮动图片未归入有效作业字段（可能是非作业列、缺少课程老师或内容标为“无”），请对照原表核对。`);
+  const unmatchedFiles=book.sheets.flatMap(sheet=>[...sheet.files.values()].flat()).filter(id=>!usedFiles.has(id));
+  if(unmatchedFiles.length)warnings.push(`有 ${unmatchedFiles.length} 个内嵌附件未归入有效作业字段，请对照原表补充，内容为“无”的行不会生成作业。`);
   if(ignored.length)warnings.push(`未作为作业表处理的工作表：${ignored.join('、')}。`);
   return{records:result,assets:[...assets.values()],warnings:[...new Set(warnings)],sheets:recognized,ignoredSheets:ignored};
 }

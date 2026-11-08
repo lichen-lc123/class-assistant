@@ -33,6 +33,18 @@ test('课程作业关联、默认发布、批量删除与密码修改',async t=>
     const done=await call('/homework/records/'+work.id+'/completion','POST',{completed:true,revision:work.revision},a);assert.equal(done.status,200);
     assert.equal((await call('/homework/course/'+aEntry.entryId,'GET',undefined,a)).data.records.find(r=>r.id===work.id).completed,true);
     assert.ok(!(await call('/homework/summary','GET',undefined,a)).data.records.some(r=>r.id===work.id));
+    assert.equal((await call('/homework/records/'+privateWork.data.id+'/completion','POST',{completed:true,revision:privateWork.data.revision},a)).status,200);
+    db.prepare('UPDATE homework_completions SET updated_at=? WHERE record_id=?').run('2026-11-01T08:00:00.000Z',work.id);
+    db.prepare('UPDATE homework_completions SET updated_at=? WHERE record_id=?').run('2026-11-02T08:00:00.000Z',privateWork.data.id);
+    for(const endpoint of ['/homework?termId='+termId,'/homework/course/'+aEntry.entryId]){
+      const completed=(await call(endpoint,'GET',undefined,a)).data.records.filter(r=>r.completed);
+      assert.deepEqual(completed.map(r=>r.id),[privateWork.data.id,work.id]);
+    }
+    // Undo and complete again: use the new completion time; repeating completion is idempotent.
+    assert.equal((await call('/homework/records/'+work.id+'/completion','POST',{completed:false,revision:work.revision},a)).status,200);
+    const recompleted=(await call('/homework/records/'+work.id+'/completion','POST',{completed:true,revision:work.revision},a)).data;
+    assert.equal((await call('/homework/records/'+work.id+'/completion','POST',{completed:true,revision:work.revision},a)).data.completedAt,recompleted.completedAt);
+    assert.deepEqual((await call('/homework','GET',undefined,a)).data.records.filter(r=>r.completed).map(r=>r.id),[work.id,privateWork.data.id]);
     const bad=await call('/admin/homework/batch-delete','POST',{termId,confirm:true,items:[{id:work.id,revision:work.revision},{id:privateWork.data.id,revision:privateWork.data.revision}]},admin);assert.equal(bad.status,403);
     assert.ok(db.prepare('SELECT id FROM homework_records WHERE id=?').get(work.id));
   });

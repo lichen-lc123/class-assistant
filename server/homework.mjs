@@ -14,7 +14,14 @@ function assignmentIdentity(r){
   const number=value=>{if(/^\d+$/.test(value))return Number(value);let total=0,part=0;for(const c of value){if(c==='十'||c==='百'){total+=(part||1)*(c==='十'?10:100);part=0;}else part='零一二三四五六七八九'.indexOf(c==='两'?'二':c);}return total+part;};
   return JSON.stringify([r.kind,normalizeCourseName(r.course_name),normalizedText(r.teacher),r.kind==='assignment'&&match?'第'+number(match[1])+'次':title]);
 }
-export function compareHomework(a,b){const rank={high:0,normal:1,low:2},date=r=>r.planned_date||r.due_date||'9999-12-31',time=r=>(r.planned_date?r.planned_time:r.due_time)||'23:59';return Number(a.completed)-Number(b.completed)||(rank[a.priority||'normal']-rank[b.priority||'normal'])||date(a).localeCompare(date(b))||time(a).localeCompare(time(b))||a.title.localeCompare(b.title)||String(a.id||'').localeCompare(String(b.id||''));}
+export function compareHomework(a,b){
+  const byState=Number(Boolean(a.completed))-Number(Boolean(b.completed));
+  if(byState)return byState;
+  const stable=()=>a.title.localeCompare(b.title)||String(a.id||'').localeCompare(String(b.id||''));
+  if(a.completed&&b.completed)return String(b.completedAt||'').localeCompare(String(a.completedAt||''))||stable();
+  const rank={high:0,normal:1,low:2},date=r=>r.planned_date||r.due_date||'9999-12-31',time=r=>(r.planned_date?r.planned_time:r.due_time)||'23:59';
+  return(rank[a.priority||'normal']-rank[b.priority||'normal'])||date(a).localeCompare(date(b))||time(a).localeCompare(time(b))||stable();
+}
 export function homeworkService(db,timetable){
   const reminderSettings=reminderSettingsService(db);
   const transaction=fn=>{db.exec('BEGIN IMMEDIATE');try{const v=fn();db.exec('COMMIT');return v;}catch(e){db.exec('ROLLBACK');throw e;}};
