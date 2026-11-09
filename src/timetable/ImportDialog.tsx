@@ -7,7 +7,6 @@ import { CourseEditor } from './CourseEditor';
 import {CardCourseEditor} from './CardCourseEditor';
 import {useMobileLayout} from '../components/useMobileLayout';
 import { CourseWeekdays } from './CourseWeekdays';
-import {primaryTeachingCalendar} from '../../shared/course-week.mjs';
 import { weekdayLabel } from './date';
 import { importSaveIssue } from './import-save';
 import { errorMessage, type Course, type CourseData, type Preview, type Source, type Term, type TimetableView } from './types';
@@ -49,8 +48,7 @@ export function ImportDialog({term,source,admin=false,current,onClose,onSaved}:{
     try{const p=await api<Preview>(prefix+(admin?'/template-preview':'/preview'),'POST',{termId:term.id,source:mode,text,...(courses?{courses,unparsedItems:preview?.unparsedItems,importWarnings:preview?.importWarnings}:{})});setPreview(p);return true;}catch(e){setError(errorMessage(e));return false;}finally{setBusy(false);}
   }
   async function loadPrompt(){
-    const p=await api<{text:string}>('/timetable/prompt');const context=JSON.stringify({academic_year:term.academicYear,semester:term.name,primary_calendar:primaryTeachingCalendar(term),calendars:term.config.calendars,source_calendars:term.config.sourceCalendars||[],periods:term.config.periods},null,2);
-    const value=p.text.replace('下面是待解析的原始课表内容：',`网站目标学年：${term.academicYear}\n网站目标学期：${term.name}\n以下是网站已经配置的教学日历和作息，可用于准确匹配课程规则，不代表学生已选课程，也不作为过滤明确上课日期的范围：\n${context}\n\n下面是待解析的原始课表内容：`);setPrompt(value);return value;
+    const p=await api<{text:string}>('/timetable/prompt?termId='+encodeURIComponent(term.id));setPrompt(p.text);return p.text;
   }
   async function viewPrompt(){if(promptBusy)return;setPromptBusy(true);try{await loadPrompt();}catch(e){setError(errorMessage(e));}finally{setPromptBusy(false);}}
   async function copyPrompt(){

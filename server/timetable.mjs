@@ -4,6 +4,7 @@ import { problem, trim, validateTerm, normalizeCourse, expandCourse, findConflic
 import { calendarImport } from './academic-calendar.mjs';
 import { academicCalendarWarnings } from '../shared/academic-calendar.mjs';
 import { parseAiTimetable } from './ai-timetable.mjs';
+import {buildTimetablePrompt} from './timetable-prompt.mjs';
 import { importConflicts,importConflictMessage } from './import-conflicts.mjs';
 import { upcomingClassDays } from './dashboard.mjs';
 import { templateImportService } from './template-import.mjs';
@@ -168,7 +169,8 @@ export function timetableService(db,{onCoursesChanged=()=>{}}={}) {
       const terms=db.prepare('SELECT id FROM terms ORDER BY academic_year DESC, starts_on DESC, name').all().map(r=>term(r.id));const today=todayShanghai();send(200,{terms,currentTermIds:terms.filter(t=>t.startsOn&&t.startsOn<=today&&t.endsOn>=today).map(t=>t.id),today,timeZone:'Asia/Shanghai'});return;
     }
     if(path==='/api/timetable/prompt'&&req.method==='GET'){
-      const text=readFileSync(new URL('../需求文档/讨论稿/课表AI解析提示词.md',import.meta.url),'utf8');send(200,{text:text.slice(text.indexOf('你是课表数据整理助手。'))});return;
+      const text=readFileSync(new URL('../需求文档/讨论稿/课表AI解析提示词.md',import.meta.url),'utf8'),base=text.slice(text.indexOf('你是课表数据整理助手。'));
+      const termId=url.searchParams.get('termId');send(200,{text:termId?buildTimetablePrompt(base,term(termId)):base});return;
     }
     if(path==='/api/admin/timetable/calendar-prompt'&&req.method==='GET'){
       send(200,{text:readFileSync(new URL('../需求文档/课表功能/校历AI提取提示词.md',import.meta.url),'utf8')});return;
