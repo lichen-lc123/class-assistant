@@ -51,6 +51,7 @@
 
 .admin-course-grid .course-tile{min-width:0}
 .course-tile .template-users,.template-carousel-heading .template-users{display:block;max-width:100%;min-width:0;margin:6px 0;color:#7a8573;font-size:11px;line-height:1.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.template-users-mobile .template-users-track{display:inline-flex;gap:24px;vertical-align:bottom;white-space:nowrap;max-width:none}.template-users-track>span{flex:none}.template-users-mobile.is-scrolling{text-overflow:clip}.template-users-mobile.is-scrolling .template-users-track{animation:template-users-scroll var(--template-users-duration) linear infinite}@keyframes template-users-scroll{0%,5%{transform:translateX(0)}95%,100%{transform:translateX(var(--template-users-shift))}}@media(prefers-reduced-motion:reduce){.template-users-mobile.is-scrolling{overflow-x:auto}.template-users-mobile.is-scrolling .template-users-track{animation:none}.template-users-mobile.is-scrolling .template-users-track>span[aria-hidden]{display:none}}
 
 .template-edit-course{display:flex;align-items:center;justify-content:space-between;gap:12px}.template-edit-course>label{flex:1;min-width:0}.template-edit-course>button{flex-shrink:0}.template-edit-course small{display:block;margin-top:5px;font-size:11px;color:#7a8573}
 
