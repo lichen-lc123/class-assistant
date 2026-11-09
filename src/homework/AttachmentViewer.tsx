@@ -12,7 +12,7 @@ const fileMime=(name:string)=>mimeTypes[name.split('.').pop()?.toLowerCase()||''
 function Blocks({blocks}:{blocks:Block[]}){return <>{blocks.map((block,i)=>block.type==='image'?<img key={i} src={block.src} alt={block.alt||'文档图片'}/>:block.type==='table'?<div key={i} className="attachment-preview-table"><table><tbody>{block.rows?.map((row,r)=><tr key={r}>{row.map((cell,c)=><td key={c}><Blocks blocks={cell}/></td>)}</tr>)}</tbody></table></div>:block.type==='heading'?<h3 key={i}>{block.text}</h3>:<p key={i}>{block.text}</p>)}</>;}
 export default function AttachmentViewer({attachment,url,onClose}:{attachment:HomeworkAttachment;url:string;onClose:()=>void}){
  const name=attachment.filename||attachment.caption||'附件',isPdf=/\.pdf$/i.test(name),isOffice=/\.(docx|pptx)$/i.test(name);
- const [error,setError]=useState(''),[loading,setLoading]=useState(true),[file,setFile]=useState<File|null>(null),[blobUrl,setBlobUrl]=useState('');
+ const [error,setError]=useState(''),[loading,setLoading]=useState(true),[file,setFile]=useState<File|null>(null),[downloadUrl,setDownloadUrl]=useState(''),[showDownloadLink,setShowDownloadLink]=useState(false),[downloadMessage,setDownloadMessage]=useState('');
  const [pdf,setPdf]=useState<PDFDocumentProxy|null>(null),[office,setOffice]=useState<OfficePreview|null>(null),[page,setPage]=useState(1),[rendering,setRendering]=useState(false);
  const canvas=useRef<HTMLCanvasElement>(null),container=useRef<HTMLDivElement>(null);
  useEffect(()=>{
@@ -21,7 +21,16 @@ export default function AttachmentViewer({attachment,url,onClose}:{attachment:Ho
    const response=await fetch(url,{credentials:'same-origin',signal:abort.signal});
    if(!response.ok){if(response.status===401)window.dispatchEvent(new Event('session-expired'));throw new Error(response.status===403?'你没有权限查看此附件。':'附件读取失败，请刷新后重试。');}
    const bytes=await response.arrayBuffer();if(!active)return;
-   const data=new File([bytes],name,{type:fileMime(name)});objectUrl=URL.createObjectURL(data);setFile(data);setBlobUrl(objectUrl);
+   const data=new File([bytes],name,{type:fileMime(name)});objectUrl=URL.createObjectURL(data);setFile(data);
+   if(url.startsWith('data:'))setDownloadUrl(objectUrl);
+   else{
+    // Blob addresses only exist in this WebView. Use an authorized HTTP link
+    // that remains usable when WeChat hands the download to another browser.
+    const original=new URL(url,window.location.href);setDownloadUrl(url);
+    const link=await fetch(original.pathname+'/download-link'+original.search,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}',signal:abort.signal});
+    if(link.ok){const result:{url:string}=await link.json();if(active)setDownloadUrl(result.url);}
+    else if(active)setDownloadMessage('跨浏览器下载链接暂未获取成功，可重新打开此附件重试。');
+   }
    if(isPdf){
     const pdfjs=await import('pdfjs-dist/legacy/build/pdf.mjs');
     const worker=await import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?url');if(!active)return;
@@ -43,7 +52,9 @@ export default function AttachmentViewer({attachment,url,onClose}:{attachment:Ho
  },[pdf,page]);
  const count=pdf?.numPages||office?.pages.length||1;
  let canShare=false;try{canShare=Boolean(file&&navigator.canShare?.({files:[file]}));}catch{/* An unavailable share policy must not prevent preview or download. */}
- return <Modal title={name} onClose={onClose} className="attachment-viewer"><div className="attachment-actions">{blobUrl&&<a className="secondary-button compact" href={blobUrl} download={name}><Download size={16}/>下载原文件</a>}{canShare&&<button type="button" className="secondary-button compact" onClick={()=>{if(file)void navigator.share({files:[file],title:name}).catch(e=>{if(e?.name!=='AbortError')setError('当前环境无法保存或分享此文件，仍可查看或下载原文件。');});}}><Share2 size={16}/>保存／分享文件</button>}</div>
+ const absoluteDownload=downloadUrl?new URL(downloadUrl,window.location.href).href:'';
+ return <Modal title={name} onClose={onClose} className="attachment-viewer"><div className="attachment-actions">{downloadUrl&&<a className="secondary-button compact" href={downloadUrl} download={name}><Download size={16}/>下载原文件</a>}{downloadUrl.startsWith('/api/homework/downloads/')&&<button type="button" className="secondary-button compact" onClick={()=>{setShowDownloadLink(true);if(navigator.clipboard?.writeText)void navigator.clipboard.writeText(absoluteDownload).then(()=>setDownloadMessage('下载链接已复制，15 分钟内有效。')).catch(()=>setDownloadMessage('请长按下方链接复制，到浏览器打开即可下载。'));else setDownloadMessage('请长按下方链接复制，到浏览器打开即可下载。');}}>复制下载链接</button>}{canShare&&<button type="button" className="secondary-button compact" onClick={()=>{if(file)void navigator.share({files:[file],title:name}).catch(e=>{if(e?.name!=='AbortError')setError('当前环境无法保存或分享此文件，仍可查看或下载原文件。');});}}><Share2 size={16}/>保存／分享文件</button>}</div>
+  {showDownloadLink&&<label className="attachment-download-link">下载链接（15 分钟内有效）<input aria-label="附件下载链接" readOnly value={absoluteDownload} onFocus={e=>e.currentTarget.select()}/></label>}{downloadMessage&&<p className="muted-note" role="status">{downloadMessage}</p>}
   {loading&&<p role="status">正在读取附件…</p>}{error&&<p className="feedback" role="alert">{error}</p>}
   {!loading&&!isPdf&&!isOffice&&<p className="notice">此文件可下载后查看；当前浏览器支持文件分享时，也可直接保存或分享。</p>}
   {office?.message&&<p className="muted-note">{office.message}</p>}

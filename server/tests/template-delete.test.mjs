@@ -69,14 +69,14 @@ test('管理员删除模板保留已选课程、个人调整、卡片与作业�
     assert.equal((await select(deletedId,student)).status,400);
     assert.equal((await call(path,'DELETE',{revision:1,confirm:true},admin)).status,404);
   });
-  await t.test('剩余模板移除共享课不删除原模板保留课，卡片更新继续生效',async()=>{
+  await t.test('剩余模板移除共享课不删除保留课，已编辑课程持续保持个人内容',async()=>{
     assert.equal((await call('/admin/timetable/templates/'+remainingId,'PUT',{name:'继续同步模板',courseIds:[c],revision:1},admin)).status,200);
     const after=await get(student);assert(after.courses.some(x=>x.publicCourseId===a));assert(after.courses.some(x=>x.publicCourseId===b));
     assert.deepEqual((await get(otherStudent)).courses.map(x=>x.publicCourseId),[c]);
     const original=catalog.find(x=>x.id===a);
     assert.equal((await call('/admin/timetable/courses/'+a,'PUT',{course:{...raw('甲课程更新','14'),teacher:'新老师'},revision:original.revision,acceptWarnings:true},admin)).status,200);
     const updated=(await get(student)).courses.find(x=>x.publicCourseId===a);
-    assert.equal(updated.course_name,'甲课程更新');assert.equal(updated.teacher,'新老师');assert.equal(updated.sessions[0].room,'个人教室');
+    assert.equal(updated.course_name,'甲课程');assert.equal(updated.teacher,'老师');assert.equal(updated.sessions[0].room,'个人教室');
     assert.equal((await call('/homework','GET',undefined,student)).data.records.find(x=>x.id===homework.data.id).completed,true);
     assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
   });

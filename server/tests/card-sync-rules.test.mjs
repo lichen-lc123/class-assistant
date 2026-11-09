@@ -30,23 +30,23 @@ test('模板生成卡片双向同步，手动卡片独立同步，追加卡片�
   const manualTemplateId=(await call('/admin/timetable/templates','POST',{termId,name:'含手动课程模板',courseIds:[manual.id]},admin)).data.id;
   assert.equal((await select(cookies.manual,{source:'cards',courseIds:[manual.id]})).status,200);
   assert.equal((await select(cookies['manual-template'],{source:'template',templateId:manualTemplateId})).status,200);
-  await t.test('修改自动生成卡片同步模板、模板用户和卡片用户，个人教室优先',async()=>{
+  await t.test('修改自动生成卡片同步未编辑用户，已编辑模板课程保持个人内容',async()=>{
     const own=await get(cookies.template),entry=own.courses[0];
     assert.equal((await call(`/timetable/${termId}/entries/${entry.id}`,'PATCH',{revision:own.timetable.revision,publicRevision:entry.publicRevision,sessions:entry.sessions.map(s=>({...s,room:'个人教室'}))},cookies.template)).status,200);
     const changed=raw('自动课程新名称','2026-11-18','新老师');
     assert.equal((await call('/admin/timetable/courses/'+auto.id,'PUT',{course:changed,revision:auto.revision,acceptWarnings:true},admin)).status,200);
     const template=(await templates()).find(t=>t.id===templateId);assert.equal(template.courses[0].course_name,changed.course_name);
-    for(const cookie of [cookies.template,cookies.auto]){const c=(await get(cookie)).courses[0];assert.equal(c.course_name,changed.course_name);assert.equal(c.teacher,'新老师');assert.equal(c.sessions[0].date,'2026-11-18');}
+    {const c=(await get(cookies.auto)).courses[0];assert.equal(c.course_name,changed.course_name);assert.equal(c.teacher,'新老师');assert.equal(c.sessions[0].date,'2026-11-18');} assert.equal((await get(cookies.template)).courses[0].course_name,'自动课程');assert.equal((await get(cookies.template)).courses[0].sessions[0].date,'2026-11-14');
     assert.equal((await get(cookies.template)).courses[0].sessions[0].room,'个人教室');
   });
-  await t.test('模板中编辑课程会修改生成的卡片及所有选用用户，旧版与越权请求被拒绝',async()=>{
+  await t.test('模板中编辑课程修改卡片及未编辑用户，个人保留者不变，旧版与越权请求被拒绝',async()=>{
     const template=(await templates()).find(t=>t.id===templateId),card=(await catalog()).find(c=>c.id===auto.id),changed=raw('模板内修订课程','2026-11-20','模板老师','13:00','15:00');
     const body={name:template.name,revision:template.revision,courseIds:template.courseIds,courseChanges:[{id:auto.id,revision:card.revision,course:changed}],acceptWarnings:true};
     assert.equal((await call('/admin/timetable/templates/'+templateId,'PUT',body,cookies.template)).status,403);
     assert.equal((await call('/admin/timetable/templates/'+templateId,'PUT',{...body,courseChanges:[{...body.courseChanges[0],revision:0}]},admin)).status,409);
     assert.equal((await call('/admin/timetable/templates/'+templateId,'PUT',body,admin)).status,200);
     assert.equal((await catalog()).find(c=>c.id===auto.id).teacher,'模板老师');
-    for(const cookie of [cookies.template,cookies.auto])assert.equal((await get(cookie)).courses[0].sessions[0].start_time,'13:00');
+    assert.equal((await get(cookies.auto)).courses[0].sessions[0].start_time,'13:00');assert.equal((await get(cookies.template)).courses[0].sessions[0].start_time,'08:00');
     assert.equal((await get(cookies.template)).courses[0].sessions[0].room,'个人教室');
     const current=(await templates()).find(t=>t.id===templateId),before=(await catalog()).find(c=>c.id===auto.id);
     const bad=await call('/admin/timetable/templates/'+templateId,'PUT',{...body,name:'不应保存',revision:current.revision,courseChanges:[{id:auto.id,revision:before.revision,course:raw('不应写入','2026-11-21')},{id:manual.id,revision:1,course:raw('不应越出模板','2026-11-22')}]},admin);
@@ -79,10 +79,10 @@ test('模板生成卡片双向同步，手动卡片独立同步，追加卡片�
     assert.deepEqual((await get(cookies['manual-template'])).courses.map(c=>c.sessions[0].date).sort(),['2026-11-18','2026-11-21']);
   });
   await t.test('导入模板后追加卡片，预览提示时间冲突且保存无法绕过',async()=>{
-    const conflicting=raw('冲突新卡片','2026-11-20','另一老师','14:00','16:00');
+    const conflicting=raw('冲突新卡片','2026-11-14','另一老师','09:00','11:00');
     assert.equal((await call('/admin/timetable/courses','POST',{termId,source:'manual',courses:[conflicting],acceptWarnings:true},admin)).status,201);
     const card=(await catalog()).find(c=>c.course_name===conflicting.course_name),own=await get(cookies.template),before=db.prepare('SELECT * FROM timetable_entries ORDER BY id').all();
-    const p=await call('/timetable/selection-preview','POST',{termId,source:'cards',courseIds:[card.id]},cookies.template);assert.equal(p.status,200);assert.equal(p.data.importBlocked,true);assert.match(p.data.importError,/课程时间重复/);assert(p.data.importError.includes('2026-11-20'));assert(p.data.importError.includes('模板内修订课程'));
+    const p=await call('/timetable/selection-preview','POST',{termId,source:'cards',courseIds:[card.id]},cookies.template);assert.equal(p.status,200);assert.equal(p.data.importBlocked,true);assert.match(p.data.importError,/课程时间重复/);assert(p.data.importError.includes('2026-11-14'));assert(p.data.importError.includes('自动课程'));
     assert.equal((await select(cookies.template,{source:'cards',courseIds:[card.id]})).status,409);assert.deepEqual(db.prepare('SELECT * FROM timetable_entries ORDER BY id').all(),before);assert.equal((await get(cookies.template)).timetable.revision,own.timetable.revision);
     assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
   });

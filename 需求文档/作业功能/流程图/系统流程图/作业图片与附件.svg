@@ -65,9 +65,9 @@
 </text>
 <rect x="70" y="1307" width="440" height="97" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1338.5">前端｜PDF 本地画布翻页</tspan>
-<tspan x="290.0" y="1361.5">DOCX/PPTX 请求授权内容预览</tspan>
-<tspan x="290.0" y="1384.5">其他文件下载或原生分享</tspan>
+<tspan x="290.0" y="1338.5">前端｜PDF/Office 站内预览</tspan>
+<tspan x="290.0" y="1361.5">向后端申请短时授权下载链接</tspan>
+<tspan x="290.0" y="1384.5">可交另一浏览器下载或原生分享</tspan>
 </text>
 <rect x="70" y="1478" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

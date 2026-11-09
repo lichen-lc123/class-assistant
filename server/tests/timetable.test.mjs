@@ -166,7 +166,7 @@ test('课表完整接口与权限流程',async t=>{
     const all=(await call(`/admin/timetable/courses?termId=${termId}`,'GET',undefined,admin)).data;const master=all.find(c=>c.id===courseA);
     const updated={...master,weekly_rules:[],special_dates:[],explicit_sessions:[{date:'2026-11-03',start_time:'12:00',end_time:'13:00',room:'公共新教室'}]};
     assert.equal((await call(`/admin/timetable/courses/${courseA}`,'PUT',{course:updated,revision:master.revision,acceptWarnings:true},admin)).status,200);
-    let view=(await call(`/timetable/${termId}`,'GET',undefined,student)).data;let mine=view.courses.find(c=>c.id===entry.id);assert.equal(mine.sessions[0].date,'2026-11-02');assert.equal(mine.sessions[0].room,'个人确认地点');assert.equal(mine.publicChanged,true);
+    let view=(await call(`/timetable/${termId}`,'GET',undefined,student)).data;let mine=view.courses.find(c=>c.id===entry.id);assert.equal(mine.sessions[0].date,'2026-11-02');assert.equal(mine.sessions[0].room,'个人确认地点');assert.equal(mine.publicChanged,false);assert.equal(mine.templateSyncPaused,true);
     s=await call(`/timetable/${termId}/entries/${entry.id}/reset`,'POST',{revision:view.timetable.revision},student);assert.equal(s.status,200);view=s.data;mine=view.courses.find(c=>c.id===entry.id);assert.equal(mine.sessions[0].date,'2026-11-03');assert.equal(mine.hasOverride,false);own=view;
     const otherView=(await call(`/timetable/${termId}`,'GET',undefined,other)).data;assert.equal(otherView.courses[0].sessions[0].date,'2026-11-03');assert.equal(otherView.courses[0].sessions[0].room,'另一位同学确认地点');
   });
@@ -175,15 +175,15 @@ test('课表完整接口与权限流程',async t=>{
     assert.equal((await call(`/timetable/${termId}`,'DELETE',{revision:0,confirm:true},student)).status,409);
     assert.ok((await call(`/timetable/${termId}`,'GET',undefined,student)).data.timetable);
   });
-  await t.test('仅修改个人地点不冻结公共时间；公共更新期间拒绝旧页面修改',async()=>{
+  await t.test('模板课程仅改地点也保留整门内容，后续可继续编辑个人安排',async()=>{
     const entry=own.courses.find(c=>c.publicCourseId===courseA);
     const mine=entry.sessions.map(s=>({...s,room:'仅个人地点'}));
     let r=await call(`/timetable/${termId}/entries/${entry.id}`,'PATCH',{revision:own.timetable.revision,publicRevision:entry.publicRevision,sessions:mine},student);assert.equal(r.status,200);own=r.data;
     const master=(await call(`/admin/timetable/courses?termId=${termId}`,'GET',undefined,admin)).data.find(c=>c.id===courseA);
     await call(`/admin/timetable/courses/${courseA}`,'PUT',{course:{...master,explicit_sessions:[{date:'2026-11-04',start_time:'14:00',end_time:'15:00',room:'公共变更地点'}]},revision:master.revision,acceptWarnings:true},admin);
     const view=(await call(`/timetable/${termId}`,'GET',undefined,student)).data;const c=view.courses.find(c=>c.id===entry.id);
-    assert.equal(c.sessions[0].date,'2026-11-04');assert.equal(c.sessions[0].start_time,'14:00');assert.equal(c.sessions[0].room,'仅个人地点');
-    r=await call(`/timetable/${termId}/entries/${entry.id}`,'PATCH',{revision:view.timetable.revision,publicRevision:entry.publicRevision,sessions:mine},student);assert.equal(r.status,409);own=view;
+    assert.equal(c.sessions[0].date,'2026-11-03');assert.equal(c.sessions[0].start_time,'12:00');assert.equal(c.sessions[0].room,'仅个人地点');assert.equal(c.templateSyncPaused,true);
+    r=await call(`/timetable/${termId}/entries/${entry.id}`,'PATCH',{revision:view.timetable.revision,publicRevision:entry.publicRevision,sessions:mine},student);assert.equal(r.status,200);own=r.data;
   });
   await t.test('删除只影响本人本学期；删除后可换来源，个人导入不产生公共卡片',async()=>{
     const w=await call(`/timetable/${winterId}`,'POST',{source:'ai',courses:[{course_name:'冬季课程',semester:'冬学期'}],acceptWarnings:true},student);assert.equal(w.status,200);

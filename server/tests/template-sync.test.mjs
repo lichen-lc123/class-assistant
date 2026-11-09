@@ -60,12 +60,12 @@ test('模板成员与卡片更新同步到已选用户，保留个人安排并�
     const dashboard=(await call('/timetable/dashboard','GET',undefined,cookies.template)).data;
     assert.deepEqual(dashboard.days.flatMap(day=>day.lessons.map(x=>x.courseName)).sort(),['保留课程','新增课程']);own=fresh;
   });
-  await t.test('修改卡片名称老师时间地点后同步，个人教室优先且自行导入仍独立',async()=>{
+  await t.test('未编辑卡片选课继续同步，已编辑模板课程及自行导入保持独立',async()=>{
     const old=(await call('/admin/timetable/courses?termId='+termId,'GET',undefined,admin)).data.find(x=>x.id===a);
     const updated={...initial[0],course_name:'更新课程名',teacher:'更新老师',explicit_sessions:[{date:addDays(date,3),start_time:'13:00',end_time:'15:00',room:'新公共教室'}]};
     assert.equal((await call('/admin/timetable/courses/'+a,'PUT',{course:updated,revision:old.revision,acceptWarnings:true},admin)).status,200);
     const template=(await get(cookies.template)).data.courses.find(x=>x.publicCourseId===a),card=(await get(cookies.cards)).data.courses.find(x=>x.publicCourseId===a);
-    for(const entry of [template,card]){assert.equal(entry.course_name,'更新课程名');assert.equal(entry.teacher,'更新老师');assert.equal(entry.sessions[0].date,addDays(date,3));assert.equal(entry.sessions[0].start_time,'13:00');}
+    assert.equal(card.course_name,'更新课程名');assert.equal(card.teacher,'更新老师');assert.equal(card.sessions[0].date,addDays(date,3));assert.equal(card.sessions[0].start_time,'13:00');assert.equal(template.course_name,'保留课程');assert.equal(template.teacher,'原老师');assert.equal(template.sessions[0].date,date);
     assert.equal(template.sessions[0].room,'我的教室');assert.equal(card.sessions[0].room,'新公共教室');
     const privateCourse=(await get(cookies.private)).data.courses[0];assert.equal(privateCourse.course_name,'保留课程');assert.equal(privateCourse.sessions[0].room,'原教室');
     // Old card edits cannot overwrite a newly changed shared course.

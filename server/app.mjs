@@ -111,6 +111,7 @@ export async function createApp({ databasePath, serveStatic = false, allowedOrig
         const oldSession = session(req); if (oldSession) db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(oldSession.key);
         setSession(res, record.id); send(200, publicUser(findUser(record.id))); return;
       }
+      if(path.startsWith('/api/homework/downloads/')&&homework.handleDownload({req,path,res}))return;
       const active = session(req);
       if (!active) { clearCookie(res); fail(401, '登录已失效，请重新登录。'); }
       // Upgrade still-valid legacy sessions without reviving revoked/expired tokens.

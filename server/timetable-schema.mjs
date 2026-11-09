@@ -70,6 +70,13 @@ export function initTimetableSchema(db) {
       template_id TEXT NOT NULL REFERENCES timetable_templates(id) ON DELETE CASCADE,
       PRIMARY KEY(entry_id,template_id)
     );
+    CREATE TABLE IF NOT EXISTS timetable_template_course_choices (
+      timetable_id TEXT NOT NULL REFERENCES timetables(id) ON DELETE CASCADE,
+      template_id TEXT NOT NULL REFERENCES timetable_templates(id) ON DELETE CASCADE,
+      course_id TEXT NOT NULL REFERENCES public_courses(id) ON DELETE CASCADE,
+      action TEXT NOT NULL CHECK(action IN ('removed','edited')),
+      PRIMARY KEY(timetable_id,template_id,course_id)
+    );
     ${legacy?`UPDATE timetable_entries SET direct_source=(SELECT source FROM timetables WHERE id=timetable_id) WHERE timetable_id IN (SELECT id FROM timetables WHERE source<>'template');
     INSERT OR IGNORE INTO timetable_template_subscriptions SELECT id,template_id,COALESCE(template_revision,0) FROM timetables WHERE source='template' AND template_id IS NOT NULL;
     INSERT OR IGNORE INTO timetable_entry_templates SELECT e.id,t.template_id FROM timetable_entries e JOIN timetables t ON t.id=e.timetable_id WHERE t.source='template' AND t.template_id IS NOT NULL AND e.course_id IS NOT NULL;`:''}

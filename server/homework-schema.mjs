@@ -58,6 +58,14 @@ export function initHomeworkSchema(db){
     record_id TEXT NOT NULL REFERENCES homework_records(id) ON DELETE CASCADE,
     seen_revision INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(user_id,record_id)
   )`);
+  db.exec(`CREATE TABLE IF NOT EXISTS homework_download_links(
+    token_hash TEXT PRIMARY KEY,
+    session_key TEXT NOT NULL REFERENCES sessions(token_hash) ON DELETE CASCADE,
+    record_id TEXT NOT NULL REFERENCES homework_records(id) ON DELETE CASCADE,
+    asset_id TEXT NOT NULL REFERENCES homework_assets(id) ON DELETE CASCADE,
+    field TEXT NOT NULL,
+    expires_at INTEGER NOT NULL
+  );CREATE INDEX IF NOT EXISTS homework_download_expiry ON homework_download_links(expires_at);`);
   if(!db.prepare('PRAGMA table_info(homework_records)').all().some(c=>c.name==='update_revision'))db.exec('ALTER TABLE homework_records ADD COLUMN update_revision INTEGER NOT NULL DEFAULT 0');
   if(!db.prepare('PRAGMA table_info(homework_records)').all().some(c=>c.name==='owner_id')){
     db.exec('ALTER TABLE homework_records ADD COLUMN owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE');

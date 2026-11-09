@@ -3,6 +3,7 @@ import {homeworkFromFile,imageMime,normalizeCourseName,noHomework} from './homew
 import {problem,validDate,validTime,todayShanghai,expandCourse} from './schedule.mjs';
 import {homeworkCourseTime,matchesHomeworkCourseTime} from './homework-course-time.mjs';
 import {officePreview} from './office-preview.mjs';
+import {homeworkDownloads} from './homework-downloads.mjs';
 import {reminderSettingsService} from './reminder-settings.mjs';
 import {homeworkCompletionAction} from './homework-notification-actions.mjs';
 import {courseIdentity,courseTimeLabel} from './course-identity.mjs';
@@ -25,6 +26,7 @@ export function compareHomework(a,b){
   return(rank[a.priority||'normal']-rank[b.priority||'normal'])||date(a).localeCompare(date(b))||time(a).localeCompare(time(b))||stable();
 }
 export function homeworkService(db,timetable){
+  const downloads=homeworkDownloads(db,loadAttachment);
   const reminderSettings=reminderSettingsService(db);
   const transaction=fn=>{db.exec('BEGIN IMMEDIATE');try{const v=fn();db.exec('COMMIT');return v;}catch(e){db.exec('ROLLBACK');throw e;}};
   function classOptions(termId){
@@ -189,9 +191,18 @@ export function homeworkService(db,timetable){
     for(const a of item.attachments){const asset=assets.get(a.assetId);if(!asset&&!previous.has(a.assetId))problem('附件资料缺失或不属于此作业，请重新选择文件上传。');const stored=asset?null:db.prepare('SELECT mime,length(bytes) AS size FROM homework_assets WHERE id=?').get(a.assetId),mime=asset?.mime||stored?.mime;if(!counted.has(a.assetId)){total+=asset?.bytes.length||stored?.size||0;counted.add(a.assetId);}if(total>20*1024*1024)problem('本项作业的图片与附件合计不能超过20 MB。');}
     db.prepare('DELETE FROM homework_attachments WHERE record_id=?').run(id);for(const a of item.attachments){const file=assets.get(a.assetId);if(file)db.prepare('INSERT OR IGNORE INTO homework_assets VALUES(?,?,?)').run(a.assetId,file.mime,file.bytes);if(!db.prepare('SELECT id FROM homework_assets WHERE id=?').get(a.assetId))problem('附件资料缺失，请重新上传。');db.prepare('INSERT OR IGNORE INTO homework_attachments VALUES(?,?,?,?)').run(id,a.assetId,a.field,a.caption);}
   }
+  function loadAttachment(recordId,assetId,field,user){
+    const row=getRecord(recordId);if(row.owner_id!=null?row.owner_id!==user.id:user.role!=='admin'&&!visible(row,user.id))problem('无权查看此作业附件。',403);
+    const link=db.prepare('SELECT * FROM homework_attachments WHERE record_id=? AND asset_id=?'+(field?' AND field=?':'')+' LIMIT 1').get(row.id,assetId,...(field?[field]:[]));if(!link)problem('附件不属于此作业。',404);
+    const asset=db.prepare('SELECT * FROM homework_assets WHERE id=?').get(assetId);if(!asset)problem('附件不存在。',404);
+    const image=asset.mime.startsWith('image/'),name=parse(row.payload_json).attachment_names?.[asset.id+':'+link.field]||link.caption||(image?'作业图片.'+asset.mime.split('/')[1]:'作业附件');
+    return{...asset,name,field:link.field};
+  }
   async function handle({req,path,url,user,readJson,send,getSession,res}){
     const admin=path.startsWith('/api/admin/');if(admin&&user.role!=='admin')problem('仅学委或管理员可以维护作业。',403);
     const read=async()=>{const body=await readJson(req,32*1024*1024),active=getSession();if(!active)problem('登录已失效，请重新登录。',401);if(admin&&active.user.role!=='admin')problem('管理权限已失效。',403);return body;};
+    const downloadLink=path.match(/^\/api\/homework\/assets\/([a-f0-9]{64})\/download-link$/);
+    if(downloadLink&&req.method==='POST'){await read();const session=getSession();if(!session)problem('登录已失效，请重新登录。',401);send(200,downloads.create(session,downloadLink[1],url.searchParams.get('recordId'),url.searchParams.get('field')));return;}
     const assetPath=path.match(/^\/api\/homework\/assets\/([a-f0-9]{64})$/);
     if(assetPath&&req.method==='GET'){
       const row=getRecord(url.searchParams.get('recordId'));if(row.owner_id!=null?row.owner_id!==user.id:user.role!=='admin'&&!visible(row,user.id))problem('无权查看此作业附件。',403);
@@ -355,5 +366,5 @@ export function homeworkService(db,timetable){
     }
     problem('作业接口不存在。',404);
   }
-  return{handle,personal,classOptions,reminderCandidate,publishPending};
+  return{handle,handleDownload:downloads.handle,personal,classOptions,reminderCandidate,publishPending};
 }

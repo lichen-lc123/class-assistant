@@ -25,7 +25,8 @@
 </text>
 <rect x="70" y="441" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="484.0">后端｜仅同步需要更新的模板订阅</tspan>
+<tspan x="290.0" y="472.5">后端｜按模板与课程读取个人选择</tspan>
+<tspan x="290.0" y="495.5">跳过已移除或已编辑课程</tspan>
 </text>
 <rect x="70" y="589" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
@@ -42,7 +43,7 @@
 <path d="M70 1046 A220.0 13 0 0 1 510 1046 L510 1120 A220.0 13 0 0 1 70 1120 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
 <path d="M70 1046 A220.0 13 0 0 0 510 1046" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1077.5">数据库｜个人编辑只写本人的覆盖</tspan>
+<tspan x="290.0" y="1077.5">数据库｜保存整门快照及本人选择</tspan>
 <tspan x="290.0" y="1100.5">版本冲突拒绝覆盖</tspan>
 </text>
 <rect x="70" y="1207" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>

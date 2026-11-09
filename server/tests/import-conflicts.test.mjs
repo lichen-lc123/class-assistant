@@ -84,7 +84,7 @@ test('三种来源均可追加，重复时间整批拒绝，模板同步不删�
   await t.test('多模板同步按来源维护，AI表格和卡片追加课程均保留，重合来源不重复建课',async()=>{
     const edit=async(id,courseIds)=>{const tpl=(await call('/admin/timetable/templates?termId='+termId,'GET',undefined,admin)).data.find(x=>x.id===id);return call('/admin/timetable/templates/'+id,'PUT',{name:tpl.name,revision:tpl.revision,courseIds},admin);};
     assert.equal((await edit(template,[ids.ADMIN])).status,200);
-    let table=await get();assert.ok(!table.courses.some(x=>x.teaching_class_code==='BASE'));for(const code of ['ADMIN','AI','EXCEL','TWO','CARD','ADJ','DIFF','FREE'])assert.ok(table.courses.some(x=>x.teaching_class_code===code),code);
+    let table=await get();assert.ok(table.courses.some(x=>x.teaching_class_code==='BASE'&&x.hasOverride));for(const code of ['ADMIN','AI','EXCEL','TWO','CARD','ADJ','DIFF','FREE'])assert.ok(table.courses.some(x=>x.teaching_class_code===code),code);
     assert.equal((await edit(second,[ids.CARD])).status,200);table=await get();assert.equal(table.courses.filter(x=>x.publicCourseId===ids.CARD).length,1);assert.ok(!table.courses.some(x=>x.teaching_class_code==='TWO'));
     assert.equal((await edit(second,[ids.ADMIN])).status,200);table=await get();assert.ok(table.courses.some(x=>x.teaching_class_code==='CARD'));assert.equal(table.courses.filter(x=>x.publicCourseId===ids.ADMIN).length,1);
     assert.equal((await get(cookies.two)).courses.find(x=>x.teaching_class_code==='BASE').course_name,'最初课程');

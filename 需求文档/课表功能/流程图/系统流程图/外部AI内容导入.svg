@@ -28,7 +28,8 @@
 </text>
 <rect x="70" y="441" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="484.0">后端｜解析 JSON 并验证目标学期</tspan>
+<tspan x="290.0" y="472.5">后端｜兼容字符串内原始制表符</tspan>
+<tspan x="290.0" y="495.5">解析完整 JSON 并验证目标学期</tspan>
 </text>
 <rect x="70" y="589" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

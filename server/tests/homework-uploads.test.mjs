@@ -35,6 +35,18 @@ test('作业图片与附件上传、保留、移除、下载及私人权限',asy
     for(const cookie of [two,admin,outside])assert.equal((await download(url+'&preview=1',cookie)).status,403);
     assert.equal((await download(url+'&preview=1')).status,401);
     assert.deepEqual(Buffer.from(await (await download(url,one)).arrayBuffer()),bytes);
+    const issue=cookie=>call('/homework/assets/'+document.id+'/download-link?recordId='+saved.data.id+'&field=content','POST',{},cookie);
+    for(const cookie of [two,admin,outside])assert.equal((await issue(cookie)).status,403);
+    const link=await issue(one);assert.equal(link.status,200);assert.ok(link.data.url.startsWith('/api/homework/downloads/'));assert.ok(!link.data.url.startsWith('blob:'));
+    const external=await download(link.data.url);assert.equal(external.status,200);assert.match(external.headers.get('content-disposition'),/^attachment/);assert.equal(Number(external.headers.get('content-length')),bytes.length);assert.deepEqual(Buffer.from(await external.arrayBuffer()),bytes);
+    const head=await fetch(base+link.data.url,{method:'HEAD'});assert.equal(head.status,200);assert.equal((await head.arrayBuffer()).byteLength,0);
+    const withOtherParameters=await download(link.data.url+'?recordId=another-record');assert.deepEqual(Buffer.from(await withOtherParameters.arrayBuffer()),bytes);
+    db.prepare('UPDATE homework_download_links SET expires_at=0').run();assert.equal((await download(link.data.url)).status,410);
+    const renewed=await issue(one);assert.equal(renewed.status,200);
+    const temporary=await login('upload-one','UploadStudentFixture123'),temporaryLink=await issue(temporary);assert.equal(temporaryLink.status,200);
+    assert.equal((await download(temporaryLink.data.url)).status,200);assert.equal((await call('/auth/logout','POST',{},temporary)).status,200);assert.equal((await download(temporaryLink.data.url)).status,410);
+    assert.equal((await download(renewed.data.url)).status,200);
+    const removed=await call('/homework/personal/'+saved.data.id,'PUT',{revision:saved.data.revision,record:{...saved.data,attachments:[]}},one);assert.equal(removed.status,200);assert.equal((await download(renewed.data.url)).status,404);
   });
   await t.test('单独发布草稿保留原附件、文件名、所属字段和下载权限',async()=>{
     const draft=await call('/admin/homework/records','POST',{termId,record:{...record,title:'待发布附件',published:false},assets:[image,pdf]},admin);assert.equal(draft.status,201);

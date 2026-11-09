@@ -31,7 +31,8 @@
 </text>
 <rect x="70" y="589" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="632.0">用户｜将 JSON 粘回系统</tspan>
+<tspan x="290.0" y="620.5">用户｜粘贴全部内容或分段追加</tspan>
+<tspan x="290.0" y="643.5">查看字符数及结尾，可放大编辑</tspan>
 </text>
 <rect x="70" y="737" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

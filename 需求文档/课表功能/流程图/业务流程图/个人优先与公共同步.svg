@@ -31,12 +31,13 @@
 </text>
 <rect x="70" y="737" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="768.5">网站｜未修改字段跟随公共安排</tspan>
-<tspan x="290.0" y="791.5">个人修改过的安排保持优先</tspan>
+<tspan x="290.0" y="768.5">网站｜未修改课程继续同步</tspan>
+<tspan x="290.0" y="791.5">编辑课程保留完整个人快照</tspan>
 </text>
 <rect x="70" y="885" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="928.0">用户｜公共课次改变后核对个人覆盖</tspan>
+<tspan x="290.0" y="916.5">用户｜可主动恢复默认安排</tspan>
+<tspan x="290.0" y="939.5">移除的模板课程不自动补回</tspan>
 </text>
 <rect x="70" y="1033" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
