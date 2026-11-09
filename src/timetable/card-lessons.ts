@@ -1,5 +1,6 @@
 import type { CourseData, Course, ExplicitSession, Term } from './types';
 import {courseTeachingWeek} from '../../shared/course-week.mjs';
+import {numberLessons} from '../../shared/lesson-order.mjs';
 
 export function dateWeekday(date:string){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return null;
@@ -11,7 +12,7 @@ export function dateWeek(date:string,term:Term):number|null{
   return courseTeachingWeek(date,{},term);
 }
 export function numberCardLessons<T extends ExplicitSession>(lessons:T[]):T[]{
-  return lessons.map((lesson,index)=>({...lesson,lesson_number:index+1}));
+  return numberLessons(lessons);
 }
 export function newCardLesson(lessons:ExplicitSession[]):ExplicitSession{
   const first=lessons[0];
@@ -25,7 +26,7 @@ export function lessonTitle(n:number){
 }
 export function cardLessons(course:CourseData,term:Term):ExplicitSession[]{
   const expanded=(course as Course).sessions;
-  return (expanded||course.explicit_sessions).map((s,i)=>({...s,lesson_number:s.lesson_number||i+1,week:s.week??course.explicit_sessions.find(e=>e.date===s.date&&e.start_time===s.start_time)?.week??dateWeek(s.date,term)}));
+  return numberCardLessons((expanded||course.explicit_sessions).map(s=>({...s,week:s.week??course.explicit_sessions.find(e=>e.date===s.date&&e.start_time===s.start_time)?.week??dateWeek(s.date,term)})));
 }
 // Keep incomplete source arrangements; replacing resolved rules prevents an old
 // weekly date from reappearing after a lesson is moved or removed in the editor.
@@ -45,5 +46,5 @@ export function replaceCardLessons(course:CourseData,lessons:ExplicitSession[],t
   const special_dates=course.special_dates.filter(s=>!s.date||reviews.some(r=>r.action==='pending'&&r.date===s.date));
   const extra_fields={...course.extra_fields};
   delete extra_fields['周次日期冲突处理'];
-  return {...course,room:null,weekly_rules,special_dates,explicit_sessions:lessons.map(s=>({...s,weekday:dateWeekday(s.date)})),extra_fields};
+  return {...course,room:null,weekly_rules,special_dates,explicit_sessions:numberCardLessons(lessons).map(s=>({...s,weekday:dateWeekday(s.date)})),extra_fields};
 }

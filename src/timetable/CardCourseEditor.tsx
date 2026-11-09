@@ -6,7 +6,7 @@ import type { CourseData, ExplicitSession, Term } from './types';
 
 export function CardCourseEditor({course,term,onClose,onSave,busy=false,extra,error,title='编辑卡片模板'}:{course:CourseData;term:Term;onClose:()=>void;onSave:(course:CourseData)=>void;busy?:boolean;extra?:ReactNode;error?:string;title?:string}){
   const [name,setName]=useState(course.course_name),[teacher,setTeacher]=useState(course.teacher||'');
-  const [lessons,setLessons]=useState<(ExplicitSession&{key:number})[]>(()=>numberCardLessons(cardLessons(course,term).sort((a,b)=>(a.lesson_number||201)-(b.lesson_number||201)).map((s,i)=>({...s,week:dateWeek(s.date,term)??s.week??null,key:i}))));
+  const [lessons,setLessons]=useState<(ExplicitSession&{key:number})[]>(()=>numberCardLessons(cardLessons(course,term).map((s,i)=>({...s,week:dateWeek(s.date,term)??s.week??null,key:i}))));
   const nextKey=useRef(lessons.length),scrollArea=useRef<HTMLDivElement>(null);
   const [addedKey,setAddedKey]=useState<number|null>(null);
   useLayoutEffect(()=>{
@@ -16,7 +16,7 @@ export function CardCourseEditor({course,term,onClose,onSave,busy=false,extra,er
     area.scrollTo({top:area.scrollTop+card.getBoundingClientRect().top-area.getBoundingClientRect().top-8,behavior:'auto'});
     card.querySelector<HTMLInputElement>('input[type="date"]')?.focus({preventScroll:true});
   },[addedKey]);
-  function update(key:number,patch:Partial<ExplicitSession>){setLessons(old=>old.map(s=>s.key===key?{...s,...patch}:s));}
+  function update(key:number,patch:Partial<ExplicitSession>){setLessons(old=>numberCardLessons(old.map(s=>s.key===key?{...s,...patch}:s)));}
   function add(){const key=nextKey.current++;setLessons(old=>[...old,{...newCardLesson(old),key}]);setAddedKey(key);}
   function submit(e:FormEvent){
     e.preventDefault();if(busy)return;
@@ -45,7 +45,7 @@ export function CardCourseEditor({course,term,onClose,onSave,busy=false,extra,er
       </div>
     </section>)}</div>
     {(remaining.weekly_rules.length>0||remaining.special_dates.length>0)&&<p className="notice">还有尚未明确日期或时间的原始安排，保存时将继续保留。请对照导入内容核对。</p>}
-    <p className="muted-note">课次自动连续编号，周次与星期随日期生成；校历未覆盖或存在歧义时，周次标为待确认。新增课堂默认沿用第一节课的地点和起止时间，可单独调整。</p>
+    <p className="muted-note">课次按上课日期、开始时间自动连续编号；新增、改期或删除后重新排序。周次与星期随日期生成。新增课堂默认沿用第一节课的地点和起止时间，可单独调整。</p>
     {extra}{error&&<p role="alert" className="feedback">{error}</p>}
     <div className="modal-actions"><button type="button" className="secondary-button" disabled={busy} onClick={onClose}>取消</button><button className="primary-button compact" disabled={busy}>{busy?'正在保存…':'保存并重新检查'}</button></div>
     </div>

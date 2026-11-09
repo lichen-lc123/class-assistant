@@ -58,10 +58,10 @@ test('实践替换同一时间的课堂，明确日期和具体安排重复也�
   assert.equal(result.sessions.length,2);const practice=result.sessions.find(s=>s.date==='2026-12-11');assert.equal(practice.kind,'practice');assert.equal(practice.room,null);
 });
 
-test('原文明示调课作为例外替换原课次，不误作冲突；补充课次编号保留',()=>{
+test('原文明示调课替换原课次，补充课次保留日期并按最终时间重新编号',()=>{
   const result=expand({...base,special_dates:[{date:'2026-12-12',original_date:'2026-12-11',kind:'reschedule'},{date:'2027-01-08',kind:'supplement',lesson_number:7},{date:'2027-01-15',kind:'supplement',lesson_number:8}]});
   assert.deepEqual(result.sessions.map(s=>s.date),['2026-12-12','2026-12-25','2027-01-08','2027-01-15']);
-  assert.equal(result.sessions[2].lesson_number,7);assert.equal(result.sessions[3].lesson_number,8);assert.equal(result.warnings.length,0);
+  assert.equal(result.sessions[2].lesson_number,3);assert.equal(result.sessions[3].lesson_number,4);assert.equal(result.warnings.length,0);
   const adjusted=expand({...base,special_dates:[{date:'2026-12-12',original_date:'2026-12-11',kind:'reschedule'},dated('2026-12-13')],extra_fields:{'周次日期冲突处理':[{date:'2026-12-13',weekly_rule_index:1,week:5,action:'use_weekly_rule',reason:'旧课次对照标记'}]}});
   assert.ok(adjusted.sessions.some(s=>s.date==='2026-12-13'));assert.ok(adjusted.warnings.some(w=>w.includes('已有例外调整')));
 });

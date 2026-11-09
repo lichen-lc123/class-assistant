@@ -48,6 +48,18 @@ test('删除中间课次后连续自动编号，保持日期和各节课的独�
   assert.deepEqual(remaining.map(s=>s.lesson_number),[1,2]);assert.equal(remaining[1].room,'教室8');assert.equal(newCardLesson(remaining).lesson_number,3);
 });
 
+test('插入一月之前的课次后自动顺延，改期、同日不同时刻和删除使用相同顺序',()=>{
+  const original=['2026-10-03','2026-10-17','2026-10-31','2026-11-14','2026-11-28','2026-12-12','2027-01-09','2027-01-16'].map((date,index)=>({key:index,lesson_number:index+1,date,start_time:'08:50',end_time:'12:25',room:'教室'+index}));
+  const inserted=numberCardLessons([...original,{...original[6],key:8,date:'2026-12-26',lesson_number:9}]);
+  assert.equal(inserted[6].key,8);assert.equal(inserted[6].lesson_number,7);assert.equal(inserted[7].key,6);assert.equal(inserted[7].lesson_number,8);assert.equal(original[6].lesson_number,7);
+  const changed=numberCardLessons(inserted.map(s=>s.key===8?{...s,date:'2027-01-09',start_time:'13:25',end_time:'17:00'}:s));
+  assert.equal(changed[6].key,6);assert.equal(changed[6].lesson_number,7);assert.equal(changed[7].key,8);assert.equal(changed[7].lesson_number,8);
+  const removed=numberCardLessons(changed.filter(s=>s.key!==8));assert.deepEqual(removed.map(s=>s.lesson_number),[1,2,3,4,5,6,7,8]);
+  const pending=numberCardLessons([{...original[0],date:'',key:9},...original]);assert.equal(pending.at(-1).key,9);
+  const saved=expanded(replaceCardLessons(expanded({...raw,weekly_rules:[],explicit_sessions:original}),inserted,term));
+  assert.deepEqual(saved.sessions.map(s=>s.lesson_number),[1,2,3,4,5,6,7,8,9]);assert.equal(saved.sessions[6].date,'2026-12-26');
+});
+
 test('无效日期及校历范围外日期不编造周次',()=>{
   assert.equal(dateWeekday('2026-02-30'),null);assert.equal(dateWeekday('not-a-date'),null);
   assert.equal(dateWeek('2026-02-30',term),null);assert.equal(dateWeek('2026-09-13',term),null);

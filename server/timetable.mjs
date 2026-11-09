@@ -5,6 +5,7 @@ import { calendarImport } from './academic-calendar.mjs';
 import { academicCalendarWarnings } from '../shared/academic-calendar.mjs';
 import { parseAiTimetable } from './ai-timetable.mjs';
 import {buildTimetablePrompt} from './timetable-prompt.mjs';
+import {numberLessons} from '../shared/lesson-order.mjs';
 import { importConflicts,importConflictMessage } from './import-conflicts.mjs';
 import { upcomingClassDays } from './dashboard.mjs';
 import { templateImportService } from './template-import.mjs';
@@ -351,7 +352,7 @@ export function timetableService(db,{onCoursesChanged=()=>{}}={}) {
       if(req.method==='PATCH'&&!entryPath[3]){
         if(e.course_id&&Number(body.publicRevision)!==(e.base_snapshot_json?e.base_revision:master(e.course_id)?.revision))problem('公共课程刚刚更新，请刷新课表并核对新安排后再保存个人修改。',409);
         const current=entryView(e,t),normalized=normalizeCourse({...current,weekly_rules:[],special_dates:[],explicit_sessions:body.sessions,room:body.room},t);
-        if(t.startsOn&&normalized.explicit_sessions.some(s=>s.date<t.startsOn||s.date>t.endsOn))problem('个人安排的日期不属于当前学期，请修正日期或切换到对应学期。');
+        normalized.explicit_sessions=numberLessons(normalized.explicit_sessions);
         const defaults=entryView({...e,override_json:null},t).sessions;
         const changedTimes=normalized.explicit_sessions.length!==defaults.length||normalized.explicit_sessions.some((s,i)=>{const d=defaults[i];return !d||s.date!==d.date||s.start_time!==d.start_time||s.end_time!==d.end_time||(s.kind==='practice')!==(d.kind==='practice');});
         const rooms={};normalized.explicit_sessions.forEach((s,i)=>{if(s.kind!=='practice'&&(s.room||null)!==(defaults[i]?.room||null))rooms[String(i)]=s.room||null;});

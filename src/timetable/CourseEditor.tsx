@@ -2,37 +2,42 @@ import { useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } fro
 import { Plus, X } from 'lucide-react';
 import { Modal } from '../components/Modal';
 import {dateWeek,dateWeekday,lessonTitle,newCardLesson,numberCardLessons} from './card-lessons';
+import {chronologicalLessons} from '../../shared/lesson-order.mjs';
 import { type CourseData, type Term, type WeeklyRule, type SpecialDate, type ExplicitSession, type WeeklyDateResolution } from './types';
 
 export function SessionsEditor({value,onChange,term}:{value:ExplicitSession[];onChange:(v:ExplicitSession[])=>void;term:Term}){
-  const list=useRef<HTMLDivElement>(null),adding=useRef(false);
+  const list=useRef<HTMLDivElement>(null),adding=useRef<number|null>(null),keys=useRef(new WeakMap<ExplicitSession,number>()),nextKey=useRef(0);
+  const keyFor=(session:ExplicitSession)=>{let key=keys.current.get(session);if(key===undefined){key=nextKey.current++;keys.current.set(session,key);}return key;};
+  const ordered=chronologicalLessons(value);
+  function publish(lessons:ExplicitSession[]){const sorted=chronologicalLessons(lessons),numbered=numberCardLessons(sorted);numbered.forEach((s,i)=>keys.current.set(s,keyFor(sorted[i])));onChange(numbered);}
   useLayoutEffect(()=>{
-    if(!adding.current)return;adding.current=false;
-    const area=list.current,card=area?.lastElementChild as HTMLElement|null;
+    if(adding.current===null)return;const key=adding.current;adding.current=null;
+    const area=list.current,card=area?.querySelector<HTMLElement>('[data-lesson-key="'+key+'"]');
     if(!area||!card)return;
     area.scrollTo({top:area.scrollTop+card.getBoundingClientRect().top-area.getBoundingClientRect().top-8,behavior:'auto'});
     card.querySelector<HTMLInputElement>('input[type="date"]')?.focus({preventScroll:true});
   },[value.length]);
-  const update=(i:number,patch:Partial<ExplicitSession>)=>onChange(numberCardLessons(value.map((s,j)=>i===j?{...s,...patch}:s)));
-  return <div className="schedule-fields shared-lesson-editor"><div className="mini-heading"><strong>具体上课安排 · {value.length} 次课</strong><button className="text-button" type="button" disabled={value.length>=200} onClick={()=>{adding.current=true;onChange([...numberCardLessons(value),newCardLesson(value)]);}}><Plus size={14}/>新增一次课</button></div>
+  const update=(target:ExplicitSession,patch:Partial<ExplicitSession>)=>{const changed={...target,...patch};keys.current.set(changed,keyFor(target));publish(value.map(s=>s===target?changed:s));};
+  return <div className="schedule-fields shared-lesson-editor"><div className="mini-heading"><strong>具体上课安排 · {value.length} 次课</strong><button className="text-button" type="button" disabled={value.length>=200} onClick={()=>{const added=newCardLesson(ordered);adding.current=keyFor(added);publish([...value,added]);}}><Plus size={14}/>新增一次课</button></div>
     {!value.length&&<p className="muted-note">没有明确日期时可先保留待安排，不必填写猜测的时间。</p>}
-    <div className="shared-lesson-scroll" ref={list}>{value.map((s,i)=><section className="lesson-editor-card" key={i}>
-      <div className="mini-heading"><h3>{lessonTitle(i+1)}</h3><button className="text-button danger-text" type="button" aria-label={'移除第'+(i+1)+'次课'} onClick={()=>onChange(numberCardLessons(value.filter((_,j)=>j!==i)))}><X size={16}/>删除</button></div>
+    <p className="muted-note">按上课日期和开始时间正序编号，新增、改期或删除后自动重新排序。</p>
+    <div className="shared-lesson-scroll" ref={list}>{ordered.map((s,i)=><section className="lesson-editor-card" key={keyFor(s)} data-lesson-key={keyFor(s)}>
+      <div className="mini-heading"><h3>{lessonTitle(i+1)}</h3><button className="text-button danger-text" type="button" aria-label={'移除第'+(i+1)+'次课'} onClick={()=>publish(value.filter(item=>item!==s))}><X size={16}/>删除</button></div>
       <div className="lesson-editor-fields">
         <label>第几次课<input readOnly value={i+1}/></label>
-        <label>上课日期<input aria-label={'第'+(i+1)+'次日期'} type="date" value={s.date} required onChange={e=>update(i,{date:e.target.value,week:dateWeek(e.target.value,term),weekday:dateWeekday(e.target.value)})}/></label>
+        <label>上课日期<input aria-label={'第'+(i+1)+'次日期'} type="date" value={s.date} required onChange={e=>update(s,{date:e.target.value,week:dateWeek(e.target.value,term),weekday:dateWeekday(e.target.value)})}/></label>
         <label>上课周次<input readOnly value={dateWeek(s.date,term)??s.week??''} placeholder={s.date?'校历周次待确认':'选择日期后自动生成'}/></label>
         <label>星期<input readOnly value={dateWeekday(s.date)?'星期'+'一二三四五六日'[dateWeekday(s.date)!-1]:''} placeholder="选择日期后自动生成"/></label>
-        <label className="lesson-room">地点<input value={s.room||''} placeholder={s.kind==='practice'?'实践活动不在教室':'可待通知'} disabled={s.kind==='practice'} onChange={e=>update(i,{room:e.target.value})}/></label>
-        <label>上课开始时间<input type="time" value={s.start_time} required onChange={e=>update(i,{start_time:e.target.value})}/></label>
-        <label>上课结束时间<input type="time" value={s.end_time} required onChange={e=>update(i,{end_time:e.target.value})}/></label>
-        <label>类型<select value={s.kind||'lecture'} onChange={e=>update(i,{kind:e.target.value,room:e.target.value==='practice'?null:s.room})}><option value="lecture">课堂教学</option><option value="practice">实践活动</option></select></label>
+        <label className="lesson-room">地点<input value={s.room||''} placeholder={s.kind==='practice'?'实践活动不在教室':'可待通知'} disabled={s.kind==='practice'} onChange={e=>update(s,{room:e.target.value})}/></label>
+        <label>上课开始时间<input type="time" value={s.start_time} required onChange={e=>update(s,{start_time:e.target.value})}/></label>
+        <label>上课结束时间<input type="time" value={s.end_time} required onChange={e=>update(s,{end_time:e.target.value})}/></label>
+        <label>类型<select value={s.kind||'lecture'} onChange={e=>update(s,{kind:e.target.value,room:e.target.value==='practice'?null:s.room})}><option value="lecture">课堂教学</option><option value="practice">实践活动</option></select></label>
       </div>
     </section>)}</div>
   </div>;
 }
 export function CourseEditor({course,term,onClose,onSave,busy=false,extra,error,title}:{course:CourseData;term:Term;onClose:()=>void;onSave:(c:CourseData)=>void;busy?:boolean;extra?:ReactNode;error?:string;title?:string}){
-  const [value,setValue]=useState<CourseData>(()=>structuredClone(course));
+  const [value,setValue]=useState<CourseData>(()=>({...structuredClone(course),explicit_sessions:numberCardLessons(course.explicit_sessions)}));
   const [weeksText,setWeeksText]=useState(()=>course.weekly_rules.map(r=>r.weeks.join(',')));
   const resolutions=(Array.isArray(value.extra_fields?.['周次日期冲突处理'])?value.extra_fields!['周次日期冲突处理']:[]) as WeeklyDateResolution[];
   const originalResolutions=Array.isArray(course.extra_fields?.['周次日期冲突处理'])?course.extra_fields!['周次日期冲突处理']:[];

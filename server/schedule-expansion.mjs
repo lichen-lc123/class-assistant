@@ -2,6 +2,7 @@
 // the currently published calendars. Explicit dates remain independent of weeks.
 import {courseTeachingWeek} from '../shared/course-week.mjs';
 import {hasConfirmedCompleteDateList} from './confirmed-schedule.mjs';
+import {numberLessons} from '../shared/lesson-order.mjs';
 export function expandSchedule(course,term,{addDays}) {
   const warnings=[...(course.warnings||[])],notices=[],date_reviews=[];
   const periods=term.config.periods||[],calendars=term.config.calendars||[];
@@ -26,8 +27,7 @@ export function expandSchedule(course,term,{addDays}) {
       if(!existing.room&&session.room)existing.room=session.room;
     }
     if(session._explicitLesson){
-      if(existing._explicitLesson&&existing.lesson_number!==session.lesson_number)warnings.push(`${session.date} 同一次课出现不同课次编号，请核对。`);
-      else{existing.lesson_number=session.lesson_number;existing._explicitLesson=true;}
+      if(!existing._explicitLesson){existing.lesson_number=session.lesson_number;existing._explicitLesson=true;}
     }
     return'merged';
   }
@@ -122,14 +122,10 @@ export function expandSchedule(course,term,{addDays}) {
     if(session&&explicit.week!=null)session.week=explicit.week;
     add(session);
   }
-  sessions.sort((a,b)=>a.start.localeCompare(b.start));
-  const explicitNumbers=new Map();
-  for(const s of sessions)if(s._explicitLesson){
-    if(explicitNumbers.has(s.lesson_number))warnings.push(`第 ${s.lesson_number} 次课对应多个不同日期，均已保留，请核对是否同一次课。`);
-    explicitNumbers.set(s.lesson_number,s);
-  }
-  const used=new Set(explicitNumbers.keys());let nextNumber=1;
-  for(const s of sessions){if(!s._explicitLesson){while(used.has(nextNumber))nextNumber++;s.lesson_number=nextNumber;used.add(nextNumber++);}if(s.kind!=='practice'&&!s.room)warnings.push(`${s.date} 的教室待通知。`);}
+  // Source lesson numbers are used above only to resolve original reschedules.
+  // Display numbers always follow the final, deduplicated chronological order.
+  sessions=numberLessons(sessions);
+  for(const s of sessions)if(s.kind!=='practice'&&!s.room)warnings.push(`${s.date} 的教室待通知。`);
   for(let i=0;i<sessions.length;i++)for(let j=i+1;j<sessions.length&&sessions[j].start<sessions[i].end;j++)warnings.push(`${sessions[j].date} 本课程有不同起止时间的重叠安排，均已保留，请核对是否同一课次。`);
   const outside=sessions.filter(s=>s._source!=='weekly'&&((term.startsOn&&s.date<term.startsOn)||(term.endsOn&&s.date>term.endsOn)||(calendars.length&&!calendars.some(c=>c.start_date<=s.date&&(!c.end_date||s.date<=c.end_date))))).map(s=>s.date);
   if(outside.length)notices.push(`${[...new Set(outside)].join('、')} 超出现有学期或教学日历范围，仍按明确日期保留在本学期课程中，不要求配置后续日期区间的校历。`);
