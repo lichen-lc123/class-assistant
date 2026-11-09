@@ -23,6 +23,13 @@ test('双端提示词使用服务端最新目标学期配置，作息前置，�
  assert.ok(prompt.indexOf('完整配置：')<prompt.indexOf('必须遵守：'));
  assert.ok(prompt.includes('2—5节 = 08:10—12:10'));assert.ok(!prompt.includes('6—9节 ='));
  assert.ok(prompt.includes('网站目标学年：2028-2029'));assert.ok(prompt.includes('"start_date":"2028-09-04"'));
+ // A copied calendar's end must not become an import cutoff. Check the real
+ // preview API, including a dated lesson whose time is genuinely unknown.
+ const inspection=await call('/timetable/preview','POST',{termId:created.data.id,source:'ai',text:JSON.stringify({schema_version:'timetable.v1',academic_year:input.academicYear,semester:input.name,courses:[{course_name:'明确日期边界测试',teacher:'测试老师',explicit_sessions:[{date:'2028-09-01',start_time:'08:10',end_time:'12:10'},{date:'2029-02-07',start_time:'08:10',end_time:'12:10'}]},{course_name:'明确日期时间待定测试',special_dates:[{date:'2029-02-14',kind:'lecture',raw:'原文明示的日期，具体时分待通知'}]}]})});
+ assert.equal(inspection.status,200);
+ assert.deepEqual(inspection.data.courses[0].sessions.map(s=>s.date),['2028-09-01','2029-02-07']);
+ assert.equal(inspection.data.courses[1].special_dates[0].date,'2029-02-14');assert.equal(inspection.data.courses[1].sessions.length,0);
+ assert.equal(inspection.data.unparsedItems.length,0);
  const updated=await call('/admin/timetable/terms/'+created.data.id,'PUT',{...input,revision:created.data.revision,config:{...input.config,periods:[{number:2,start:'09:10',end:'10:00'},{number:5,start:'12:10',end:'13:10'}]}});assert.equal(updated.status,200);
  const latest=(await call(path)).data.text;assert.ok(latest.includes('2—5节 = 09:10—13:10'));assert.ok(!latest.includes('2—5节 = 08:10—12:10'));
  const empty=await call('/admin/timetable/terms','POST',{academicYear:'2029-2030',name:'尚未配置'});assert.equal(empty.status,201);
