@@ -4,6 +4,7 @@ import {removeLocalFilePaths,safeHomeworkLink} from '../shared/homework-links.mj
 import {createHash} from 'node:crypto';
 import {posix} from 'node:path';
 import {problem,validDate,validTime} from './schedule.mjs';
+import {homeworkCourseTime} from './homework-course-time.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const decode=s=>String(s||'').replace(/&#x([0-9a-f]+);/gi,(_,n)=>String.fromCodePoint(parseInt(n,16))).replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Number(n))).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
 const attr=(s,key)=>decode(s.match(new RegExp('(?:^|\\s)'+key+'=["\x27]([^"\x27]*)["\x27]'))?.[1]);
@@ -135,25 +136,45 @@ export function homeworkFromFile(file,term){
   };
   const append=(item,key,value,source=item.source)=>{const p=part(value,key,source);if(p.text&&!item[key].split('\n\n').includes(p.text))item[key]+=(item[key]?'\n\n':'')+p.text;for(const a of p.attachments)if(!item.attachments.some(x=>x.assetId===a.assetId&&x.field===a.field))item.attachments.push(a);};
   const create=(kind,course,teacher,title,source)=>({kind,course_name:course,teacher,title,content:'',submission:'',assessment_rules:'',team_requirement:'',notes:'',due_date:null,due_time:null,deadline_raw:'',attachments:[],warnings:[],source,source_rows:[],credits:''});
+  const review=(item,reason)=>{item.review_required=true;item.review_reasons=[...new Set([...(item.review_reasons||[]),reason])];};
+  const deadline=(item,value,date1904=false)=>{try{Object.assign(item,parseHomeworkDeadline(value,term,date1904));if(meaningful(item.deadline_raw)&&!item.due_date&&!/^(?:待通知|另行通知|待定|未定|暂无|未公布|待公布|暂无截止时间|截止时间待通知)$/.test(clean(value)))review(item,'截止说明无法确定具体日期，请核对；如暂未通知可清空截止说明。');}catch(error){if(error.status!==400)throw error;Object.assign(item,{due_date:null,due_time:null,deadline_raw:clean(value)});review(item,'原表截止日期或时间无效，请管理员核对。');}};
   const getPolicy=(course,teacher,source)=>{const key=normalizeCourseName(course)+'|'+teacher;if(!policies.has(key))policies.set(key,create('reference',course,teacher,'课程考核与说明',source));return policies.get(key);};
   const hasEnglishDetails=book.sheets.some(s=>s.rows.some(r=>r?.includes('课次')&&r?.includes('作业内容')));
   for(const sheet of book.sheets){
     const headerIndex=sheet.rows.findIndex(r=>r?.includes('课程名称')&&r.some(v=>/作业.*内容|作业内容/.test(v)));
     const englishIndex=sheet.rows.findIndex(r=>r?.includes('课次')&&r?.includes('作业内容'));
-    if(headerIndex<0&&englishIndex<0){ignored.push(sheet.name);continue;}
+    if(headerIndex<0&&englishIndex<0){
+      ignored.push(sheet.name);
+      const values=sheet.rows.flatMap((row,i)=>row?.some(meaningful)?['第'+(i+1)+'行：'+row.map(removeLocalFilePaths).join(' | ')]:[]);
+      const original=values.join('\n');
+      if(original&&!/校历|作息/.test(sheet.name))for(let offset=0;offset<original.length;offset+=18000){const part=offset/18000+1,item=create('assignment','','','待核对工作表：'+sheet.name+(original.length>18000?'（'+part+'）':''),file.name+' / '+sheet.name);item.content=original.slice(offset,offset+18000);item.source_rows=[{sheet:sheet.name,raw:{未识别表格:item.content}}];review(item,'工作表结构无法自动识别，原文已保留，请核对课程、老师和作业内容。');records.set('unparsed-sheet:'+sheet.name+':'+part,item);}
+      continue;
+    }
     recognized.push(sheet.name);const isEnglish=headerIndex<0,h=isEnglish?englishIndex:headerIndex,headers=sheet.rows[h];
     const index=(...names)=>headers.findIndex(v=>names.includes(clean(v)));
     const ci=index('课程名称'),ti=index('任课老师','任课教师'),wi=headers.findIndex(v=>/作业.*内容|作业内容/.test(v)),di=index('截止日期','截止时间'),pi=index('提交平台'),ri=index('课程考核规则'),gi=index('是否需要组队'),ni=index('备注'),li=index('课次'),credit=index('学分'),sequence=index('序号');
     const englishCourse=clean(sheet.rows.slice(0,h).flat().find(v=>String(v).includes('英语应用能力'))||'研究生英语应用能力提升').replace(/[（(].*$/,'');
     const auxSeen=new Set();let auxTitle=clean(headers[6])||'补充考核说明';
     for(let row=h+1;row<sheet.rows.length;row++){
-      const values=sheet.rows[row];if(!values)continue;const course=isEnglish?englishCourse:clean(values[ci]),teacher=clean(values[ti]);if(!course||!teacher)continue;
+      const values=sheet.rows[row];if(!values)continue;const course=isEnglish?englishCourse:clean(values[ci]),teacher=clean(values[ti]);
       const fieldValue=col=>[clean(values[col]),...(sheet.images.get(row+'|'+col)||[]).map(id=>`=DISPIMG("${id}",1)`),...(sheet.files.get(row+'|'+col)||[]).map(id=>`=EMBEDFILE("${id}")`)].filter(Boolean).join('\n');
+      if(!course||!teacher){
+        if(!values.some(meaningful)&&![...sheet.images.keys(),...sheet.files.keys()].some(k=>k.startsWith(row+'|')))continue;
+        if(noHomework(values[wi])&&![values[ri],values[pi],values[gi],values[ni]].some(meaningful))continue;
+        const source=`${file.name} / ${sheet.name} / 第${row+1}行`,raw=Object.fromEntries(headers.map((name,col)=>[clean(name)||'附加列'+col,clean(values[col])]).filter(([,value])=>value));
+        const item=create(noHomework(values[wi])?'reference':'assignment',course,teacher,`待核对记录：${sheet.name} 第${row+1}行`,source);item.source_rows.push({sheet:sheet.name,row:row+1,raw});
+        append(item,item.kind==='reference'?'notes':'content',fieldValue(wi)||Object.entries(raw).map(([k,v])=>k+'：'+v).join('\n')||'原表图片或附件，请核对');
+        for(const [field,col]of [['submission',pi],['assessment_rules',ri],['notes',ni]])if(col>=0)append(item,field,fieldValue(col));
+        review(item,'课程名称或任课老师缺失，原始内容已保留。');records.set('unparsed-row:'+sheet.name+':'+row,item);continue;
+      }
       const source=`${file.name} / ${sheet.name} / 第${row+1}行`,policy=getPolicy(course,teacher,source);
       const raw=Object.fromEntries(headers.map((v,c)=>[`${clean(v)||'附加列'}（第${c+1}列）`,clean(values[c])]).filter(([,v])=>v));policy.source_rows.push({sheet:sheet.name,row:row+1,raw});
       for(const [key,col]of [['submission',pi],['assessment_rules',ri],['team_requirement',gi],['notes',ni]])if(col>=0&&meaningful(fieldValue(col)))append(policy,key,fieldValue(col),source);
       policy.credits=policy.credits||clean(values[credit]);policy.sequence=policy.sequence||clean(values[sequence]);
       const attachmentCols=headers.flatMap((name,col)=>/附件|参考资料|资料文件|下载链接/.test(clean(name))?[col]:[]);
+      const known=new Set([ci,ti,wi,di,pi,ri,gi,ni,li,credit,sequence,...attachmentCols,...(isEnglish?[6,7]:[])]);
+      const unknown=headers.flatMap((name,col)=>!known.has(col)&&!/^(?:上课时间|授课时间|课程时间|上课日期|授课日期|课程编号|上课班)/.test(clean(name))&&meaningful(values[col])?[(clean(name)||'未命名列')+'：'+clean(values[col])]:[]);
+      if(unknown.length){append(policy,'notes','待核对原表字段：\n'+unknown.join('\n'));review(policy,'存在系统未识别的原表字段，内容已保留，请核对。');}
       let content=noHomework(values[wi])?'':[fieldValue(wi),...attachmentCols.filter(col=>col!==wi).map(fieldValue)].filter(Boolean).join('\n');const title=isEnglish?clean(values[li]).replace('次课','次作业'):clean(headers[wi]).replace('内容','')||'课程作业';
       if(hasEnglishDetails&&!isEnglish&&/英语/.test(course)&&/见表格.*英语/.test(content)){append(policy,'notes','作业详情已从“英语秋季课程”表按课次和老师导入。');content='';}
       if(/^已结束$/.test(content)){append(policy,'notes',`${title}：原表标记已结束。`);content='';}
@@ -161,7 +182,8 @@ export function homeworkFromFile(file,term){
         const key=normalizeCourseName(course)+'|'+teacher+'|'+title;if(!records.has(key))records.set(key,create('assignment',course,teacher,title,source));const item=records.get(key);append(item,'content',content,source);item.source_rows.push({sheet:sheet.name,row:row+1,raw});
         for(const [field,col]of [['submission',pi],['notes',ni]])if(col>=0&&meaningful(fieldValue(col)))append(item,field,fieldValue(col));
         item.team_requirement=clean(values[gi]);item.credits=clean(values[credit]);item.sequence=clean(values[sequence]);
-        if(!item.deadline_raw&&di>=0)Object.assign(item,parseHomeworkDeadline(values[di],term,book.date1904));
+        if(unknown.length)review(item,'存在系统未识别的原表字段，请核对同课程待确认说明。');
+        if(di>=0){if(!item.deadline_raw)deadline(item,values[di],book.date1904);else if(meaningful(values[di])&&clean(values[di])!==item.deadline_raw){review(item,'同一作业出现不同截止说明，请管理员核对。');append(item,'notes','原表另有截止说明：'+clean(values[di]));}}
       }
       if(isEnglish){
         for(let col=6;col<Math.min(8,values.length);col++){
@@ -169,14 +191,14 @@ export function homeworkFromFile(file,term){
           if(/^期末作业/.test(original)){auxTitle=original;continue;}
           const target=original.match(/^([^：:\n]{1,15})班级\s*[:：]/)?.[1]||teacher;
           const midterm=/中期/.test(auxTitle)&&/提交|截止/.test(original),extraTitle=midterm?'中期作业（演讲视频）':auxTitle;
-          if(midterm){const key=normalizeCourseName(course)+'|'+target+'|'+extraTitle;if(!records.has(key))records.set(key,create('assignment',course,target,extraTitle,source));const item=records.get(key);append(item,'content',original);const deadline=original.match(/(?:作业)?提交截止时间[^\n。]*[。]?/);if(deadline&&!item.deadline_raw)Object.assign(item,parseHomeworkDeadline(deadline[0],term));item.source_rows.push({sheet:sheet.name,row:row+1,raw:{[headers[col]||'附加说明']:original}});}
+          if(midterm){const key=normalizeCourseName(course)+'|'+target+'|'+extraTitle;if(!records.has(key))records.set(key,create('assignment',course,target,extraTitle,source));const item=records.get(key);append(item,'content',original);const due=original.match(/(?:作业)?提交截止时间[^\n。]*[。]?/);if(due&&!item.deadline_raw)deadline(item,due[0]);item.source_rows.push({sheet:sheet.name,row:row+1,raw:{[headers[col]||'附加说明']:original}});}
           else append(getPolicy(course,target,source),'assessment_rules',`${extraTitle}\n${original}`,source);
         }
       }
     }
   }
-  const result=[...policies.values()].filter(r=>r.submission||r.assessment_rules||r.team_requirement||r.notes||r.attachments.length).concat([...records.values()]);if(!recognized.length)problem('未找到课程名称、任课老师、作业内容等表头，请使用提供的作业表格式。');if(result.length>500)problem('一次最多导入 500 条作业及考核记录。');
-  for(const item of result){item.warnings=[...new Set(item.warnings)];if(item.attachments.length)item.warnings.push('已保留原表图片或附件，请在预览中核对内容及适用课程。');}
+  const result=[...policies.values()].filter(r=>r.submission||r.assessment_rules||r.team_requirement||r.notes||r.attachments.length).concat([...records.values()]);if(!recognized.length&&!result.length)problem('表格没有可保留的内容，请核对原文件。');if(result.length>500)problem('一次最多导入 500 条作业及考核记录。');
+  for(const item of result){item.course_time=homeworkCourseTime(item);item.warnings=[...new Set(item.warnings)];if(item.attachments.length)item.warnings.push('已保留原表图片或附件，请在预览中核对内容及适用课程。');if(/【原表(?:图片|附件)待补充】/.test([item.content,item.notes,item.assessment_rules,item.submission].join('\n')))review(item,'原表存在未成功提取的图片或附件，请补充核对。');}
   const unmatched=book.sheets.flatMap(sheet=>[...sheet.images.values()].flat()).filter(id=>!usedImages.has(id));
   if(unmatched.length)warnings.push(`有 ${unmatched.length} 张浮动图片未归入有效作业字段（可能是非作业列、缺少课程老师或内容标为“无”），请对照原表核对。`);
   const unmatchedFiles=book.sheets.flatMap(sheet=>[...sheet.files.values()].flat()).filter(id=>!usedFiles.has(id));

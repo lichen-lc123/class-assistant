@@ -1,0 +1,30 @@
+%% 管理员批量删除作业 · 业务流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["管理员｜筛选当前学期的公共作业"]
+    N2["管理员｜勾选记录或全选当前结果"]
+    N3["网站｜展示已选数量及删除确认"]
+    N4{"管理员｜确认删除？"}
+    B4["网站｜取消并保留原记录"]
+    N5["网站｜删除所选记录并刷新列表"]
+    N6(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 -->|否| B4
+    N4 -->|是| N5
+    N5 --> N6
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 decision;
+    class B4 exception;
+    class N5 normal;
+    class N6 terminal;

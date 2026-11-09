@@ -1,27 +1,27 @@
-%% 管理员作业维护 · 系统流程图 · V1.0 · 2026-11-06
+%% 管理员作业维护 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜携带登录会话和目标学期<br/>读取课程课程与作业清单"]
-    N2{"后端｜登录、改密与<br/>管理员权限有效？"}
-    B2["后端｜返回拒绝原因<br/>不读取管理资料"]
-    N3["前端｜提交原表字段、课程<br/>发布开关及已有版本"]
-    N4{"后端｜字段、课程<br/>和版本校验通过？"}
-    B4["前端｜显示具体错误<br/>要求核对或刷新"]
-    N5[("数据库｜事务保存作业记录<br/>课程关联与图片引用")]
-    N6["后端｜学生请求时从会话识别本人<br/>读取本人课表的选课关系"]
-    N7["后端｜按学期及已选课级过滤<br/>仅返回已发布正文和授权图片"]
-    N8["前端｜学生查看作业<br/>学委可再次管理更新"]
+    N1["前端｜携带会话读取管理清单<br/>不按 created_by 筛选"]
+    N2{"后端｜管理员且完成首次改密？"}
+    B2["后端｜返回 401 或 403"]
+    N3["前端｜提交多个课程目标<br/>人工编辑不隐式发布"]
+    N4[("数据库｜事务更新字段、附件及版本<br/>保留个人计划和全员状态策略")]
+    N5["前端｜独立提交 publish 与 revision"]
+    N6{"后端｜目标有效且待确认内容已核对？"}
+    B6["后端｜保留草稿，不强制填写截止"]
+    N7[("数据库｜发布记录及多课程关联")]
+    N8["后端｜普通用户按已选课程读取<br/>无截止时返回空日期而非虚构时间"]
     N9(["结束"])
     N0 --> N1
-    N1 -->|会话、学期标识| N2
+    N1 --> N2
     N2 -->|否| B2
     N2 -->|是| N3
-    N3 -->|字段、课程、版本| N4
-    N4 -->|否| B4
-    N4 -->|是| N5
-    N5 -->|最新作业及目标课程| N6
-    N6 -->|本人已选课级| N7
-    N7 -->|可见作业与附件地址| N8
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 -->|否| B6
+    N6 -->|是| N7
+    N7 --> N8
     N8 --> N9
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
@@ -33,10 +33,10 @@ flowchart TD
     class N2 decision;
     class B2 exception;
     class N3 normal;
-    class N4 decision;
-    class B4 exception;
-    class N5 database;
-    class N6 normal;
-    class N7 normal;
+    class N4 database;
+    class N5 normal;
+    class N6 decision;
+    class B6 exception;
+    class N7 database;
     class N8 normal;
     class N9 terminal;

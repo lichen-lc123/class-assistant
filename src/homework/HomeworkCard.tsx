@@ -1,18 +1,20 @@
 import {homeworkTextParts} from '../../shared/homework-links.mjs';
 import {useHomeworkUpdate} from './useHomeworkUpdate';
-import type {ReactNode} from 'react';
-import {CheckCircle2,Download,Paperclip} from 'lucide-react';
+import {useState,type ReactNode} from 'react';
+import {CheckCircle2,Download,Eye,Paperclip} from 'lucide-react';
+import AttachmentViewer from './AttachmentViewer';
 import {fileSize} from './HomeworkAttachmentsEditor';
-import {courseTone,deadlineLabel,planLabel,priorityNames,type Homework,type HomeworkAsset} from './types';
+import {courseTone,deadlineLabel,planLabel,priorityNames,type Homework,type HomeworkAsset,type HomeworkAttachment} from './types';
 function LinkedText({value}:{value:string}){return <>{homeworkTextParts(value).map((part,i)=>part.href?<a key={i} href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>:part.text)}</>;}
 const fields=[['submission','提交方式'],['assessment_rules','考核规则'],['team_requirement','组队要求'],['notes','补充说明']] as const;
 function HomeworkImages({record,field,label,assets}:{record:Homework;field:string;label:string;assets:HomeworkAsset[]}){
   return <>{record.attachments.filter(a=>a.field===field).map(a=>{const asset=assets.find(x=>x.id===a.assetId),mime=asset?.mime||a.mime,url=asset?`data:${mime};base64,${asset.content}`:a.url;return url&&mime?.startsWith('image/')?<figure key={a.assetId}><a href={url} target="_blank" rel="noreferrer"><img loading="lazy" src={url} alt={a.filename||label}/></a><figcaption>{a.filename||label} · 点击查看原图</figcaption></figure>:null;})}</>;
 }
 function HomeworkFiles({record,assets,field='attachment'}:{record:Homework;assets:HomeworkAsset[];field?:string}){
+  const [opened,setOpened]=useState<{attachment:HomeworkAttachment;url:string}|null>(null);
   const files=record.attachments.filter(a=>a.field===field&&(field==='attachment'||!(assets.find(x=>x.id===a.assetId)?.mime||a.mime||'image/').startsWith('image/')));
   if(!files.length)return null;
-  return <section className="homework-file-downloads" aria-label="作业附件"><h3><Paperclip size={16}/>附件（{files.length}）</h3>{files.map(a=>{const asset=assets.find(x=>x.id===a.assetId),url=asset?`data:${asset.mime};base64,${asset.content}`:a.url;return url?<a key={a.assetId+':'+a.field} href={asset?url:url+'&download=1'} download={a.filename||'作业附件'}><Paperclip size={17}/><span><strong>{a.filename||a.caption||'作业附件'}</strong>{a.size&&<small>{fileSize(a.size)}</small>}</span><Download size={17}/></a>:null;})}</section>;
+  return <section className="homework-file-downloads" aria-label="作业附件"><h3><Paperclip size={16}/>附件（{files.length}）</h3>{files.map(a=>{const asset=assets.find(x=>x.id===a.assetId),url=asset?`data:${asset.mime};base64,${asset.content}`:a.url,name=a.filename||a.caption||'作业附件',preview=/\.(pdf|docx|pptx)$/i.test(name);return url?<button type="button" className="attachment-open" key={a.assetId+':'+a.field} onClick={()=>setOpened({attachment:a,url})} aria-label={(preview?'查看':'打开')+name}><Paperclip size={17}/><span><strong>{name}</strong><small>{a.size?fileSize(a.size)+' · ':''}{preview?'点击查看':'下载文件'}</small></span>{preview?<Eye size={17}/>:<Download size={17}/>}</button>:null;})}{opened&&<AttachmentViewer attachment={opened.attachment} url={opened.url} onClose={()=>setOpened(null)}/>}</section>;
 }
 export function HomeworkCard({record:r,assets=[],children,expandDetails=false,trackUpdates=true}:{record:Homework;assets?:HomeworkAsset[];children?:ReactNode;expandDetails?:boolean;trackUpdates?:boolean}){
   const update=useHomeworkUpdate(r,trackUpdates);

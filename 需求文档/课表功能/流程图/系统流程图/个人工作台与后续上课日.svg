@@ -1,69 +1,55 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1685" viewBox="0 0 1100 1685" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1359" viewBox="0 0 1100 1359" role="img" aria-labelledby="title desc">
 <title id="title">个人工作台与后续上课日 · 系统流程图</title>
-<desc id="desc">一期已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<desc id="desc">当前已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
 <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
-<rect width="1100" height="1685" fill="#F7F5F0"/>
+<rect width="1100" height="1359" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">个人工作台与后续上课日 · 系统流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-02 · 课表功能 · 已实现</text>
+<text x="70" y="90" font-size="15" fill="#788371">当前版 · 2026-11-09 · MEM2602 当前业务规则</text>
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
-<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="445.0" font-size="15" fill="#66765D">登录会话及工作台请求</text>
-<path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="617.0" font-size="15" fill="#66765D">本人用户标识及课表范围</text>
-<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="789.0" font-size="15" fill="#66765D">课程基值、个人安排及学期</text>
-<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="961.0" font-size="15" fill="#66765D">合成后的实际日期时间</text>
-<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1133.0" font-size="15" fill="#66765D">未来三个上课日及倒计时</text>
-<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1305.0" font-size="15" fill="#66765D">当前展示日期及刷新事件</text>
-<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 219 L290.0 289" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 367 L290.0 437" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 515 L290.0 585" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 663 L290.0 733" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 811 L290.0 881" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 959 L290.0 1029" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1107 L290.0 1177" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="188.0">开始</tspan>
 </text>
-<rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="293" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">前端｜请求个人工作台</tspan>
-<tspan x="290.0" y="371.5">不提交他人账号或参考日期</tspan>
+<tspan x="290.0" y="324.5">前端｜请求 dashboard 及 homework summary</tspan>
+<tspan x="290.0" y="347.5">手机传 view=mobile</tspan>
 </text>
-<rect x="70" y="489" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<rect x="70" y="441" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">后端｜从登录会话确定用户</tspan>
-<tspan x="290.0" y="543.5">读取本人各学期课表</tspan>
+<tspan x="290.0" y="484.0">后端｜合并本人课表及个人安排</tspan>
 </text>
-<path d="M70 674 A220.0 13 0 0 1 510 674 L510 722 A220.0 13 0 0 1 70 722 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
-<path d="M70 674 A220.0 13 0 0 0 510 674" stroke="#8A9CA6" fill="none"/>
+<rect x="70" y="589" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">数据库｜返回本人选课关系</tspan>
-<tspan x="290.0" y="715.5">个人覆盖与公共课程基值</tspan>
+<tspan x="290.0" y="620.5">后端｜电脑过滤今天及过去日期</tspan>
+<tspan x="290.0" y="643.5">手机过滤已结束课次</tspan>
 </text>
-<rect x="70" y="833" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<rect x="70" y="737" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">后端｜合成实际课程安排</tspan>
-<tspan x="290.0" y="887.5">按北京时间日期排除今天和过去</tspan>
+<tspan x="290.0" y="768.5">后端｜按日期和开始时间排列</tspan>
+<tspan x="290.0" y="791.5">电脑最多 3 天、手机最多 1 天</tspan>
 </text>
-<rect x="70" y="1005" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<rect x="70" y="885" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">后端｜按有课日期分组排序</tspan>
-<tspan x="290.0" y="1059.5">截取前三组并计算日期差</tspan>
+<tspan x="290.0" y="916.5">前端｜手机优先当前课次</tspan>
+<tspan x="290.0" y="939.5">展示单卡并在结束后刷新</tspan>
 </text>
-<rect x="70" y="1177" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="1033" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">前端｜左列轮播实际已有上课日</tspan>
-<tspan x="290.0" y="1231.5">中列作业，右列常用网址</tspan>
+<tspan x="290.0" y="1064.5">前端｜按设备限制待做卡片数</tspan>
+<tspan x="290.0" y="1087.5">课程与作业均可打开详情</tspan>
 </text>
-<rect x="70" y="1349" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="1181" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">前端｜跨日、返回页面或刷新</tspan>
-<tspan x="290.0" y="1403.5">重新请求并更新倒计时</tspan>
+<tspan x="290.0" y="1224.0">结束</tspan>
 </text>
-<rect x="70" y="1521" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1564.0">结束</tspan>
-</text>
-<text x="70" y="1655" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+<text x="70" y="1329" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
 </g></svg>

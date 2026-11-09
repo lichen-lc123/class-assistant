@@ -1,6 +1,8 @@
 import {randomUUID,createHash} from 'node:crypto';
 import {homeworkFromFile,imageMime,normalizeCourseName,noHomework} from './homework-files.mjs';
-import {problem,validDate,validTime,todayShanghai} from './schedule.mjs';
+import {problem,validDate,validTime,todayShanghai,expandCourse} from './schedule.mjs';
+import {homeworkCourseTime,matchesHomeworkCourseTime} from './homework-course-time.mjs';
+import {officePreview} from './office-preview.mjs';
 import {reminderSettingsService} from './reminder-settings.mjs';
 import {homeworkCompletionAction} from './homework-notification-actions.mjs';
 import {courseIdentity,courseTimeLabel} from './course-identity.mjs';
@@ -27,7 +29,7 @@ export function homeworkService(db,timetable){
   const transaction=fn=>{db.exec('BEGIN IMMEDIATE');try{const v=fn();db.exec('COMMIT');return v;}catch(e){db.exec('ROLLBACK');throw e;}};
   function classOptions(termId){
     const t=timetable.term(termId),result=new Map(),identities=new Set(),publicRows=db.prepare('SELECT * FROM public_courses WHERE term_id=? ORDER BY id').all(termId);
-    const add=(course,master)=>{const identity=courseIdentity(course,t),id=master?.id||null;if(!id&&!identity)return;const key=id?'course:'+id:'identity:'+identity;if(result.has(key)||identity&&identities.has(identity))return;if(identity)identities.add(identity);result.set(key,{key,courseId:id,identityKey:identity,courseName:course.course_name||'',teacher:course.teacher||'',timeLabel:courseTimeLabel(course,t),label:`${course.course_name||'课程'} · ${course.teacher||'老师待确认'} · ${courseTimeLabel(course,t)}`});};
+    const add=(course,master)=>{const identity=courseIdentity(course,t),id=master?.id||null;if(!id&&!identity)return;const key=id?'course:'+id:'identity:'+identity;if(result.has(key)||identity&&identities.has(identity))return;if(identity)identities.add(identity);result.set(key,{key,courseId:id,identityKey:identity,courseName:course.course_name||'',teacher:course.teacher||'',published:master?Boolean(master.published):true,matchTimes:expandCourse(course,t).sessions,timeLabel:courseTimeLabel(course,t),label:`${course.course_name||'课程'} · ${course.teacher||'老师待确认'} · ${courseTimeLabel(course,t)}`});};
     for(const row of publicRows)add(parse(row.payload_json),row);
     const entries=db.prepare('SELECT e.* FROM timetable_entries e JOIN timetables tt ON tt.id=e.timetable_id WHERE tt.term_id=? AND e.course_id IS NULL').all(termId);
     for(const entry of entries){const course=parse(entry.private_json);if(course)add(course,null);}
@@ -43,6 +45,44 @@ export function homeworkService(db,timetable){
     });
   }
   function targets(id){return db.prepare('SELECT target_key,course_id AS courseId,identity_key AS identityKey FROM homework_targets WHERE record_id=?').all(id).map(row=>({courseId:row.courseId,identityKey:row.identityKey,key:row.courseId?'course:'+row.courseId:row.identityKey?'identity:'+row.identityKey:'legacy:'+hash(row.target_key)}));}
+  const matchingClasses=(record,options)=>options.filter(o=>normalizeCourseName(o.courseName)===normalizeCourseName(record.course_name)&&o.teacher.split(/[、,，/；;\s]+/).some(t=>normalizedTeacher(t)===normalizedTeacher(record.teacher))&&matchesHomeworkCourseTime(homeworkCourseTime(record),o.matchTimes));
+  // Preserve the existing date/time-specific associations for 导论. The user
+  // explicitly excluded it from this rollout's name-based sharing expansion.
+  const sharesCourseFamily=data=>!normalizeCourseName(data.course_name).startsWith('工程管理导论')&&!homeworkCourseTime(data);
+  const familyAudience=(data)=>sharesCourseFamily(data)&&(data.audience_mode==='family'||data.audience_mode==null&&data.source_rows?.length>0);
+  function waitingForCourse(row){
+    const data=parse(row.payload_json);
+    if(row.published||row.owner_id!=null||targets(row.id).length||data.review_required)return false;
+    // Older untouched imports predate this explicit policy. Edited legacy drafts
+    // have unknown intent and remain manual; an explicit false always wins.
+    return data.auto_publish_on_match===true||data.auto_publish_on_match==null&&Array.isArray(data.source_rows)&&data.source_rows.length>0&&row.created_at===row.updated_at;
+  }
+  function publishPending(termId){
+    const publishedIds=[];let expanded=0,linked=0;
+    const apply=()=>{
+      const options=classOptions(termId);
+      for(const row of db.prepare('SELECT * FROM homework_records WHERE term_id=? AND owner_id IS NULL').all(termId)){
+        const data=parse(row.payload_json),family=familyAudience(data)||sharesCourseFamily(data)&&waitingForCourse(row);
+        if(data.review_required)continue;
+        if(row.published?!family:!waitingForCourse(row))continue;
+        const matches=matchingClasses(data,options).filter(c=>c.published);
+        if(!matches.length||!family&&matches.length!==1)continue;
+        // Only add the missing audience and publication metadata. Keep record ID,
+        // original text, filenames, attachment bytes, plans and completion policy.
+        data.auto_publish_on_match=false;
+        if(family)data.audience_mode='family';
+        const existing=new Set(targets(row.id).map(t=>t.key));
+        const additions=matches.filter(chosen=>!existing.has(chosen.key));
+        if(row.published&&!additions.length)continue;
+        for(const chosen of additions)db.prepare('INSERT INTO homework_targets(record_id,target_key,course_id,identity_key) VALUES(?,?,?,?)').run(row.id,chosen.key,chosen.courseId,chosen.identityKey);
+        db.prepare("UPDATE homework_records SET payload_json=?,published=1,revision=revision+1,update_revision=revision+1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?").run(JSON.stringify(data),row.id);
+        db.prepare('UPDATE homework_completions SET completed_revision=? WHERE record_id=? AND completed_revision=?').run(row.revision+1,row.id,row.revision);
+        linked+=additions.length;if(row.published)expanded++;else publishedIds.push(row.id);
+      }
+    };
+    if(db.isTransaction)apply();else transaction(apply);
+    return{published:publishedIds.length,publishedIds,expanded,linked};
+  }
   function visible(row,userId){
     if(!row)return false;if(row.owner_id!=null)return row.owner_id===userId;if(!row.published)return false;
     const mine=ownClasses(userId,row.term_id),t=timetable.term(row.term_id);
@@ -63,9 +103,10 @@ export function homeworkService(db,timetable){
     const data=parse(row.payload_json),term=timetable.term(row.term_id),completion=db.prepare('SELECT completed_revision,updated_at FROM homework_completions WHERE user_id=? AND record_id=?').get(userId,row.id);
     const defaults=row.kind==='assignment'&&row.owner_id==null?db.prepare('SELECT * FROM homework_completion_defaults WHERE record_id=?').get(row.id):null;
     const exception=defaults?db.prepare('SELECT generation FROM homework_completion_exceptions WHERE user_id=? AND record_id=?').get(userId,row.id):null;
-    const defaultCompleted=Boolean(defaults&&exception?.generation!==defaults.generation);
-    const completed=exception&&exception.generation===defaults?.generation?false:defaultCompleted||completion?.completed_revision===row.revision;
-    const completedAt=completed?[...(defaultCompleted?[defaults.completed_at]:[]),...(completion?.completed_revision===row.revision?[completion.updated_at]:[])].sort().at(-1):null;
+    const defaultState=data.all_students_completed!==false,hasException=Boolean(defaults&&exception?.generation===defaults.generation);
+    const defaultCompleted=Boolean(defaults&&defaultState&&!hasException);
+    const completed=defaults?(hasException?!defaultState:defaultState):completion?.completed_revision===row.revision;
+    const completedAt=completed?[...(defaultCompleted?[defaults.completed_at]:[]),...(completion&&(completion.completed_revision===row.revision||hasException)?[completion.updated_at]:[])].sort().at(-1)||defaults?.completed_at||null:null;
     const today=todayShanghai(),daysUntil=data.due_date?Math.round((Date.parse(data.due_date+'T00:00:00Z')-Date.parse(today+'T00:00:00Z'))/86400000):null;
     const overdue=row.kind==='assignment'&&Boolean(data.due_date&&(data.due_date<today||data.due_date===today&&data.due_time&&Date.now()>Date.parse(data.due_date+'T'+data.due_time+':00+08:00')));
     const attachments=db.prepare('SELECT a.asset_id AS assetId,a.field,a.caption,b.mime,length(b.bytes) AS size FROM homework_attachments a JOIN homework_assets b ON b.id=a.asset_id WHERE a.record_id=?').all(row.id).map(a=>({...a,filename:data.attachment_names?.[a.assetId+':'+a.field]||'',url:`/api/homework/assets/${a.assetId}?recordId=${row.id}&field=${encodeURIComponent(a.field)}`}));
@@ -73,8 +114,8 @@ export function homeworkService(db,timetable){
     if(!admin)delete data.source_rows;
     const preferences=db.prepare('SELECT priority,planned_date,planned_time FROM homework_preferences WHERE user_id=? AND record_id=?').get(userId,row.id)||{priority:'normal',planned_date:null,planned_time:null};
     const seen=db.prepare('SELECT seen_revision FROM homework_reads WHERE user_id=? AND record_id=?').get(userId,row.id);
-    const audience=targets(row.id),draftReason=!row.published?(audience.length===0?'未匹配到课程，请先编辑并选择实际课程。':audience.length>1?'关联了多门课程，请先编辑并选择唯一课程。':'已保存为草稿，点击“发布”后同学才能查看。'):null;
-    return{...data,...preferences,hasUpdates:!admin&&!defaultCompleted&&row.update_revision>(seen?.seen_revision||0),id:row.id,termId:row.term_id,sourceType:row.owner_id!=null?'personal':'class',canEdit:row.owner_id===userId,academicYear:term.academicYear,termName:term.name,kind:row.kind,title:row.title,published:Boolean(row.published),revision:row.revision,updatedAt:row.updated_at,completed,completedAt,remindersSuppressed:completed,needsReconfirm:Boolean(completion&&!completed),overdue:overdue&&!completed,daysUntil,targets:audience,attachments,...(admin?{allCompletedAt:defaults?.completed_at||null,allCompletedGeneration:defaults?.generation||0,draftReason}:{})};
+    const audience=targets(row.id),waiting=waitingForCourse(row),draftReason=!row.published?(data.review_required?'待管理员确认：'+(data.review_reasons?.join('；')||'课程或原表内容尚未核对。'):waiting?(homeworkCourseTime(data)?'原表上课时间尚未匹配到明确课程，请核对适用课程。':'等待课程补齐；同课程名、同老师的课程将自动关联并发布。'):audience.length===0?'未匹配到课程，请先编辑并选择适用课程。':'已保存为草稿，点击“发布”后同学才能查看。'):null;
+    return{...data,...preferences,hasUpdates:!admin&&!defaultCompleted&&row.update_revision>(seen?.seen_revision||0),id:row.id,termId:row.term_id,sourceType:row.owner_id!=null?'personal':'class',canEdit:row.owner_id===userId,academicYear:term.academicYear,termName:term.name,kind:row.kind,title:row.title,published:Boolean(row.published),revision:row.revision,updatedAt:row.updated_at,completed,completedAt,remindersSuppressed:completed,needsReconfirm:Boolean(completion&&!completed&&!defaults),overdue:overdue&&!completed,daysUntil,targets:audience,attachments,...(admin?{allCompletionState:defaults?defaultState:null,allCompletedAt:defaults&&defaultState?defaults.completed_at:null,allCompletedGeneration:defaults?.generation||0,draftReason,auto_publish_on_match:waiting}:{})};
   }
   // Every future sender must call this immediately before sending, including
   // retries. A candidate captured before completion is not a delivery permit.
@@ -90,22 +131,25 @@ export function homeworkService(db,timetable){
     const rows=db.prepare(`SELECT * FROM homework_records WHERE (owner_id=? OR owner_id IS NULL AND published=1) ${termId?'AND term_id=?':''} ORDER BY created_at DESC`).all(userId,...(termId?[termId]:[]));
     return rows.filter(row=>visible(row,userId)).map(row=>view(row,userId)).sort(compareHomework);
   }
-  function normalize(input,termId,privateRecord=false){
+  function normalize(input,termId,privateRecord=false,previous=null){
     if(!input||typeof input!=='object')problem('请填写作业内容。');const kind=input.kind;if(!['assignment','reference'].includes(kind))problem('请选择作业或考核说明。');
     if(!privateRecord&&input.autoPublish===true){
-      if(!Array.isArray(input.targetKeys)||input.targetKeys.length!==1)problem('请选择一门明确的课程，保存后自动发布给该课程的同学。');
+      if(!Array.isArray(input.targetKeys)||!input.targetKeys.length)problem('请选择适用课程，保存后发布给对应同学。');
       const course=classOptions(termId).find(c=>c.key===input.targetKeys[0]);
       if(!course)problem('课程不存在或不属于本学期，请重新选择。');
       input={...input,course_name:course.courseName,teacher:course.teacher,published:true};
     }
     const record={kind,title:text(input.title,160),course_name:text(input.course_name,160),teacher:text(input.teacher,100),content:text(input.content),submission:text(input.submission,4000),assessment_rules:text(input.assessment_rules),team_requirement:text(input.team_requirement,2000),notes:text(input.notes),deadline_raw:text(input.deadline_raw,2000),due_date:input.due_date||null,due_time:input.due_time||null,source:text(input.source,400),sequence:text(String(input.sequence??''),30),credits:text(String(input.credits??''),30),source_rows:Array.isArray(input.source_rows)?input.source_rows.slice(0,100):[],warnings:Array.isArray(input.warnings)?input.warnings.filter(x=>typeof x==='string').slice(0,40):[]};
-    if(!record.title||!privateRecord&&(!record.course_name||!record.teacher))problem(privateRecord?'请填写个人作业标题。':'课程名称、任课老师和标题不能为空。');
+    if(!record.title)problem('请填写作业标题。');
+    if(!privateRecord){record.course_time=text(homeworkCourseTime(input),2000);record.audience_mode=input.audience_mode==='family'&&!record.course_time?'family':'selected';record.review_required=input.review_required===true||!record.course_name||!record.teacher;record.review_reasons=Array.isArray(input.review_reasons)?input.review_reasons.filter(s=>typeof s==='string').slice(0,40):[];if(typeof previous?.all_students_completed==='boolean')record.all_students_completed=previous.all_students_completed;}
     if(privateRecord&&(kind!=='assignment'||input.targetKeys?.length))problem('个人作业不能发布给其他课程。');
     if(record.due_date&&!validDate(record.due_date)||record.due_time&&!validTime(record.due_time)||record.due_time&&!record.due_date)problem('截止日期或时间不正确；具体时间需要对应日期。');
     const options=new Map((privateRecord?[]:classOptions(termId)).map(o=>[o.key,o]));
     if(!Array.isArray(input.targetKeys)||input.targetKeys.length>100)problem('请选择适用课程。');
     const chosen=[...new Set(input.targetKeys)].map(key=>{if(typeof key!=='string')problem('课程无效。');const option=options.get(key);if(option)return option;problem('课程不存在或不属于当前学期，请重新选择课程及其上课时间。');});
     const published=privateRecord||input.published===true;if(!privateRecord&&published&&!chosen.length)problem('发布前请选择适用课程并核对上课时间；尚未匹配时可先保存草稿。');
+    if(!privateRecord&&published&&record.review_required)problem('此记录含待确认内容，请先编辑核对后再发布。');
+    if(!privateRecord)record.auto_publish_on_match=!published&&!chosen.length&&input.auto_publish_on_match===true;
     const refs=Array.isArray(input.attachments)?input.attachments:[];if(refs.length>100)problem('附件数量过多。');
     const attachments=refs.map(a=>{if(!a||!/^[a-f0-9]{64}$/.test(a.assetId)||!['content','assessment_rules','notes','submission','team_requirement','attachment'].includes(a.field))problem('图片或附件关联无效。');return{assetId:a.assetId,field:a.field,caption:text(a.caption,400),filename:text(a.filename,200).replace(/[\x00-\x1f\x7f/\\]/g,'_')};});
     record.attachment_names=Object.fromEntries(attachments.filter(a=>a.filename).map(a=>[a.assetId+':'+a.field,a.filename]));
@@ -155,6 +199,9 @@ export function homeworkService(db,timetable){
       const link=db.prepare('SELECT * FROM homework_attachments WHERE record_id=? AND asset_id=?'+(field?' AND field=?':'')+' LIMIT 1').get(row.id,assetPath[1],...(field?[field]:[]));if(!link)problem('附件不属于此作业。',404);
       const asset=db.prepare('SELECT * FROM homework_assets WHERE id=?').get(assetPath[1]);if(!asset)problem('附件不存在。',404);
       const image=asset.mime.startsWith('image/'),name=parse(row.payload_json).attachment_names?.[asset.id+':'+link.field]||link.caption||(image?'作业图片.'+asset.mime.split('/')[1]:'作业附件');
+      if(url.searchParams.get('preview')==='1'){
+        try{send(200,officePreview(asset.bytes,name));}catch{send(200,{format:'unsupported',message:'此文档暂无法预览，可直接下载原文件查看。',pages:[]});}return;
+      }
       const disposition=!image||link.field==='attachment'||url.searchParams.get('download')==='1'?'attachment':'inline';
       res.writeHead(200,{'Content-Type':image?asset.mime:'application/octet-stream','Content-Disposition':`${disposition}; filename="homework-file"; filename*=UTF-8''${encodeURIComponent(name).replace(/'/g,'%27')}`,'Cache-Control':'private, no-store'});res.end(Buffer.from(asset.bytes));return;
     }
@@ -210,20 +257,24 @@ export function homeworkService(db,timetable){
     if(path==='/api/admin/homework'&&req.method==='GET'){
       const termId=url.searchParams.get('termId');timetable.term(termId);send(200,{records:db.prepare('SELECT * FROM homework_records WHERE term_id=? AND owner_id IS NULL ORDER BY created_at DESC').all(termId).map(r=>view(r,user.id,true))});return;
     }
+    if(path==='/api/admin/homework/match-pending'&&req.method==='POST'){
+      const body=await read();timetable.term(body.termId);send(200,publishPending(body.termId));return;
+    }
     if(path==='/api/admin/homework/preview'&&req.method==='POST'){
       const body=await read(),term=timetable.term(body.termId),parsed=homeworkFromFile(body.file,term),options=classOptions(term.id);
-      const records=parsed.records.map((r,i)=>{const matches=options.filter(o=>normalizeCourseName(o.courseName)===normalizeCourseName(r.course_name)&&o.teacher.split(/[、,，/；;\s]+/).some(t=>normalizedTeacher(t)===normalizedTeacher(r.teacher)));const existing=importExisting(term.id,r);return{...r,previewId:'row-'+i,targetKeys:matches.length===1?[matches[0].key]:[],published:matches.length===1,matchCount:matches.length,existingId:existing?.id||null,existingRevision:existing?.revision||null,warnings:[...r.warnings,...(matches.length===1?[]:[matches.length?'同名同老师有多个上课时间，请选择对应课程。':'未匹配到课程，将先保存草稿；请选择课程并核对教师和上课时间。'])]};});send(200,{...parsed,records,classes:options});return;
+      const records=parsed.records.map((r,i)=>{const matches=matchingClasses(r,options).filter(c=>c.published),existing=importExisting(term.id,r),family=sharesCourseFamily(r),ready=!r.review_required&&matches.length>0&&(family||matches.length===1);return{...r,previewId:'row-'+i,audience_mode:family?'family':'selected',targetKeys:ready?matches.map(c=>c.key):[],published:ready,auto_publish_on_match:!ready&&!r.review_required,matchCount:matches.length,existingId:existing?.id||null,existingRevision:existing?.revision||null,warnings:[...r.warnings,...(ready?[]:[r.review_required?'存在待确认内容，先保留草稿，请管理员核对。':matches.length?'存在不同上课日期或时段，请手动核对适用课程。':'未匹配到课程，先保存草稿；课程补齐后自动检查。'])]};});send(200,{...parsed,records,classes:options});return;
     }
     if(path==='/api/admin/homework/import'&&req.method==='POST'){
       const body=await read(),term=timetable.term(body.termId);if(body.confirm!==true)problem('请核对导入预览并确认保存。');if(!Array.isArray(body.records)||!body.records.length||body.records.length>500)problem('每次需导入1—500条记录。');const assets=decodeAssets(body.assets),validRecords=body.records.filter(r=>!(r?.kind==='assignment'&&noHomework(r.content))),skippedEmpty=body.records.length-validRecords.length;
-      let created=0,updated=0,skipped=0,drafts=0;
+      let created=0,updated=0,skipped=0,drafts=0,matched;const newIds=[];
       transaction(()=>{for(const input of validRecords){
         const old=importExisting(term.id,input);
         if(old&&input.existingRevision!=null&&Number(input.existingRevision)!==old.revision)problem('作业在预览后已被更新，请重新导入表格。',409);
         // An import updates published content, not the audience or personal state.
-        const item=normalize(old?{...input,autoPublish:false,targetKeys:targets(old.id).map(t=>t.key),published:Boolean(old.published)}:input,term.id);
+        const previous=old?parse(old.payload_json):null;
+        const item=normalize(old?{...input,autoPublish:false,targetKeys:targets(old.id).map(t=>t.key),published:Boolean(old.published)&&!input.review_required,audience_mode:previous.audience_mode||(familyAudience(previous)?'family':'selected'),auto_publish_on_match:waitingForCourse(old)}:{...input,auto_publish_on_match:input.auto_publish_on_match!==false&&!input.published&&!input.targetKeys?.length},term.id,false,previous);
         if(old){
-          const previous=parse(old.payload_json),fields=['kind','content','submission','assessment_rules','team_requirement','notes','due_date','due_time','deadline_raw','credits','attachment_names'];
+          const fields=['kind','content','submission','assessment_rules','team_requirement','notes','due_date','due_time','deadline_raw','credits','attachment_names','auto_publish_on_match','course_time','audience_mode','review_required','review_reasons'];
           const oldAttachments=db.prepare('SELECT asset_id AS assetId,field,caption FROM homework_attachments WHERE record_id=? ORDER BY asset_id,field').all(old.id);
           const nextAttachments=item.attachments.map(({assetId,field,caption})=>({assetId,field,caption})).sort((a,b)=>a.assetId.localeCompare(b.assetId)||a.field.localeCompare(b.field));
           if(fields.every(k=>JSON.stringify(previous[k])===JSON.stringify(item.record[k]))&&JSON.stringify(oldAttachments)===JSON.stringify(nextAttachments)){skipped++;continue;}
@@ -232,9 +283,9 @@ export function homeworkService(db,timetable){
           writeLinks(old.id,item,assets);updated++;
         }else{
           const id=randomUUID();db.prepare('INSERT INTO homework_records(id,term_id,source_key,kind,title,payload_json,published,created_by) VALUES(?,?,?,?,?,?,?,?)').run(id,term.id,item.key,item.record.kind,item.record.title,JSON.stringify(item.record),item.published?1:0,user.id);
-          writeLinks(id,item,assets);created++;if(!item.published)drafts++;
+          writeLinks(id,item,assets);created++;newIds.push(id);if(!item.published)drafts++;
         }
-      }});send(201,{created,updated,skipped,skippedEmpty,drafts});return;
+      }matched=publishPending(term.id);drafts=newIds.filter(id=>!getRecord(id).published).length;});send(201,{created,updated,skipped,skippedEmpty,drafts,autoPublished:matched.published,expanded:matched.expanded});return;
     }
     if(path==='/api/admin/homework/records'&&req.method==='POST'){
       const body=await read(),term=timetable.term(body.termId),item=normalize(body.record,term.id),assets=decodeAssets(body.assets);if(db.prepare('SELECT id FROM homework_records WHERE term_id=? AND source_key=?').get(term.id,item.key))problem('已有相同课程、老师和标题的记录，请编辑原记录。',409);const id=randomUUID();transaction(()=>{db.prepare('INSERT INTO homework_records(id,term_id,source_key,kind,title,payload_json,published,created_by) VALUES(?,?,?,?,?,?,?,?)').run(id,term.id,item.key,item.record.kind,item.record.title,JSON.stringify(item.record),item.published?1:0,user.id);writeLinks(id,item,assets);});send(201,view(getRecord(id),user.id,true));return;
@@ -245,7 +296,7 @@ export function homeworkService(db,timetable){
       if(row.owner_id!=null)problem('个人作业不能发布给其他同学。',403);
       if(Number(body.revision)!==row.revision)problem('记录已更新，请刷新后再发布。',409);
       if(row.published){send(200,view(row,user.id,true));return;}
-      const current=view(row,user.id,true),item=normalize({...current,targetKeys:current.targets.map(t=>t.key),autoPublish:true},row.term_id);
+      const current=view(row,user.id,true),item=normalize({...current,targetKeys:current.targets.map(t=>t.key),autoPublish:true},row.term_id,false,parse(row.payload_json));
       if(db.prepare('SELECT id FROM homework_records WHERE term_id=? AND source_key=? AND id<>?').get(row.term_id,item.key,row.id))problem('已有相同课程、老师和标题的记录，请先核对。',409);
       transaction(()=>{
         db.prepare("UPDATE homework_records SET source_key=?,payload_json=?,published=1,revision=revision+1,update_revision=revision+1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?").run(item.key,JSON.stringify(item.record),row.id);
@@ -258,18 +309,20 @@ export function homeworkService(db,timetable){
       if(row.owner_id!=null||row.kind!=='assignment'||!row.published)problem('仅能将已发布的课程作业标记为全部完成。',400);
       if(Number(body.revision)!==row.revision)problem('作业已更新，请刷新后再操作。',409);
       if(body.confirm!==true)problem('请确认将此作业设为全部完成。');
+      const completed=body.completed===undefined?true:body.completed;if(typeof completed!=='boolean')problem('完成状态无效。');
       transaction(()=>{
         const previous=db.prepare('SELECT generation FROM homework_completion_defaults WHERE record_id=?').get(row.id);
         if(Number(body.generation||0)!==(previous?.generation||0))problem('全员完成状态已更新，请刷新后再操作。',409);
         db.prepare("INSERT INTO homework_completion_defaults(record_id,generation,completed_at,updated_by) VALUES(?,1,strftime('%Y-%m-%dT%H:%M:%fZ','now'),?) ON CONFLICT(record_id) DO UPDATE SET generation=generation+1,completed_at=excluded.completed_at,updated_by=excluded.updated_by").run(row.id,user.id);
+        db.prepare('UPDATE homework_records SET payload_json=? WHERE id=?').run(JSON.stringify({...parse(row.payload_json),all_students_completed:completed}),row.id);
       });
-      send(200,view(row,user.id,true));return;
+      send(200,view(getRecord(row.id),user.id,true));return;
     }
     const edit=path.match(/^\/api\/admin\/homework\/records\/([\w-]+)$/);
     if(edit&&['PUT','DELETE'].includes(req.method)){
       const body=await read(),old=getRecord(edit[1]);if(old.owner_id!=null)problem('个人作业仅能由本人通过个人入口维护。',403);if(Number(body.revision)!==old.revision)problem('记录已更新，请刷新后再操作。',409);
       if(req.method==='DELETE'){if(body.confirm!==true)problem('请确认删除该记录。');db.prepare('DELETE FROM homework_records WHERE id=?').run(old.id);send(200,{ok:true});return;}
-      const item=normalize(body.record,old.term_id),assets=decodeAssets(body.assets);if(db.prepare('SELECT id FROM homework_records WHERE term_id=? AND source_key=? AND id<>?').get(old.term_id,item.key,old.id))problem('已有相同课程、老师和标题的记录。',409);
+      const item=normalize(body.record,old.term_id,false,parse(old.payload_json)),assets=decodeAssets(body.assets);if(db.prepare('SELECT id FROM homework_records WHERE term_id=? AND source_key=? AND id<>?').get(old.term_id,item.key,old.id))problem('已有相同课程、老师和标题的记录。',409);
       transaction(()=>{db.prepare("UPDATE homework_records SET source_key=?,kind=?,title=?,payload_json=?,published=?,revision=revision+1,update_revision=revision+1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?").run(item.key,item.record.kind,item.record.title,JSON.stringify(item.record),item.published?1:0,old.id);writeLinks(old.id,item,assets);});send(200,view(getRecord(old.id),user.id,true));return;
     }
     const readPath=path.match(/^\/api\/homework\/records\/([\w-]+)\/read$/);
@@ -289,18 +342,18 @@ export function homeworkService(db,timetable){
     }
     if(complete&&req.method==='POST'){
       const body=await read(),row=getRecord(complete[1]);if(!visible(row,user.id)||row.kind!=='assignment')problem('此作业不属于本人的个人作业或已选课程。',403);if(Number(body.revision)!==row.revision)problem('作业内容已更新，请刷新并核对后再标记完成。',409);if(typeof body.completed!=='boolean')problem('完成状态无效。');
+      const wasCompleted=Boolean(view(row,user.id).completed),defaults=db.prepare('SELECT generation FROM homework_completion_defaults WHERE record_id=?').get(row.id),defaultState=parse(row.payload_json).all_students_completed!==false;
       transaction(()=>{
+        if(defaults&&body.completed!==defaultState)db.prepare('INSERT INTO homework_completion_exceptions(user_id,record_id,generation) VALUES(?,?,?) ON CONFLICT(user_id,record_id) DO UPDATE SET generation=excluded.generation').run(user.id,row.id,defaults.generation);
+        else db.prepare('DELETE FROM homework_completion_exceptions WHERE user_id=? AND record_id=?').run(user.id,row.id);
         if(body.completed){
-          db.prepare('DELETE FROM homework_completion_exceptions WHERE user_id=? AND record_id=?').run(user.id,row.id);
-          db.prepare("INSERT INTO homework_completions(user_id,record_id,completed_revision) VALUES(?,?,?) ON CONFLICT(user_id,record_id) DO UPDATE SET completed_revision=excluded.completed_revision,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE homework_completions.completed_revision<>excluded.completed_revision").run(user.id,row.id,row.revision);acknowledge(user.id,row);
+          db.prepare("INSERT INTO homework_completions(user_id,record_id,completed_revision) VALUES(?,?,?) ON CONFLICT(user_id,record_id) DO UPDATE SET completed_revision=excluded.completed_revision,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE homework_completions.completed_revision<>excluded.completed_revision OR ?=1").run(user.id,row.id,row.revision,wasCompleted?0:1);acknowledge(user.id,row);
         }else{
           db.prepare('DELETE FROM homework_completions WHERE user_id=? AND record_id=?').run(user.id,row.id);
-          const defaults=db.prepare('SELECT generation FROM homework_completion_defaults WHERE record_id=?').get(row.id);
-          if(defaults)db.prepare('INSERT INTO homework_completion_exceptions(user_id,record_id,generation) VALUES(?,?,?) ON CONFLICT(user_id,record_id) DO UPDATE SET generation=excluded.generation').run(user.id,row.id,defaults.generation);
         }
       });send(200,view(row,user.id));return;
     }
     problem('作业接口不存在。',404);
   }
-  return{handle,personal,classOptions,reminderCandidate};
+  return{handle,personal,classOptions,reminderCandidate,publishPending};
 }

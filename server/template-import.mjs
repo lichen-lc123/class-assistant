@@ -14,7 +14,7 @@ function templateContentSignature(courses,t){
     return hash({name:compact(c.course_name),code:compact(c.course_code),teacher:teacher(c.teacher),credits:c.credits??null,college:compact(c.college),category:compact(c.course_category),required:compact(c.required_or_elective),schedule:scheduleSignature(c,t)});
   }).sort());
 }
-export function templateImportService(db,{term,prepare,requireReview}){
+export function templateImportService(db,{term,prepare,requireReview,onCoursesChanged=()=>{}}){
   const catalogRows=termId=>db.prepare('SELECT * FROM public_courses WHERE term_id=? ORDER BY id').all(termId);
   const version=rows=>hash(rows.map(r=>[r.id,r.revision,r.card_enabled,r.published,r.payload_json]));
   function rejectDuplicate(t,courses,userId){
@@ -63,6 +63,7 @@ export function templateImportService(db,{term,prepare,requireReview}){
         else{courseId=randomUUID();db.prepare('INSERT INTO public_courses(id,term_id,class_code,payload_json,card_enabled,published) VALUES(?,?,?,?,1,1)').run(courseId,t.id,null,JSON.stringify(item.course));created++;cardsCreated++;}
         db.prepare('INSERT INTO template_courses(template_id,course_id,course_snapshot_json) VALUES(?,?,?)').run(id,courseId,item.existing?.origin==='manual'?JSON.stringify(item.course):null);
       }
+      onCoursesChanged(t.id);
       db.exec('COMMIT');return{id,name,courseCount:items.length,created,reused,cardsCreated};
     }catch(e){db.exec('ROLLBACK');throw e;}
   }

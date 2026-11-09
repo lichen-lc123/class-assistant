@@ -1,0 +1,45 @@
+%% 功能发布与数据保护 · 系统流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["部署脚本｜验证包摘要及文件白名单"]
+    N2["服务器｜内存数据库发布检查<br/>不接触真实数据"]
+    N3["服务器｜一致性备份并生成内容指纹"]
+    N4["服务器｜在服务器副本初始化新版结构"]
+    N5{"校验器｜旧表内容不变且新表为空？"}
+    B5["部署脚本｜拒绝发布"]
+    N6["服务器｜停服后再备份和校验正式库"]
+    N7["部署脚本｜原子切换 current 并启动"]
+    N8{"验收｜资源、身份接口及完整性正常？"}
+    B8["部署脚本｜停止写入并回退程序和备份"]
+    N9["服务器｜记录 DEPLOYMENT.txt<br/>核对历史附件下载字节"]
+    N10(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 -->|否| B5
+    N5 -->|是| N6
+    N6 --> N7
+    N7 --> N8
+    N8 -->|否| B8
+    N8 -->|是| N9
+    N9 --> N10
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 decision;
+    class B5 exception;
+    class N6 normal;
+    class N7 normal;
+    class N8 decision;
+    class B8 exception;
+    class N9 normal;
+    class N10 terminal;

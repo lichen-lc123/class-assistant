@@ -1,14 +1,13 @@
-%% 管理员模板删除 · 业务流程图 · V1.0 · 2026-11-02
+%% 管理员模板删除 · 业务流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["管理员｜在课表模板列表<br/>点击删除模板"]
-    N2["网站｜显示模板名称和删除范围<br/>说明课程卡片与已选课程保留"]
-    N3{"管理员｜确认删除？"}
-    B3["关闭弹框<br/>不改变数据"]
-    N4["网站｜校验权限和模板版本<br/>删除模板及其选用入口"]
-    N5["网站｜保留学生已有课程及个人调整<br/>其他模板继续正常使用"]
-    N6["学生｜继续查看课程和作业<br/>已选课程仍跟随课程卡片更新"]
-    N7(["结束"])
+    N1["管理员｜选择任意管理员维护的模板"]
+    N2["管理员｜点击删除并查看确认范围"]
+    N3{"管理员｜确认删除模板？"}
+    B3["网站｜取消并保留模板"]
+    N4["网站｜移除模板及其可选入口"]
+    N5["同学｜已选课程和个人安排保留<br/>以后不再订阅已删除模板"]
+    N6(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
@@ -16,7 +15,6 @@ flowchart TD
     N3 -->|是| N4
     N4 --> N5
     N5 --> N6
-    N6 --> N7
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -29,5 +27,4 @@ flowchart TD
     class B3 exception;
     class N4 normal;
     class N5 normal;
-    class N6 normal;
-    class N7 terminal;
+    class N6 terminal;

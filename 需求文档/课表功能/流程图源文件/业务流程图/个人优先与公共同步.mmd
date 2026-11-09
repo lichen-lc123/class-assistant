@@ -1,20 +1,18 @@
-%% 个人优先与公共同步 · 业务流程图 · V1.0 · 2026-11-02
+%% 个人优先与公共同步 · 业务流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["管理员｜编辑模板生成卡片<br/>或编辑模板内课程"]
-    N2["网站｜更新共享课程<br/>模板、卡片及已选用户同步"]
-    N3["管理员｜编辑独立手动卡片<br/>直接选用卡片的用户同步"]
-    N4["网站｜保留模板中的手动课程<br/>模板及其已选用户独立维护"]
-    N5["学生｜个人时间和地点调整优先<br/>可继续追加其他课程"]
-    N6["网站｜追加课程时检查时间<br/>冲突提示并拒绝整批添加"]
-    N7(["结束"])
+    N1["管理员｜维护公共模板或课程卡片"]
+    N2["网站｜按来源更新公共基值和引用"]
+    N3["用户｜可调整自己的时间或地点"]
+    N4["网站｜未修改字段跟随公共安排<br/>个人修改过的安排保持优先"]
+    N5["用户｜公共课次改变后核对个人覆盖"]
+    N6(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
     N3 --> N4
     N4 --> N5
     N5 --> N6
-    N6 --> N7
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -26,5 +24,4 @@ flowchart TD
     class N3 normal;
     class N4 normal;
     class N5 normal;
-    class N6 normal;
-    class N7 terminal;
+    class N6 terminal;

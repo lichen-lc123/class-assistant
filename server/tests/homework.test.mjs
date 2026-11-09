@@ -77,6 +77,20 @@ test('已完成作业按完成时间倒序，优先级和计划时间不干扰�
   const tied=[{id:'b',title:'同名',completed:true,completedAt:null},{id:'a',title:'同名',completed:true,completedAt:null}];
   assert.deepEqual(tied.sort(compareHomework).map(r=>r.id),['a','b']);
 });
+test('未覆盖的表头、缺少老师及无效截止保存待核对内容；无截止、待通知允许正常导入',()=>{
+ const make=(headers,values,name='作业表')=>({name:'待核对样例.xlsx',content:zip({'xl/workbook.xml':`<workbook><sheets><sheet name="${name}" r:id="r1"/></sheets></workbook>`,'xl/_rels/workbook.xml.rels':'<Relationships><Relationship Id="r1" Target="worksheets/sheet1.xml"/></Relationships>','xl/worksheets/sheet1.xml':'<worksheet><sheetData>'+row(1,headers.map((s,i)=>[String.fromCharCode(65+i),s]))+values.map((line,i)=>row(i+2,line.map((s,j)=>[String.fromCharCode(65+j),s]))).join('')+'</sheetData></worksheet>'}).toString('base64')});
+ const result=homeworkFromFile(make(['课程名称','任课老师','第一次作业内容','截止日期','上课时间'],[
+  ['无截止课程','甲老师','阅读材料','',''],['待通知课程','甲老师','准备报告','待通知',''],['错误日期课程','甲老师','课程报告','2026-02-30',''],['缺老师课程','','补充内容','',''],['明确时段课程','甲老师','时段作业','','2026-11-14 08:00—10:00'],
+ ]),term).records;
+ assert.ok(!result.find(r=>r.course_name==='无截止课程').review_required);assert.ok(!result.find(r=>r.course_name==='待通知课程').review_required);
+ assert.equal(result.find(r=>r.course_name==='错误日期课程').review_required,true);assert.equal(result.find(r=>r.course_name==='缺老师课程').review_required,true);
+ assert.equal(result.find(r=>r.course_name==='明确时段课程').course_time,'2026-11-14 08:00—10:00');
+ const unknown=homeworkFromFile(make(['说明栏目','其他内容'],[['待确认课程信息','需要人工整理的作业']], '未识别格式'),term).records;
+ assert.equal(unknown.length,1);assert.equal(unknown[0].review_required,true);assert.match(unknown[0].content,/需要人工整理的作业/);
+ const additional=homeworkFromFile(make(['课程名称','任课老师','第一次作业内容','额外安排'],[['额外字段课程','甲老师','课程正文','需要人工判断的规则']]),term).records;
+ assert.ok(additional.every(r=>r.review_required));assert.ok(additional.some(r=>r.notes.includes('需要人工判断的规则')));
+});
+
 test('作业完整流程：管理员预览确认、草稿、班级隔离、附件授权、个人完成和版本保护',async t=>{
   const {server,db}=await createApp({databasePath:':memory:'});await createInitialAdmin(db,'work-admin','学委','HomeworkAdmin123');const pass=await hashPassword('HomeworkStudent123');for(const id of ['work-one','work-two','work-peer'])db.prepare('INSERT INTO users(student_id,name,password_hash,must_change_password) VALUES(?,?,?,0)').run(id,id,pass);
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));
@@ -90,7 +104,7 @@ test('作业完整流程：管理员预览确认、草稿、班级隔离、附�
   const p=await call('/admin/homework/preview','POST',{termId,file:fixture()},admin);assert.equal(p.status,200);assert.equal(db.prepare('SELECT count(*) n FROM homework_records').get().n,0);assert.deepEqual(p.data.records.find(r=>r.kind==='assignment').targetKeys,[courseTarget(db,'CLASS-A')]);
   const payload={termId,records:p.data.records,assets:p.data.assets};assert.equal((await call('/admin/homework/import','POST',payload,admin)).status,400);
   const ambiguous=(await call('/admin/timetable/courses','POST',{termId,source:'manual',courses:[{course_name:'工程经济学',teacher:'甲老师',teaching_class_code:'CLASS-C'}],acceptWarnings:true,generateCards:false},admin));assert.equal(ambiguous.status,201);
-  const ambiguousPreview=(await call('/admin/homework/preview','POST',{termId,file:fixture()},admin)).data;assert.equal(ambiguousPreview.records.find(r=>r.kind==='assignment').matchCount,2);assert.equal(ambiguousPreview.records.find(r=>r.kind==='assignment').published,false);assert.deepEqual(ambiguousPreview.records.find(r=>r.kind==='assignment').targetKeys,[]);
+  const ambiguousPreview=(await call('/admin/homework/preview','POST',{termId,file:fixture()},admin)).data;assert.equal(ambiguousPreview.records.find(r=>r.kind==='assignment').matchCount,2);assert.equal(ambiguousPreview.records.find(r=>r.kind==='assignment').published,true);assert.equal(ambiguousPreview.records.find(r=>r.kind==='assignment').targetKeys.length,2);payload.records=ambiguousPreview.records;
   const saved=await call('/admin/homework/import','POST',{...payload,confirm:true},admin);assert.equal(saved.status,201);assert.equal(saved.data.created,3);assert.equal(saved.data.drafts,0);
   const repeat=await call('/admin/homework/import','POST',{...payload,confirm:true},admin);assert.equal(repeat.data.created,0);assert.equal(repeat.data.skipped,3);
   const mine=(await call('/homework?userId=work-two','GET',undefined,one)).data.records,others=(await call('/homework','GET',undefined,two)).data.records;assert.equal(mine.length,2);assert.equal(others.length,1);assert.ok(mine.every(r=>r.teacher==='甲老师'));assert.ok(others.every(r=>r.teacher==='乙老师'));assert.ok(!JSON.stringify(mine).includes('source_rows'));assert.equal((await call('/homework','GET',undefined,admin)).data.records.length,0);

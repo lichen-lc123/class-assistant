@@ -1,0 +1,33 @@
+%% 课程补齐后自动发布作业 · 业务流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["管理员｜先导入作业<br/>未找到课程时保存待匹配草稿"]
+    N2["管理员或同学｜后续补齐课程<br/>或管理员打开作业页补扫"]
+    N3["网站｜同学期按课程和老师匹配<br/>无明确时间时覆盖全部同组课程"]
+    N4{"网站｜适用范围与内容明确？"}
+    B4["网站｜保留草稿并说明原因<br/>待管理员确认后发布"]
+    N5["网站｜关联原作业并自动发布<br/>已发布共用作业可补充课程关联"]
+    N6["同学｜选入适用课程后<br/>电脑和手机都能查看"]
+    N7(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 -->|否| B4
+    N4 -->|是| N5
+    N5 --> N6
+    N6 --> N7
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 decision;
+    class B4 exception;
+    class N5 normal;
+    class N6 normal;
+    class N7 terminal;

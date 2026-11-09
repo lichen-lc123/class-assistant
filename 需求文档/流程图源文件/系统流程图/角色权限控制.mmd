@@ -1,26 +1,20 @@
-%% 角色权限控制 · 系统流程图 · V1.0 · 2026-11-02
+%% 角色权限控制 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜携带 HttpOnly 会话 Cookie"]
-    N2["后端｜计算令牌摘要并查询<br/>sessions 关联 users"]
-    N3{"后端｜账号与会话有效<br/>且未过期？"}
-    B3["清除无效 Cookie<br/>返回 401，前端回登录页"]
-    N4{"后端｜目标是管理员操作？"}
-    B4["执行本人信息查询<br/>修改密码或退出登录"]
-    N5{"后端｜已完成初始改密<br/>且当前角色为管理员？"}
-    B5["返回 403<br/>提示先改密码或无管理权限"]
-    N6["后端｜允许执行对应管理功能<br/>接口不返回密码哈希"]
-    N7(["结束"])
+    N1["前端｜根据角色及设备渲染入口"]
+    N2["后端｜每次受保护请求读取当前会话和角色"]
+    N3{"后端｜管理请求来自有效管理员？"}
+    B3["后端｜拒绝未登录、学生<br/>或尚未完成首次改密的请求"]
+    N4["后端｜公共管理不增加创建者筛选<br/>私人记录继续校验 owner_id"]
+    N5[("数据库｜保留 created_by 作为记录归属<br/>不将其用作公共内容的管理权限")]
+    N6(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
     N3 -->|否| B3
     N3 -->|是| N4
-    N4 -->|否| B4
-    N4 -->|是| N5
-    N5 -->|否| B5
-    N5 -->|是| N6
-    N6 --> N7
+    N4 --> N5
+    N5 --> N6
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -31,9 +25,6 @@ flowchart TD
     class N2 normal;
     class N3 decision;
     class B3 exception;
-    class N4 decision;
-    class B4 exception;
-    class N5 decision;
-    class B5 exception;
-    class N6 normal;
-    class N7 terminal;
+    class N4 normal;
+    class N5 database;
+    class N6 terminal;

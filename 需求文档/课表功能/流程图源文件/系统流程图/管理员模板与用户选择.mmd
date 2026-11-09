@@ -1,22 +1,24 @@
-%% 管理员模板与用户选择 · 系统流程图 · V1.0 · 2026-11-02
+%% 管理员模板与用户选择 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜管理员选择AI内容<br/>按学期逐份预览并命名确认"]
-    N2[("数据库｜保存模板与去重卡片引用<br/>不复制重复课程")]
-    N3["前端｜弹框读取本学期已发布模板<br/>左右切换时自动预览全部课程"]
-    N4["后端｜校验登录、学期、模板发布<br/>及已有时段与本批时段无冲突"]
-    N5["后端｜返回全部课程及版本摘要<br/>前端仅展示课程，不显示核对清单"]
-    N6["后端与数据库｜校验当前预览版本<br/>点击使用后保存模板同步关系"]
-    N7["前端｜显示本人课表<br/>模板增删成员自动同步，保留个人调整"]
+    N1["后端｜读取已发布模板、课程及使用者姓名"]
+    N2["前端｜展示全部课程及模板切换<br/>不渲染普通用户核对说明"]
+    N3["前端｜提交模板及当前课表版本"]
+    N4["后端｜展开新增课次并检查本人已有课程<br/>及批次内部时间冲突"]
+    N5{"后端｜版本及冲突检查通过？"}
+    B5["后端｜返回冲突，不修改原课表"]
+    N6[("数据库｜事务保存订阅及唯一选课关系")]
+    N7["后端｜读取时同步模板更新<br/>合成个人优先安排"]
     N8(["结束"])
     N0 --> N1
-    N1 -->|管理员提供的公共资料| N2
+    N1 --> N2
     N2 --> N3
-    N3 -->|已发布的学期模板| N4
+    N3 --> N4
     N4 --> N5
-    N5 --> N6
-    N6 -->|模板课程和课程信息| N7
-    N7 -->|学生确认的模板成员| N8
+    N5 -->|否| B5
+    N5 -->|是| N6
+    N6 --> N7
+    N7 --> N8
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -24,10 +26,11 @@ flowchart TD
     classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
     class N0 terminal;
     class N1 normal;
-    class N2 database;
+    class N2 normal;
     class N3 normal;
     class N4 normal;
-    class N5 normal;
-    class N6 normal;
+    class N5 decision;
+    class B5 exception;
+    class N6 database;
     class N7 normal;
     class N8 terminal;

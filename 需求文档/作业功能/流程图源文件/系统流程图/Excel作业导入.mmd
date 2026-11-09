@@ -1,28 +1,26 @@
-%% Excel作业导入 · 系统流程图 · V1.0 · 2026-11-06
+%% Excel作业导入 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜发送学期与 XLSX 数据<br/>请求作业导入预览"]
-    N2["后端｜核对管理员会话<br/>限制文件、解压内容和图片大小"]
-    N3["后端｜解析文字、真实合并区域<br/>WPS 单元格图片和英语详细表"]
-    N4["后端｜归一日期并按课程老师<br/>生成课程候选及核对警告"]
-    N5["前端｜展示草稿与图片<br/>接收学委选择和修正"]
-    N6["前端｜发送所选记录、图片资料<br/>及核对确认标记"]
-    N7{"后端｜权限、字段、课程<br/>图片及确认均有效？"}
-    B7["后端｜返回错误<br/>不写入本次导入"]
-    N8[("数据库｜事务保存记录和附件<br/>相同记录与明确无作业跳过")]
-    N9["前端｜展示新增、草稿<br/>及重复跳过数量"]
-    N10(["结束"])
+    N1["后端｜验证管理员、学期和 XLSX 结构"]
+    N2["后端｜读取工作表、图片与 OLE 文件<br/>同一 Choice/Fallback 对象只解析一次"]
+    N3["后端｜匹配课程候选及已有作业身份"]
+    N4["前端｜展示附件名、字段归属和冲突警告"]
+    N5{"后端｜确认、版本及附件引用有效？"}
+    B5["后端｜拒绝导入并保持原内容"]
+    N6[("数据库｜按原记录 ID 更新内容<br/>新作业创建新记录及附件关联")]
+    N7[("数据库｜同步完成版本且保留偏好<br/>已有发布状态及全员策略保留")]
+    N8["后端｜返回导入统计并刷新列表"]
+    N9(["结束"])
     N0 --> N1
-    N1 -->|会话、目标学期、文件| N2
-    N2 -->|校验后的 XLSX 内容| N3
-    N3 -->|课程、老师、原文、图片| N4
-    N4 -->|预览记录与课程候选| N5
-    N5 -->|核对后的所选草稿| N6
-    N6 -->|确认、记录与图片摘要| N7
-    N7 -->|否| B7
-    N7 -->|是| N8
-    N8 -->|新增、草稿和跳过统计| N9
-    N9 --> N10
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 -->|否| B5
+    N5 -->|是| N6
+    N6 --> N7
+    N7 --> N8
+    N8 --> N9
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -33,10 +31,9 @@ flowchart TD
     class N2 normal;
     class N3 normal;
     class N4 normal;
-    class N5 normal;
-    class N6 normal;
-    class N7 decision;
-    class B7 exception;
-    class N8 database;
-    class N9 normal;
-    class N10 terminal;
+    class N5 decision;
+    class B5 exception;
+    class N6 database;
+    class N7 database;
+    class N8 normal;
+    class N9 terminal;

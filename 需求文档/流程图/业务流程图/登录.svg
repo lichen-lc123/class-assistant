@@ -1,62 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1341" viewBox="0 0 1100 1341" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1113" viewBox="0 0 1100 1113" role="img" aria-labelledby="title desc">
 <title id="title">登录 · 业务流程图</title>
-<desc id="desc">一期已实现功能。业务流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<desc id="desc">当前已实现功能。业务流程图，包括正常路径及主要异常分支；带回线的分支继续后续步骤；其余结果可修正后重试。</desc>
 <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
-<rect width="1100" height="1341" fill="#F7F5F0"/>
+<rect width="1100" height="1113" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">登录 · 业务流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-02 · 一期登录与账号管理</text>
+<text x="70" y="90" font-size="15" fill="#788371">当前版 · 2026-11-09 · MEM2602 当前业务规则</text>
 <text x="70" y="116" font-size="13" fill="#788371">使用者操作与业务判断；右侧为本次处理的其他结果。</text>
-<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M510 723.0 L641 723.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="569.5" y="711.0" font-size="15" fill="#66765D">否</text>
-<path d="M290.0 785 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="814.0" font-size="15" fill="#66765D">是</text>
-<path d="M510 895.0 L641 895.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="569.5" y="883.0" font-size="15" fill="#66765D">否</text>
-<path d="M290.0 957 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="986.0" font-size="15" fill="#66765D">是</text>
-<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 219 L290.0 289" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 367 L290.0 437" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 503.0 L641 503.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="491.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 565 L290.0 635" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="607.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 713 L290.0 783" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 861 L290.0 931" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="188.0">开始</tspan>
 </text>
-<rect x="70" y="317" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="293" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="360.0">用户打开登录页</tspan>
+<tspan x="290.0" y="336.0">用户｜打开 MEM2602 链接</tspan>
 </text>
-<rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<polygon points="290.0,441 510,503.0 290.0,565 70,503.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="509.0">网站｜已保留有效登录？</tspan>
+</text>
+<rect x="645" y="463.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="497.5">用户｜输入姓名或学号与密码</tspan>
+<tspan x="837.5" y="520.5">校验成功，首次登录先修改密码</tspan>
+</text>
+<rect x="70" y="639" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="532.0">输入账号与密码</tspan>
+<tspan x="290.0" y="682.0">网站｜恢复本人登录身份</tspan>
 </text>
-<polygon points="290.0,661 510,723.0 290.0,785 70,723.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="729.0">账号密码正确？</tspan>
-</text>
-<rect x="645" y="683.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="729.0">提示错误，重新输入</tspan>
-</text>
-<polygon points="290.0,833 510,895.0 290.0,957 70,895.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="901.0">需要修改初始密码？</tspan>
-</text>
-<rect x="645" y="846.5" width="385" height="97" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="878.0">按角色进入页面</tspan>
-<tspan x="837.5" y="901.0">管理员：系统设置</tspan>
-<tspan x="837.5" y="924.0">学生：我的账号</tspan>
-</text>
-<rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="787" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">进入我的账号</tspan>
-<tspan x="290.0" y="1059.5">先修改初始密码</tspan>
+<tspan x="290.0" y="818.5">用户｜直接进入工作台</tspan>
+<tspan x="290.0" y="841.5">可主动退出或修改密码</tspan>
 </text>
-<rect x="70" y="1177" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<rect x="70" y="935" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1220.0">结束</tspan>
+<tspan x="290.0" y="978.0">结束</tspan>
 </text>
-<text x="70" y="1311" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
-</g></svg>
+<text x="70" y="1083" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+<path d="M1030 503.0 L1070 503.0 L1070 602 L290.0 602 L290.0 635" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/></g></svg>

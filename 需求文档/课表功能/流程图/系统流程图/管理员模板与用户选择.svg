@@ -1,67 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1685" viewBox="0 0 1100 1685" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1583" viewBox="0 0 1100 1583" role="img" aria-labelledby="title desc">
 <title id="title">管理员模板与用户选择 · 系统流程图</title>
-<desc id="desc">一期已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<desc id="desc">当前已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
 <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
-<rect width="1100" height="1685" fill="#F7F5F0"/>
+<rect width="1100" height="1583" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">管理员模板与用户选择 · 系统流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-02 · 课表功能 · 已实现</text>
+<text x="70" y="90" font-size="15" fill="#788371">当前版 · 2026-11-09 · MEM2602 当前业务规则</text>
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
-<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="445.0" font-size="15" fill="#66765D">管理员提供的公共资料</text>
-<path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="789.0" font-size="15" fill="#66765D">已发布的学期模板</text>
-<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1305.0" font-size="15" fill="#66765D">模板课程和课程信息</text>
-<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1477.0" font-size="15" fill="#66765D">学生确认的模板成员</text>
+<path d="M290.0 219 L290.0 289" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 367 L290.0 437" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 515 L290.0 585" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 663 L290.0 733" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 811 L290.0 881" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 947.0 L641 947.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="935.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 1009 L290.0 1079" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1051.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1183 L290.0 1253" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1331 L290.0 1401" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="188.0">开始</tspan>
 </text>
-<rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="293" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">前端｜管理员选择AI内容</tspan>
-<tspan x="290.0" y="371.5">按学期逐份预览并命名确认</tspan>
+<tspan x="290.0" y="336.0">后端｜读取已发布模板、课程及使用者姓名</tspan>
 </text>
-<path d="M70 502 A220.0 13 0 0 1 510 502 L510 550 A220.0 13 0 0 1 70 550 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
-<path d="M70 502 A220.0 13 0 0 0 510 502" stroke="#8A9CA6" fill="none"/>
+<rect x="70" y="441" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">数据库｜保存模板与去重卡片引用</tspan>
-<tspan x="290.0" y="543.5">不复制重复课程</tspan>
+<tspan x="290.0" y="472.5">前端｜展示全部课程及模板切换</tspan>
+<tspan x="290.0" y="495.5">不渲染普通用户核对说明</tspan>
 </text>
-<rect x="70" y="661" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="589" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">前端｜弹框读取本学期已发布模板</tspan>
-<tspan x="290.0" y="715.5">左右切换时自动预览全部课程</tspan>
+<tspan x="290.0" y="632.0">前端｜提交模板及当前课表版本</tspan>
 </text>
-<rect x="70" y="833" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<rect x="70" y="737" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">后端｜校验登录、学期、模板发布</tspan>
-<tspan x="290.0" y="887.5">及已有时段与本批时段无冲突</tspan>
+<tspan x="290.0" y="768.5">后端｜展开新增课次并检查本人已有课程</tspan>
+<tspan x="290.0" y="791.5">及批次内部时间冲突</tspan>
 </text>
-<rect x="70" y="1005" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<polygon points="290.0,885 510,947.0 290.0,1009 70,947.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="941.5">后端｜版本及冲突检查通过</tspan>
+<tspan x="290.0" y="964.5">？</tspan>
+</text>
+<rect x="645" y="907.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="953.0">后端｜返回冲突，不修改原课表</tspan>
+</text>
+<path d="M70 1096 A220.0 13 0 0 1 510 1096 L510 1170 A220.0 13 0 0 1 70 1170 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 1096 A220.0 13 0 0 0 510 1096" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">后端｜返回全部课程及版本摘要</tspan>
-<tspan x="290.0" y="1059.5">前端仅展示课程，不显示核对清单</tspan>
+<tspan x="290.0" y="1139.0">数据库｜事务保存订阅及唯一选课关系</tspan>
 </text>
-<rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="1257" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">后端与数据库｜校验当前预览版本</tspan>
-<tspan x="290.0" y="1231.5">点击使用后保存模板同步关系</tspan>
+<tspan x="290.0" y="1288.5">后端｜读取时同步模板更新</tspan>
+<tspan x="290.0" y="1311.5">合成个人优先安排</tspan>
 </text>
-<rect x="70" y="1349" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="1405" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">前端｜显示本人课表</tspan>
-<tspan x="290.0" y="1403.5">模板增删成员自动同步，保留个人调整</tspan>
+<tspan x="290.0" y="1448.0">结束</tspan>
 </text>
-<rect x="70" y="1521" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1564.0">结束</tspan>
-</text>
-<text x="70" y="1655" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+<text x="70" y="1553" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
 </g></svg>

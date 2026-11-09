@@ -1,26 +1,25 @@
-%% Excel作业导入 · 业务流程图 · V1.0 · 2026-11-06
+%% Excel作业导入 · 业务流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["学委｜进入作业管理并选择学期<br/>选择本地作业表 Excel"]
-    N2["网站｜识别正文与单元格图片<br/>内容为无不生成作业卡片"]
-    N3{"网站｜表头和文件<br/>可识别？"}
-    B3["学委｜查看错误原因<br/>修正或另存 XLSX 后重试"]
-    N4["网站｜展示导入预览<br/>显示截止时间、正文和核对警告"]
-    N5["学委｜逐项核对作业与图片<br/>选择课程或保留草稿"]
-    N6["学委｜勾选确认并导入<br/>可排除本次不需要的记录"]
-    N7["网站｜保存所选记录<br/>重复跳过，不覆盖已有内容"]
-    N8["学委｜查看新增与草稿结果<br/>后续可编辑并发布草稿"]
-    N9(["结束"])
+    N1["管理员｜选择学期及 XLSX 作业表"]
+    N2["网站｜解析内容、图片、文件和链接<br/>“无”不生成作业"]
+    N3["网站｜无上课时间则匹配同名同老师全部课<br/>有明确时间则按时间核对"]
+    N4{"网站｜范围及内容可可靠确定？"}
+    B4["网站｜保留原文为待确认草稿<br/>缺课程可等待补齐后重查"]
+    N5["管理员｜核对并确认导入<br/>无截止时间不阻止发布"]
+    N6["网站｜同课程、老师、作业次数<br/>更新原内容并保留个人状态"]
+    N7["网站｜反馈新增、更新及草稿数量"]
+    N8(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
-    N3 -->|否| B3
-    N3 -->|是| N4
-    N4 --> N5
+    N3 --> N4
+    N4 -->|否| B4
+    N4 -->|是| N5
     N5 --> N6
     N6 --> N7
     N7 --> N8
-    N8 --> N9
+    B4 --> N5
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -29,11 +28,10 @@ flowchart TD
     class N0 terminal;
     class N1 normal;
     class N2 normal;
-    class N3 decision;
-    class B3 exception;
-    class N4 normal;
+    class N3 normal;
+    class N4 decision;
+    class B4 exception;
     class N5 normal;
     class N6 normal;
     class N7 normal;
-    class N8 normal;
-    class N9 terminal;
+    class N8 terminal;

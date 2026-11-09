@@ -58,11 +58,25 @@ test('管理员全员完成涵盖之后选课与新账号，个人状态可覆�
  assert.equal((await call(endpoint,'POST',{...body,revision:updated.revision},admin)).status,409);
  assert.equal((await call(endpoint,'POST',{...body,revision:updated.revision,generation:1},admin)).status,200);
  assert.equal((await mine(later)).completed,true);assert.equal((await completion(later,false,updated.revision)).data.completed,false);
+ // Reset is a new default generation. Old individual completions do not win
+ // against it, but each student can explicitly complete again afterwards.
+ const reset={revision:updated.revision,generation:2,confirm:true,completed:false};
+ assert.equal((await call(endpoint,'POST',reset,one)).status,403);
+ const undone=await call(endpoint,'POST',reset,admin);assert.equal(undone.status,200);assert.equal(undone.data.allCompletionState,false);assert.equal(undone.data.allCompletedGeneration,3);
+ assert.equal((await mine(one)).completed,false);assert.equal((await mine(later)).completed,false);assert.equal((await mine(newcomer)).completed,false);
+ assert.equal((await mine(one)).priority,'high');assert.equal((await mine(one)).planned_date,'2026-11-12');
+ assert.equal((await completion(one,true,updated.revision)).data.completed,true);assert.equal((await mine(later)).completed,false);
+ addStudent('after-reset');const afterReset=await login('after-reset');await enroll(afterReset,card.id);assert.equal((await mine(afterReset)).completed,false);
+ const republished=await call('/admin/homework/import','POST',{termId,records:[{...previewRecord,content:'重置后更新内容',existingRevision:updated.revision}],assets:[],confirm:true},admin);assert.equal(republished.status,201);
+ const finalVersion=(await mine(one)).revision;assert.equal((await mine(one)).completed,true);assert.equal((await mine(later)).completed,false);
+ assert.equal((await call(endpoint,'POST',{...reset,revision:finalVersion},admin)).status,409);
+ assert.equal((await call(endpoint,'POST',{revision:finalVersion,generation:3,confirm:true,completed:true},admin)).status,200);
+ assert.equal((await mine(later)).completed,true);
  const personal=(await call('/homework/personal','POST',{termId,record:{kind:'assignment',title:'个人作业',course_entry_id:entry.id,attachments:[]}},one)).data;
  assert.equal((await call('/admin/homework/records/'+personal.id+'/complete-all','POST',{confirm:true,revision:personal.revision},admin)).status,400);
  const reference=(await call('/admin/homework/records','POST',{termId,record:{...record,kind:'reference',title:'考核说明',assessment_rules:'期末报告'}},admin)).data;
  assert.equal((await call('/admin/homework/records/'+reference.id+'/complete-all','POST',{confirm:true,revision:reference.revision},admin)).status,400);
- assert.equal((await call('/admin/homework/records/'+work.id,'DELETE',{confirm:true,revision:updated.revision},admin)).status,200);
+ assert.equal((await call('/admin/homework/records/'+work.id,'DELETE',{confirm:true,revision:finalVersion},admin)).status,200);
  assert.equal(db.prepare('SELECT count(*) n FROM homework_completion_defaults').get().n,0);
  assert.equal(db.prepare('SELECT count(*) n FROM homework_completion_exceptions').get().n,0);
  assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);

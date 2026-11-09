@@ -1,0 +1,30 @@
+%% 课程详情与作业 · 系统流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["前端｜发送 courseEntryId 及目标学期"]
+    N2{"后端｜课程属于本人课表？"}
+    B2["后端｜拒绝读取他人课程"]
+    N3["后端｜按课程引用或完整身份匹配作业<br/>合成本人状态并分组"]
+    N4["前端｜待做在上、已完成在下<br/>日期卡片按页面宽度排列"]
+    N5["前端｜打开具体作业详情并确认已读<br/>保存完成后刷新课程分组"]
+    N6(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 decision;
+    class B2 exception;
+    class N3 normal;
+    class N4 normal;
+    class N5 normal;
+    class N6 terminal;

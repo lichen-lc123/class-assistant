@@ -1,16 +1,13 @@
-%% 作业完成与提醒停止 · 业务流程图 · V1.0 · 2026-11-06
+%% 作业完成与提醒停止 · 业务流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["用户｜在工作台或作业页点击完成<br/>或打开后续手机提醒的完成入口"]
-    N2["网站｜必要时先登录并完成改密<br/>只读取本人可见的最新作业"]
-    N3["用户｜核对要求并确认完成<br/>旧通知提示核对新内容"]
-    N4["网站｜保存本人的完成状态<br/>同一动作重复点击仍保持完成"]
-    N5["网站｜移出工作台待做列表<br/>已完成列表仍可查看原截止"]
-    N6["后续发送器｜发送或重试前<br/>重新检查最新完成状态"]
-    N7{"后续发送器｜当前版本<br/>仍然未完成？"}
-    B7["后续发送器｜停止该作业后续提醒<br/>不能沿用旧候选发送"]
-    N8["后续发送器｜继续核对提醒开关<br/>只有接通消息服务后才实际发送"]
-    N9(["结束"])
+    N1["用户｜查看本人待完成作业"]
+    N2["用户｜点击完成或详情内切换状态"]
+    N3["网站｜核对当前版本并保存本人选择"]
+    N4["网站｜完成后移出工作台并减少数量"]
+    N5["用户｜在已完成列表倒序查看<br/>可恢复未完成"]
+    N6["网站｜恢复后重新参与待做排序"]
+    N7(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
@@ -18,9 +15,6 @@ flowchart TD
     N4 --> N5
     N5 --> N6
     N6 --> N7
-    N7 -->|否| B7
-    N7 -->|是| N8
-    N8 --> N9
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -33,7 +27,4 @@ flowchart TD
     class N4 normal;
     class N5 normal;
     class N6 normal;
-    class N7 decision;
-    class B7 exception;
-    class N8 normal;
-    class N9 terminal;
+    class N7 terminal;

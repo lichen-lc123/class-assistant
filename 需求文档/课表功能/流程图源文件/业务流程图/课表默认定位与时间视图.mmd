@@ -1,28 +1,18 @@
-%% 课表默认定位与时间视图 · 业务流程图 · V1.0 · 2026-11-02
+%% 课表默认定位与时间视图 · 业务流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["学生｜进入我的课表"]
-    N2["系统｜读取管理员设置的学期<br/>按北京时间定位当前项"]
-    N3{"系统｜能确定唯一当前学期？"}
-    B3["提示等待管理员检查当前学期<br/>可查看其他已配置学期"]
-    N4{"系统｜本人已有本学期课表？"}
-    B4["提示请到课表管理导入<br/>本页保留只读课表视图"]
-    N5["系统｜默认月视图显示本月课程<br/>支持日、周、月、学期切换"]
-    N6["学生｜切换学期、月、周、日视图<br/>各自定位当前时间范围"]
-    N7["系统｜显示对应范围内课程<br/>没有课时明确提示"]
-    N8["学生｜可浏览其他时期<br/>点击回到今天恢复默认定位"]
-    N9(["结束"])
+    N1["用户｜进入我的课程"]
+    N2["网站｜默认展示课程卡片<br/>点击卡片打开课程详情"]
+    N3["用户｜切换课表 Tab"]
+    N4["网站｜电脑默认月视图<br/>手机默认整周视图"]
+    N5["用户｜切换日期或允许的视图<br/>需要时进入课表管理"]
+    N6(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
-    N3 -->|否| B3
-    N3 -->|是| N4
-    N4 -->|否| B4
-    N4 -->|是| N5
+    N3 --> N4
+    N4 --> N5
     N5 --> N6
-    N6 --> N7
-    N7 --> N8
-    N8 --> N9
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -31,12 +21,7 @@ flowchart TD
     class N0 terminal;
     class N1 normal;
     class N2 normal;
-    class N3 decision;
-    class B3 exception;
-    class N4 decision;
-    class B4 exception;
+    class N3 normal;
+    class N4 normal;
     class N5 normal;
-    class N6 normal;
-    class N7 normal;
-    class N8 normal;
-    class N9 terminal;
+    class N6 terminal;

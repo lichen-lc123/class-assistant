@@ -1,68 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1857" viewBox="0 0 1100 1857" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1359" viewBox="0 0 1100 1359" role="img" aria-labelledby="title desc">
 <title id="title">个人作业安排与工作台排序 · 业务流程图</title>
-<desc id="desc">一期已实现功能。业务流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<desc id="desc">当前已实现功能。业务流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
 <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
-<rect width="1100" height="1857" fill="#F7F5F0"/>
+<rect width="1100" height="1359" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">个人作业安排与工作台排序 · 业务流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-06 · 作业功能 · 已实现</text>
+<text x="70" y="90" font-size="15" fill="#788371">当前版 · 2026-11-09 · MEM2602 当前业务规则</text>
 <text x="70" y="116" font-size="13" fill="#788371">使用者操作与业务判断；右侧为本次处理的其他结果。</text>
-<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 219 L290.0 289" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 367 L290.0 437" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 515 L290.0 585" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 663 L290.0 733" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 811 L290.0 881" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 959 L290.0 1029" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1107 L290.0 1177" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="188.0">开始</tspan>
 </text>
-<rect x="70" y="317" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="293" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">用户｜进入个人中心的我的作业</tspan>
-<tspan x="290.0" y="371.5">查看本人已选课程的发布内容</tspan>
+<tspan x="290.0" y="336.0">用户｜按课程或老师筛选本人作业</tspan>
 </text>
-<rect x="70" y="489" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="441" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">用户｜查看学委截止要求</tspan>
-<tspan x="290.0" y="543.5">可展开文字与图片附件</tspan>
+<tspan x="290.0" y="484.0">用户｜可设置优先级及计划完成时间</tspan>
 </text>
-<rect x="70" y="661" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="589" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">用户｜可选择个人优先级</tspan>
-<tspan x="290.0" y="715.5">及自己的计划完成时间</tspan>
+<tspan x="290.0" y="620.5">网站｜保留独立的公共截止时间</tspan>
+<tspan x="290.0" y="643.5">按个人有效时间排序</tspan>
 </text>
-<rect x="70" y="833" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="737" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">网站｜保存本人的个人安排</tspan>
-<tspan x="290.0" y="887.5">学委原截止继续保留显示</tspan>
+<tspan x="290.0" y="768.5">用户｜工作台查看待做卡片及倒计时</tspan>
+<tspan x="290.0" y="791.5">电脑 4 项、手机 2 项</tspan>
 </text>
-<rect x="70" y="1005" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="885" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">网站｜先按个人优先级</tspan>
-<tspan x="290.0" y="1059.5">再按计划或学委截止正序排列</tspan>
+<tspan x="290.0" y="928.0">用户｜点击卡片查看或点击完成</tspan>
 </text>
-<rect x="70" y="1177" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="1033" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">用户｜工作台查看前3项待做作业</tspan>
-<tspan x="290.0" y="1231.5">同时查看学委截止与个人计划</tspan>
+<tspan x="290.0" y="1064.5">网站｜刷新数量、更新标记和候选补位</tspan>
+<tspan x="290.0" y="1087.5">已完成按完成时间倒序</tspan>
 </text>
-<rect x="70" y="1349" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<rect x="70" y="1181" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">用户｜标记或撤销自己的完成状态</tspan>
-<tspan x="290.0" y="1403.5">已完成作业移出工作台待做列表</tspan>
+<tspan x="290.0" y="1224.0">结束</tspan>
 </text>
-<rect x="70" y="1521" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1552.5">学委｜内容更新后提示用户核对</tspan>
-<tspan x="290.0" y="1575.5">用户重新确认当前版本已完成</tspan>
-</text>
-<rect x="70" y="1693" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1736.0">结束</tspan>
-</text>
-<text x="70" y="1827" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+<text x="70" y="1329" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
 </g></svg>

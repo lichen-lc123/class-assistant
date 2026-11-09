@@ -1,19 +1,21 @@
-%% 管理员模板与用户选择 · 业务流程图 · V1.0 · 2026-11-02
+%% 管理员模板与用户选择 · 业务流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["学委｜用AI内容导入同学课表<br/>同一学年按学期保存多份模板"]
-    N2["网站｜各模板保留各自成员<br/>相同课程课程引用同一卡片"]
-    N3["学生｜点击使用模板打开弹框<br/>自动展示当前模板全部课程"]
-    N4["学生｜用左右箭头查看全部课程<br/>直接点击使用当前模板"]
-    N5["网站｜追加课程并保存各模板同步关系<br/>无重复时追加，不替换已有课程"]
-    N6["学委｜更新模板或卡片<br/>已选用户自动同步课程"]
+    N1["管理员｜维护并发布多份模板"]
+    N2["同学｜点击使用模板"]
+    N3["同学｜左右切换查看全部课程<br/>参考已使用模板的同学"]
+    N4["同学｜确认使用所选模板"]
+    N5{"网站｜新增课程没有时间冲突？"}
+    B5["网站｜提示冲突课程和日期<br/>不导入本批次"]
+    N6["网站｜保存模板订阅与课程<br/>以后按来源同步公共更新"]
     N7(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
     N3 --> N4
     N4 --> N5
-    N5 --> N6
+    N5 -->|否| B5
+    N5 -->|是| N6
     N6 --> N7
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
@@ -25,6 +27,7 @@ flowchart TD
     class N2 normal;
     class N3 normal;
     class N4 normal;
-    class N5 normal;
+    class N5 decision;
+    class B5 exception;
     class N6 normal;
     class N7 terminal;

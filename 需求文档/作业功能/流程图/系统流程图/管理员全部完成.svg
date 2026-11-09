@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1485" viewBox="0 0 1100 1485" role="img" aria-labelledby="title desc">
+<title id="title">管理员全部完成 · 系统流程图</title>
+<desc id="desc">当前已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
+<rect width="1100" height="1485" fill="#F7F5F0"/>
+<g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
+<text x="70" y="55" font-size="29" font-weight="700">管理员全部完成 · 系统流程图</text>
+<text x="70" y="90" font-size="15" fill="#788371">当前版 · 2026-11-09 · MEM2602 当前业务规则</text>
+<text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
+<path d="M290.0 219 L290.0 289" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 367 L290.0 437" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 503.0 L641 503.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="491.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 565 L290.0 635" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="607.0" font-size="15" fill="#66765D">是</text>
+<path d="M510 701.0 L641 701.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="689.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 763 L290.0 833" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="805.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 937 L290.0 1007" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1085 L290.0 1155" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1233 L290.0 1303" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="188.0">开始</tspan>
+</text>
+<rect x="70" y="293" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="324.5">前端｜提交 completed、确认</tspan>
+<tspan x="290.0" y="347.5">作业版本和当前策略代次</tspan>
+</text>
+<polygon points="290.0,441 510,503.0 290.0,565 70,503.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="497.5">后端｜管理员且为已发布公</tspan>
+<tspan x="290.0" y="520.5">共作业？</tspan>
+</text>
+<rect x="645" y="463.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="509.0">后端｜拒绝越权、草稿、考核或私人作业</tspan>
+</text>
+<polygon points="290.0,639 510,701.0 290.0,763 70,701.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="707.0">后端｜版本和代次未变化？</tspan>
+</text>
+<rect x="645" y="661.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="707.0">后端｜返回冲突并要求刷新</tspan>
+</text>
+<path d="M70 850 A220.0 13 0 0 1 510 850 L510 924 A220.0 13 0 0 1 70 924 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 850 A220.0 13 0 0 0 510 850" stroke="#8A9CA6" fill="none"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="881.5">数据库｜递增 generation</tspan>
+<tspan x="290.0" y="904.5">保存本次全员默认完成或未完成</tspan>
+</text>
+<rect x="70" y="1011" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1042.5">后端｜当前代次优先</tspan>
+<tspan x="290.0" y="1065.5">个人例外表示与当前默认相反状态</tspan>
+</text>
+<rect x="70" y="1159" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1190.5">前端｜刷新状态、数量及工作台</tspan>
+<tspan x="290.0" y="1213.5">同学后续仍可自行设置状态</tspan>
+</text>
+<rect x="70" y="1307" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1350.0">结束</tspan>
+</text>
+<text x="70" y="1455" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+</g></svg>

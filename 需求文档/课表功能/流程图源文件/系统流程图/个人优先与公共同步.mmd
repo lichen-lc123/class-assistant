@@ -1,19 +1,19 @@
-%% 个人优先与公共同步 · 系统流程图 · V1.0 · 2026-11-02
+%% 个人优先与公共同步 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜提交来源、模板或卡片ID<br/>课程字段、成员和当前版本"]
-    N2["后端｜校验管理员及归属学期<br/>检查模板与课程版本"]
-    N3["后端｜自动课程写共享基值<br/>手动模板课程写独立快照"]
-    N4[("数据库｜事务保存课程和成员<br/>同步订阅并保留个人覆盖")]
-    N5["后端｜按来源合成本人课表<br/>直接卡片与模板副本各自更新"]
-    N6["后端｜新导入展开实际日期时间<br/>冲突返回409，禁止确认绕过"]
+    N1["后端｜读取公共课程、模板快照<br/>和本人的 private_json、override_json"]
+    N2["后端｜仅同步需要更新的模板订阅"]
+    N3["后端｜先展开公共或快照基值"]
+    N4["后端｜合成个人时间组及地点覆盖"]
+    N5["前端｜展示本人最终安排及更新提示"]
+    N6[("数据库｜个人编辑只写本人的覆盖<br/>版本冲突拒绝覆盖")]
     N7(["结束"])
     N0 --> N1
-    N1 -->|管理员会话、来源及当前版本| N2
-    N2 -->|验证后的课程修改与成员| N3
-    N3 -->|共享基值或独立课程快照| N4
-    N4 -->|本人选课、来源及个人覆盖| N5
-    N5 -->|本人最终安排与新增候选| N6
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
     N6 --> N7
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
@@ -24,7 +24,7 @@ flowchart TD
     class N1 normal;
     class N2 normal;
     class N3 normal;
-    class N4 database;
+    class N4 normal;
     class N5 normal;
-    class N6 normal;
+    class N6 database;
     class N7 terminal;

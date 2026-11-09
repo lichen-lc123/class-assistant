@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1903" viewBox="0 0 1100 1903" role="img" aria-labelledby="title desc">
+<title id="title">功能发布与数据保护 · 系统流程图</title>
+<desc id="desc">当前已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
+<rect width="1100" height="1903" fill="#F7F5F0"/>
+<g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
+<text x="70" y="55" font-size="29" font-weight="700">功能发布与数据保护 · 系统流程图</text>
+<text x="70" y="90" font-size="15" fill="#788371">当前版 · 2026-11-09 · MEM2602 当前业务规则</text>
+<text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
+<path d="M290.0 219 L290.0 289" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 367 L290.0 437" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 515 L290.0 585" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 663 L290.0 733" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 811 L290.0 881" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 947.0 L641 947.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="935.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 1009 L290.0 1079" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1051.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1157 L290.0 1227" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1305 L290.0 1375" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 1441.0 L641 1441.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="1429.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 1503 L290.0 1573" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1545.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1651 L290.0 1721" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="188.0">开始</tspan>
+</text>
+<rect x="70" y="293" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="336.0">部署脚本｜验证包摘要及文件白名单</tspan>
+</text>
+<rect x="70" y="441" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="472.5">服务器｜内存数据库发布检查</tspan>
+<tspan x="290.0" y="495.5">不接触真实数据</tspan>
+</text>
+<rect x="70" y="589" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="632.0">服务器｜一致性备份并生成内容指纹</tspan>
+</text>
+<rect x="70" y="737" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="780.0">服务器｜在服务器副本初始化新版结构</tspan>
+</text>
+<polygon points="290.0,885 510,947.0 290.0,1009 70,947.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="941.5">校验器｜旧表内容不变且新</tspan>
+<tspan x="290.0" y="964.5">表为空？</tspan>
+</text>
+<rect x="645" y="907.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="953.0">部署脚本｜拒绝发布</tspan>
+</text>
+<rect x="70" y="1083" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1126.0">服务器｜停服后再备份和校验正式库</tspan>
+</text>
+<rect x="70" y="1231" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1274.0">部署脚本｜原子切换 current 并启动</tspan>
+</text>
+<polygon points="290.0,1379 510,1441.0 290.0,1503 70,1441.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="1435.5">验收｜资源、身份接口及完</tspan>
+<tspan x="290.0" y="1458.5">整性正常？</tspan>
+</text>
+<rect x="645" y="1401.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="1447.0">部署脚本｜停止写入并回退程序和备份</tspan>
+</text>
+<rect x="70" y="1577" width="440" height="74" rx="12" fill="#FFFFFF" stroke="#A8B2A2" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1608.5">服务器｜记录 DEPLOYMENT.txt</tspan>
+<tspan x="290.0" y="1631.5">核对历史附件下载字节</tspan>
+</text>
+<rect x="70" y="1725" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1768.0">结束</tspan>
+</text>
+<text x="70" y="1873" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+</g></svg>

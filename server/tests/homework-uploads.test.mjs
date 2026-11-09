@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createApp} from '../app.mjs';
 import {createInitialAdmin,hashPassword} from '../database.mjs';
+import {zip} from './fixtures/zip.mjs';
 
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64');
 const asset=(bytes,mime='application/octet-stream')=>({id:createHash('sha256').update(bytes).digest('hex'),mime,content:bytes.toString('base64')});
@@ -26,6 +27,15 @@ test('作业图片与附件上传、保留、移除、下载及私人权限',asy
   const record={kind:'assignment',title:'图片和附件作业',course_name:course.course_name,teacher:course.teacher,content:'',targetKeys:['course:'+course.id],published:true,attachments:[ref(image,'题目截图.png','content'),ref(pdf,'作业说明.pdf')]};
   let shared,personal;
   const download=(url,cookie)=>fetch(base+url,{headers:cookie?{Cookie:cookie}:{}});
+  await t.test('文档预览复用原附件权限，保存后的旧字段无需重导，原文件字节保持不变',async()=>{
+    const bytes=zip({'word/document.xml':'<w:document><w:body><w:p><w:r><w:t>课程作业文档</w:t></w:r></w:p></w:body></w:document>'}),document=asset(bytes);
+    const saved=await call('/homework/personal','POST',{termId,record:{kind:'assignment',title:'文档预览',course_entry_id:entries[0],attachments:[ref(document,'作业.docx','content')]},assets:[document]},one);assert.equal(saved.status,201);
+    const url=saved.data.attachments[0].url;
+    const preview=await download(url+'&preview=1',one);assert.equal(preview.status,200);assert.equal(preview.headers.get('cache-control'),'no-store');assert.equal((await preview.json()).pages[0].blocks[0].text,'课程作业文档');
+    for(const cookie of [two,admin,outside])assert.equal((await download(url+'&preview=1',cookie)).status,403);
+    assert.equal((await download(url+'&preview=1')).status,401);
+    assert.deepEqual(Buffer.from(await (await download(url,one)).arrayBuffer()),bytes);
+  });
   await t.test('单独发布草稿保留原附件、文件名、所属字段和下载权限',async()=>{
     const draft=await call('/admin/homework/records','POST',{termId,record:{...record,title:'待发布附件',published:false},assets:[image,pdf]},admin);assert.equal(draft.status,201);
     assert.equal((await download(draft.data.attachments[0].url,one)).status,403);

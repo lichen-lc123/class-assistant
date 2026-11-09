@@ -1,0 +1,33 @@
+%% 管理员全部完成 · 业务流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["管理员｜查看已发布课程作业"]
+    N2["管理员｜点击全部完成<br/>之后也可点击全部未完成"]
+    N3{"管理员｜确认重置全员默认状态？"}
+    B3["网站｜取消操作并保留原状态"]
+    N4["网站｜当前及以后选课用户<br/>默认采用本次设置的状态"]
+    N5["同学｜仍可自行改为完成或未完成"]
+    N6["管理员｜必要时再次设置<br/>产生新一轮默认状态"]
+    N7(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 -->|否| B3
+    N3 -->|是| N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 decision;
+    class B3 exception;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 terminal;

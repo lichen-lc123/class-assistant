@@ -1,0 +1,27 @@
+%% 课程详情与作业 · 业务流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["用户｜点击课程卡片或课表课程"]
+    N2["网站｜打开电脑弹框或手机底部面板"]
+    N3["用户｜先看待做作业<br/>下方查看已完成作业"]
+    N4["用户｜点作业缩略项查看详细内容<br/>可标记完成或恢复未完成"]
+    N5["用户｜查看课程全部上课日期及安排"]
+    N6(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 normal;
+    class N6 terminal;

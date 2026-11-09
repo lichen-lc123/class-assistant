@@ -1,26 +1,21 @@
-%% 登录 · 系统流程图 · V1.0 · 2026-11-02
+%% 登录 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜检查必填并提交登录"]
-    N2["后端｜校验来源、JSON 与尝试次数"]
-    N3{"后端｜密码验证通过且<br/>账号未被删除或重置？"}
-    B3["返回登录失败或频次限制"]
-    N4[("数据库｜保存新会话摘要<br/>保持登录，访问刷新凭据")]
-    N5["后端｜设置 HttpOnly Cookie<br/>返回账号、角色及改密标记"]
-    N6{"前端｜必须先修改密码？"}
-    B6["按角色渲染系统设置<br/>或我的账号"]
-    N7["前端｜渲染强制修改密码表单"]
-    N8(["结束"])
+    N1["前端｜请求 /auth/me<br/>发送浏览器保存的 Cookie"]
+    N2{"后端｜会话未撤销且账号有效？"}
+    B2["后端｜登录接口校验账号及密码<br/>成功新建会话，失败留在登录页"]
+    N3[("数据库｜读取会话摘要及最新账号角色<br/>expires_at=0 表示不按时间失效")]
+    N4["后端｜刷新 HttpOnly 登录 Cookie<br/>返回本人资料及改密标记"]
+    N5["前端｜按改密状态和设备展示入口<br/>手机只展示个人功能"]
+    N6(["结束"])
     N0 --> N1
     N1 --> N2
-    N2 --> N3
-    N3 -->|否| B3
-    N3 -->|是| N4
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 --> N4
     N4 --> N5
     N5 --> N6
-    N6 -->|否| B6
-    N6 -->|是| N7
-    N7 --> N8
+    B2 --> N3
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -28,12 +23,9 @@ flowchart TD
     classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
     class N0 terminal;
     class N1 normal;
-    class N2 normal;
-    class N3 decision;
-    class B3 exception;
-    class N4 database;
+    class N2 decision;
+    class B2 exception;
+    class N3 database;
+    class N4 normal;
     class N5 normal;
-    class N6 decision;
-    class B6 exception;
-    class N7 normal;
-    class N8 terminal;
+    class N6 terminal;

@@ -1,30 +1,22 @@
-%% 作业完成与提醒停止 · 系统流程图 · V1.0 · 2026-11-06
+%% 作业完成与提醒停止 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜页面完成操作或站内链接<br/>携带作业编号及提醒版本"]
-    N2["后端｜详情GET只读<br/>检查登录与本人可见范围"]
-    N3["前端｜展示最新内容及版本变化<br/>用户明确确认后提交POST"]
-    N4{"后端｜权限及<br/>当前作业版本有效？"}
-    B4["前端｜显示无权限或版本冲突<br/>刷新内容后再确认"]
-    N5[("数据库｜按用户与作业保存完成版本<br/>重复动作不改首次完成时间")]
-    N6["前端｜显示已完成并刷新<br/>待做列表及工作台摘要"]
-    N7["后续发送器｜每次发出前调用<br/>reminderCandidate重新检查数据库"]
-    N8{"后端｜作业未完成、版本<br/>可见权限和开关仍有效？"}
-    B8["后续发送器｜放弃该次提醒<br/>包含早先取得的候选及重试"]
-    N9["后端｜返回可继续处理的候选<br/>实际发送另需接通消息通道"]
-    N10(["结束"])
+    N1["前端｜提交 completed 和 revision"]
+    N2{"后端｜本人可见且版本匹配？"}
+    B2["后端｜拒绝越权或旧版本"]
+    N3["后端｜读取全员策略与本人当前代次例外"]
+    N4[("数据库｜保存本人完成版本<br/>或当前代次的未完成例外")]
+    N5["后端｜合成 completed、completedAt<br/>及未完成数量"]
+    N6["前端｜移除已完成待做卡片并补位<br/>已完成按完成时间倒序"]
+    N7(["结束"])
     N0 --> N1
-    N1 -->|会话、作业编号、版本| N2
-    N2 -->|本人可见的最新作业| N3
-    N3 -->|completed=true及当前版本| N4
-    N4 -->|否| B4
-    N4 -->|是| N5
-    N5 -->|完成状态及时间| N6
-    N6 -->|后续发送或重试请求| N7
-    N7 -->|最新完成、权限、偏好及版本| N8
-    N8 -->|否| B8
-    N8 -->|是| N9
-    N9 --> N10
+    N1 --> N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -32,14 +24,10 @@ flowchart TD
     classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
     class N0 terminal;
     class N1 normal;
-    class N2 normal;
+    class N2 decision;
+    class B2 exception;
     class N3 normal;
-    class N4 decision;
-    class B4 exception;
-    class N5 database;
+    class N4 database;
+    class N5 normal;
     class N6 normal;
-    class N7 normal;
-    class N8 decision;
-    class B8 exception;
-    class N9 normal;
-    class N10 terminal;
+    class N7 terminal;

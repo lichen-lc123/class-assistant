@@ -1,77 +1,77 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1857" viewBox="0 0 1100 1857" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1656" viewBox="0 0 1100 1656" role="img" aria-labelledby="title desc">
 <title id="title">作业图片与附件 · 系统流程图</title>
-<desc id="desc">一期已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<desc id="desc">当前已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
 <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
-<rect width="1100" height="1857" fill="#F7F5F0"/>
+<rect width="1100" height="1656" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">作业图片与附件 · 系统流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-06 · 作业功能 · 已实现</text>
+<text x="70" y="90" font-size="15" fill="#788371">当前版 · 2026-11-09 · MEM2602 当前业务规则</text>
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
-<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="445.0" font-size="15" fill="#66765D">新文件字节、摘要与所选关联</text>
-<path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="617.0" font-size="15" fill="#66765D">会话、作业版本、附件与资料</text>
-<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="789.0" font-size="15" fill="#66765D">已验证内容与文件权限</text>
-<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="961.0" font-size="15" fill="#66765D">文件名、大小、MIME及授权URL</text>
-<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1133.0" font-size="15" fill="#66765D">作业ID、文件ID、登录会话</text>
-<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1305.0" font-size="15" fill="#66765D">有效附件关联与授权字节</text>
-<path d="M290.0 1423 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1477.0" font-size="15" fill="#66765D">后续编辑及保留或移除操作</text>
-<path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 219 L290.0 289" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 367 L290.0 437" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 515 L290.0 585" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 651.0 L641 651.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="639.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 713 L290.0 783" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="755.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 887 L290.0 957" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1035 L290.0 1105" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 1171.0 L641 1171.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="1159.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 1233 L290.0 1303" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1275.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1404 L290.0 1474" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="188.0">开始</tspan>
 </text>
-<rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="293" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">前端｜读取文件字节与摘要</tspan>
-<tspan x="290.0" y="371.5">展示文件名、大小、图片预览</tspan>
+<tspan x="290.0" y="336.0">后端｜解包 XLSX 并读取图片及 OLE 数据</tspan>
 </text>
-<rect x="70" y="489" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="441" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">前端｜随作业提交附件关联</tspan>
-<tspan x="290.0" y="543.5">新文件字节、当前版本及会话</tspan>
+<tspan x="290.0" y="472.5">后端｜按流名称和文件签名提取内容</tspan>
+<tspan x="290.0" y="495.5">去除兼容重复引用并判断锚点</tspan>
 </text>
-<rect x="70" y="661" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<polygon points="290.0,589 510,651.0 290.0,713 70,651.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="645.5">后端｜类型、大小及字段有</tspan>
+<tspan x="290.0" y="668.5">效？</tspan>
+</text>
+<rect x="645" y="611.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="657.0">后端｜提示无法提取或拒绝不合规文件</tspan>
+</text>
+<path d="M70 800 A220.0 13 0 0 1 510 800 L510 874 A220.0 13 0 0 1 70 874 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 800 A220.0 13 0 0 0 510 800" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">后端｜检查身份、选课与作业权限</tspan>
-<tspan x="290.0" y="715.5">校验文件摘要、大小及真实图片类型</tspan>
+<tspan x="290.0" y="831.5">数据库｜保存摘要、原始字节</tspan>
+<tspan x="290.0" y="854.5">及作业到字段的附件关联</tspan>
 </text>
-<path d="M70 846 A220.0 13 0 0 1 510 846 L510 894 A220.0 13 0 0 1 70 894 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
-<path d="M70 846 A220.0 13 0 0 0 510 846" stroke="#8A9CA6" fill="none"/>
+<rect x="70" y="961" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">数据库｜事务保存作业和BLOB</tspan>
-<tspan x="290.0" y="887.5">登记附件关联与本作业文件名</tspan>
+<tspan x="290.0" y="992.5">后端｜兼容读取历史附件记录</tspan>
+<tspan x="290.0" y="1015.5">生成授权文件地址</tspan>
 </text>
-<rect x="70" y="1005" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<polygon points="290.0,1109 510,1171.0 290.0,1233 70,1171.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="290.0" y="1165.5">后端｜访问者有权查看此条</tspan>
+<tspan x="290.0" y="1188.5">作业？</tspan>
+</text>
+<rect x="645" y="1131.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="16">
+<tspan x="837.5" y="1177.0">后端｜拒绝附件访问</tspan>
+</text>
+<rect x="70" y="1307" width="440" height="97" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">前端｜读取授权附件URL</tspan>
-<tspan x="290.0" y="1059.5">显示图片和下载入口</tspan>
+<tspan x="290.0" y="1338.5">前端｜PDF 本地画布翻页</tspan>
+<tspan x="290.0" y="1361.5">DOCX/PPTX 请求授权内容预览</tspan>
+<tspan x="290.0" y="1384.5">其他文件下载或原生分享</tspan>
 </text>
-<rect x="70" y="1177" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<rect x="70" y="1478" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">后端｜每次下载校验作业可见范围</tspan>
-<tspan x="290.0" y="1231.5">及当前附件关联</tspan>
+<tspan x="290.0" y="1521.0">结束</tspan>
 </text>
-<rect x="70" y="1349" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1380.5">后端｜图片按检测格式返回</tspan>
-<tspan x="290.0" y="1403.5">其他文件强制下载并禁止嗅探</tspan>
-</text>
-<path d="M70 1534 A220.0 13 0 0 1 510 1534 L510 1582 A220.0 13 0 0 1 70 1582 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
-<path d="M70 1534 A220.0 13 0 0 0 510 1534" stroke="#8A9CA6" fill="none"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1552.5">数据库｜编辑后更新附件关联</tspan>
-<tspan x="290.0" y="1575.5">移除的原作业链接失效</tspan>
-</text>
-<rect x="70" y="1693" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1736.0">结束</tspan>
-</text>
-<text x="70" y="1827" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+<text x="70" y="1626" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
 </g></svg>

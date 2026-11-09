@@ -7,6 +7,9 @@ export interface Homework {
   course_entry_id?:string|null;
   allCompletedAt?:string|null;allCompletedGeneration?:number;
   draftReason?:string|null;
+  auto_publish_on_match?:boolean;
+  audience_mode?:'family'|'selected';course_time?:string;review_required?:boolean;review_reasons?:string[];
+  allCompletionState?:boolean|null;
   priority?:'high'|'normal'|'low';planned_date?:string|null;planned_time?:string|null;
   content:string;submission:string;assessment_rules:string;team_requirement:string;notes:string;deadline_raw:string;due_date:string|null;due_time:string|null;
   autoPublish?:boolean;published:boolean;targetKeys?:string[];targets?:HomeworkTarget[];revision?:number;completed?:boolean;completedAt?:string|null;remindersSuppressed?:boolean;needsReconfirm?:boolean;overdue?:boolean;daysUntil?:number|null;

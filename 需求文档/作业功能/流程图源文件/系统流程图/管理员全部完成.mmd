@@ -1,0 +1,36 @@
+%% 管理员全部完成 · 系统流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["前端｜提交 completed、确认<br/>作业版本和当前策略代次"]
+    N2{"后端｜管理员且为已发布公共作业？"}
+    B2["后端｜拒绝越权、草稿、考核或私人作业"]
+    N3{"后端｜版本和代次未变化？"}
+    B3["后端｜返回冲突并要求刷新"]
+    N4[("数据库｜递增 generation<br/>保存本次全员默认完成或未完成")]
+    N5["后端｜当前代次优先<br/>个人例外表示与当前默认相反状态"]
+    N6["前端｜刷新状态、数量及工作台<br/>同学后续仍可自行设置状态"]
+    N7(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 -->|否| B3
+    N3 -->|是| N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 decision;
+    class B2 exception;
+    class N3 decision;
+    class B3 exception;
+    class N4 database;
+    class N5 normal;
+    class N6 normal;
+    class N7 terminal;

@@ -1,0 +1,34 @@
+%% 未识别内容草稿核对 · 业务流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["管理员｜导入作业表"]
+    N2["网站｜保留可读取的原文和文件"]
+    N3{"网站｜业务内容可明确识别？"}
+    B3["网站｜保存待核对草稿<br/>保留原文并标注原因"]
+    N4["管理员｜核对预览或草稿<br/>补充课程与内容"]
+    N5["管理员｜对待核对草稿明确勾选已核对"]
+    N6["管理员｜独立点击发布<br/>截止可留空"]
+    N7(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 -->|否| B3
+    N3 -->|是| N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
+    B3 --> N4
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 decision;
+    class B3 exception;
+    class N4 normal;
+    class N5 normal;
+    class N6 normal;
+    class N7 terminal;

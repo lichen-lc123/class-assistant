@@ -1,0 +1,39 @@
+%% 课程补齐后自动发布作业 · 系统流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["后端｜保存自动匹配和 audience_mode<br/>需要人工确认的记录禁止自动发"]
+    N2["课程保存事务｜全批次写入后检查<br/>管理页 POST 可补扫"]
+    N3["后端｜选择待匹配草稿<br/>以及已发布的课程组共用记录"]
+    N4["后端｜无时间则匹配同名同老师全部课<br/>有时间则使用明确约束"]
+    N5{"后端｜范围可靠且课程可使用？"}
+    B5["后端｜不自动发布，保留待确认原因"]
+    N6[("数据库｜按原作业 ID 补充目标<br/>不复制正文或附件")]
+    N7[("数据库｜同步完成版本<br/>保留个人偏好及全员完成策略")]
+    N8["前端｜反馈发布和补充关联数量"]
+    N9(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 -->|否| B5
+    N5 -->|是| N6
+    N6 --> N7
+    N7 --> N8
+    N8 --> N9
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 decision;
+    class B5 exception;
+    class N6 database;
+    class N7 database;
+    class N8 normal;
+    class N9 terminal;

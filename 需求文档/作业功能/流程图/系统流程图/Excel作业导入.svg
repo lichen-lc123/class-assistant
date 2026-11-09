@@ -1,90 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="2029" viewBox="0 0 1100 2029" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1757" viewBox="0 0 1100 1757" role="img" aria-labelledby="title desc">
 <title id="title">Excel作业导入 · 系统流程图</title>
-<desc id="desc">一期已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
+<desc id="desc">当前已实现功能。系统流程图，包括正常路径及主要异常分支；异常分支在本次处理结束，修正后重新发起。</desc>
 <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7E8C7A"/></marker></defs>
-<rect width="1100" height="2029" fill="#F7F5F0"/>
+<rect width="1100" height="1757" fill="#F7F5F0"/>
 <g font-family="'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif" fill="#344235">
 <text x="70" y="55" font-size="29" font-weight="700">Excel作业导入 · 系统流程图</text>
-<text x="70" y="90" font-size="15" fill="#788371">V1.0 · 2026-11-06 · 作业功能 · 已实现</text>
+<text x="70" y="90" font-size="15" fill="#788371">当前版 · 2026-11-09 · MEM2602 当前业务规则</text>
 <text x="70" y="116" font-size="13" fill="#788371">前端请求、后端校验及数据库处理；右侧为本次处理的其他结果。</text>
-<path d="M290.0 219 L290.0 313" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<path d="M290.0 391 L290.0 485" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="445.0" font-size="15" fill="#66765D">会话、目标学期、文件</text>
-<path d="M290.0 563 L290.0 657" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="617.0" font-size="15" fill="#66765D">校验后的 XLSX 内容</text>
-<path d="M290.0 735 L290.0 829" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="789.0" font-size="15" fill="#66765D">课程、老师、原文、图片</text>
-<path d="M290.0 907 L290.0 1001" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="961.0" font-size="15" fill="#66765D">预览记录与课程候选</text>
-<path d="M290.0 1079 L290.0 1173" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1133.0" font-size="15" fill="#66765D">核对后的所选草稿</text>
-<path d="M290.0 1251 L290.0 1345" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1305.0" font-size="15" fill="#66765D">确认、记录与图片摘要</text>
-<path d="M510 1411.0 L641 1411.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="569.5" y="1399.0" font-size="15" fill="#66765D">否</text>
-<path d="M290.0 1473 L290.0 1517" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1502.0" font-size="15" fill="#66765D">是</text>
-<path d="M290.0 1595 L290.0 1689" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
-<text x="305.0" y="1649.0" font-size="15" fill="#66765D">新增、草稿和跳过统计</text>
-<path d="M290.0 1767 L290.0 1861" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 219 L290.0 289" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 367 L290.0 437" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 515 L290.0 585" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 663 L290.0 733" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 811 L290.0 881" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M510 947.0 L641 947.0" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="569.5" y="935.0" font-size="15" fill="#66765D">否</text>
+<path d="M290.0 1009 L290.0 1079" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<text x="305.0" y="1051.0" font-size="15" fill="#66765D">是</text>
+<path d="M290.0 1183 L290.0 1253" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1357 L290.0 1427" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
+<path d="M290.0 1505 L290.0 1575" stroke="#7E8C7A" stroke-width="1.7" fill="none" marker-end="url(#arrow)"/>
 <rect x="70" y="145" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="188.0">开始</tspan>
 </text>
-<rect x="70" y="317" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<rect x="70" y="293" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="348.5">前端｜发送学期与 XLSX 数据</tspan>
-<tspan x="290.0" y="371.5">请求作业导入预览</tspan>
+<tspan x="290.0" y="336.0">后端｜验证管理员、学期和 XLSX 结构</tspan>
 </text>
-<rect x="70" y="489" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<rect x="70" y="441" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="520.5">后端｜核对管理员会话</tspan>
-<tspan x="290.0" y="543.5">限制文件、解压内容和图片大小</tspan>
+<tspan x="290.0" y="472.5">后端｜读取工作表、图片与 OLE 文件</tspan>
+<tspan x="290.0" y="495.5">同一 Choice/Fallback 对象只解析一次</tspan>
 </text>
-<rect x="70" y="661" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<rect x="70" y="589" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="692.5">后端｜解析文字、真实合并区域</tspan>
-<tspan x="290.0" y="715.5">WPS 单元格图片和英语详细表</tspan>
+<tspan x="290.0" y="632.0">后端｜匹配课程候选及已有作业身份</tspan>
 </text>
-<rect x="70" y="833" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
+<rect x="70" y="737" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="864.5">后端｜归一日期并按课程老师</tspan>
-<tspan x="290.0" y="887.5">生成课程候选及核对警告</tspan>
+<tspan x="290.0" y="780.0">前端｜展示附件名、字段归属和冲突警告</tspan>
 </text>
-<rect x="70" y="1005" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1036.5">前端｜展示草稿与图片</tspan>
-<tspan x="290.0" y="1059.5">接收学委选择和修正</tspan>
-</text>
-<rect x="70" y="1177" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
-<text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1208.5">前端｜发送所选记录、图片资料</tspan>
-<tspan x="290.0" y="1231.5">及核对确认标记</tspan>
-</text>
-<polygon points="290.0,1349 510,1411.0 290.0,1473 70,1411.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
+<polygon points="290.0,885 510,947.0 290.0,1009 70,947.0" fill="#F0ECE2" stroke="#A69B83" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="290.0" y="1405.5">后端｜权限、字段、课程</tspan>
-<tspan x="290.0" y="1428.5">图片及确认均有效？</tspan>
+<tspan x="290.0" y="941.5">后端｜确认、版本及附件引</tspan>
+<tspan x="290.0" y="964.5">用有效？</tspan>
 </text>
-<rect x="645" y="1371.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
+<rect x="645" y="907.0" width="385" height="80" rx="12" fill="#F2EAE6" stroke="#B09B91" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="16">
-<tspan x="837.5" y="1405.5">后端｜返回错误</tspan>
-<tspan x="837.5" y="1428.5">不写入本次导入</tspan>
+<tspan x="837.5" y="953.0">后端｜拒绝导入并保持原内容</tspan>
 </text>
-<path d="M70 1534 A220.0 13 0 0 1 510 1534 L510 1582 A220.0 13 0 0 1 70 1582 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
-<path d="M70 1534 A220.0 13 0 0 0 510 1534" stroke="#8A9CA6" fill="none"/>
+<path d="M70 1096 A220.0 13 0 0 1 510 1096 L510 1170 A220.0 13 0 0 1 70 1170 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 1096 A220.0 13 0 0 0 510 1096" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1552.5">数据库｜事务保存记录和附件</tspan>
-<tspan x="290.0" y="1575.5">相同记录与明确无作业跳过</tspan>
+<tspan x="290.0" y="1127.5">数据库｜按原记录 ID 更新内容</tspan>
+<tspan x="290.0" y="1150.5">新作业创建新记录及附件关联</tspan>
 </text>
-<rect x="70" y="1693" width="440" height="74" rx="12" fill="#EDF1E9" stroke="#95A08D" stroke-width="1.6"/>
+<path d="M70 1270 A220.0 13 0 0 1 510 1270 L510 1344 A220.0 13 0 0 1 70 1344 Z" fill="#E7EDF0" stroke="#8A9CA6" stroke-width="1.6"/>
+<path d="M70 1270 A220.0 13 0 0 0 510 1270" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1724.5">前端｜展示新增、草稿</tspan>
-<tspan x="290.0" y="1747.5">及重复跳过数量</tspan>
+<tspan x="290.0" y="1301.5">数据库｜同步完成版本且保留偏好</tspan>
+<tspan x="290.0" y="1324.5">已有发布状态及全员策略保留</tspan>
 </text>
-<rect x="70" y="1865" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<rect x="70" y="1431" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">
-<tspan x="290.0" y="1908.0">结束</tspan>
+<tspan x="290.0" y="1474.0">后端｜返回导入统计并刷新列表</tspan>
 </text>
-<text x="70" y="1999" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
+<rect x="70" y="1579" width="440" height="74" rx="37.0" fill="#E5ECE2" stroke="#8A9D82" stroke-width="1.6"/>
+<text text-anchor="middle" font-size="17">
+<tspan x="290.0" y="1622.0">结束</tspan>
+</text>
+<text x="70" y="1727" font-size="13" fill="#88917F">图例：圆角端点＝开始 / 结束；矩形＝处理；菱形＝判断；圆柱＝数据库；右侧＝其他结果。</text>
 </g></svg>

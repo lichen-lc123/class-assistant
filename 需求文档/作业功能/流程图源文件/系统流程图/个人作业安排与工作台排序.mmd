@@ -1,30 +1,20 @@
-%% 个人作业安排与工作台排序 · 系统流程图 · V1.0 · 2026-11-06
+%% 个人作业安排与工作台排序 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜携带会话读取作业<br/>或工作台待做摘要"]
-    N2["后端｜读取本人各学期选课关系<br/>筛选目标课程已发布记录"]
-    N3[("数据库｜返回公共作业原字段<br/>本人的优先级、计划与完成版本")]
-    N4["后端｜合成个人视图<br/>保留独立的学委截止字段"]
-    N5["后端｜过滤未完成的实际作业<br/>按优先级及有效计划时间排序"]
-    N6["前端｜工作台展示排序前3项<br/>作业页可调整个人安排"]
-    N7["前端｜提交个人优先级与计划<br/>或当前作业版本的完成标记"]
-    N8{"后端｜本人课程可见<br/>且版本有效？"}
-    B8["后端｜拒绝越权或旧版请求<br/>提示刷新核对"]
-    N9[("数据库｜仅保存本人的个人设置<br/>不更新公共截止时间")]
-    N10["前端｜重新读取并更新排序<br/>学委原时间持续显示"]
-    N11(["结束"])
+    N1["后端｜从本人选课筛选已发布作业<br/>合并仅本人可见的私人记录"]
+    N2[("数据库｜读取正文、附件、本人偏好<br/>已读版本及完成策略")]
+    N3["后端｜合成截止、个人计划及完成状态"]
+    N4["后端｜过滤实际未完成作业并排序<br/>摘要返回前 4 项"]
+    N5["前端｜电脑取 4 项、手机取 2 项<br/>菜单和标签显示对应数量"]
+    N6["前端｜查看确认或完成后刷新摘要<br/>只修改本人的偏好或已读状态"]
+    N7(["结束"])
     N0 --> N1
-    N1 -->|本人会话及学期筛选| N2
-    N2 -->|本人课程与发布记录| N3
-    N3 -->|公共字段和个人状态| N4
-    N4 -->|独立截止、计划和优先级| N5
-    N5 -->|排序后的前3项| N6
-    N6 -->|用户的个人调整| N7
-    N7 -->|个人设置及作业版本| N8
-    N8 -->|否| B8
-    N8 -->|是| N9
-    N9 -->|最新个人视图与排序| N10
-    N10 --> N11
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 --> N7
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -32,14 +22,9 @@ flowchart TD
     classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
     class N0 terminal;
     class N1 normal;
-    class N2 normal;
-    class N3 database;
+    class N2 database;
+    class N3 normal;
     class N4 normal;
     class N5 normal;
     class N6 normal;
-    class N7 normal;
-    class N8 decision;
-    class B8 exception;
-    class N9 database;
-    class N10 normal;
-    class N11 terminal;
+    class N7 terminal;

@@ -31,8 +31,9 @@ async function readJson(req, limit = 1024 * 1024) {
 export async function createApp({ databasePath, serveStatic = false, allowedOrigins = [], trustLoopbackProxy = false } = {}) {
   const db = openDatabase(databasePath);
   db.prepare('UPDATE sessions SET expires_at=0 WHERE expires_at>?').run(Date.now());
-  const timetable = timetableService(db);
-  const homework = homeworkService(db,timetable);
+  let homework;
+  const timetable = timetableService(db,{onCoursesChanged:termId=>homework?.publishPending(termId)});
+  homework = homeworkService(db,timetable);
   const reminderSettings = reminderSettingsService(db);
   const dummyHash = await hashPassword(randomBytes(24).toString('hex'));
   const attempts = new Map();
@@ -81,7 +82,7 @@ export async function createApp({ databasePath, serveStatic = false, allowedOrig
         if (requested !== base && !requested.startsWith(base + sep)) fail(404, '页面不存在。');
         const file = path === '/' ? resolve(base, 'index.html') : requested;
         if (!existsSync(file)) fail(404, '页面不存在。');
-        const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
+          const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
         res.writeHead(200, { 'Content-Type': types[extname(file)] || 'application/octet-stream' });
         res.end(req.method === 'HEAD' ? undefined : readFileSync(file)); return;
       }

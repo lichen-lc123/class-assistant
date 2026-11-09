@@ -1,0 +1,36 @@
+%% 未识别内容草稿核对 · 系统流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["解析器｜读取工作表并识别字段"]
+    N2["解析器｜未知表头、缺失老师<br/>或无效日期生成 review_required"]
+    N3[("数据库｜保存草稿及 review_reasons<br/>保留原文和已提取文件")]
+    N4["自动匹配器｜跳过待核对记录"]
+    N5["前端｜编辑并提交明确核对确认"]
+    N6{"发布接口｜课程有效且已确认？"}
+    B6["后端｜继续保留草稿，不发布"]
+    N7[("数据库｜发布原记录<br/>无截止日期允许为空")]
+    N8(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
+    N6 -->|否| B6
+    N6 -->|是| N7
+    N7 --> N8
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 database;
+    class N4 normal;
+    class N5 normal;
+    class N6 decision;
+    class B6 exception;
+    class N7 database;
+    class N8 terminal;

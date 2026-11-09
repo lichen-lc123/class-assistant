@@ -1,22 +1,22 @@
-%% 管理员课程上传与卡片生成 · 业务流程图 · V1.0 · 2026-11-02
+%% 管理员课程上传与卡片生成 · 业务流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["管理员｜进入课表模板下方<br/>展开卡片模板"]
-    N2["管理员｜导入课表自动生成<br/>或点击手动添加卡片"]
-    N3["管理员｜核对课程、时间与教室<br/>设置是否发布并保存"]
-    N4["网站｜校验角色和课程身份<br/>自动导入复用相同课程，手动重复拒绝"]
-    N5["网站｜保存卡片模板<br/>手动创建不要求先建整套课表"]
-    N6["学生｜搜索已发布卡片<br/>查看具体起止时间并选择"]
-    N7["管理员｜修改卡片模板<br/>已选用户和引用模板同步更新"]
-    N8(["结束"])
+    N1["管理员｜选择 AI 模板导入或手动添加卡片"]
+    N2["网站｜按课程名、老师及完整时间匹配"]
+    N3{"网站｜本次是否可以新建或复用？"}
+    B3["网站｜重复手动卡片或跨管理员重复模板<br/>提示失败，保留原内容"]
+    N4["网站｜模板导入自动生成或复用卡片<br/>保留独立模板及来源标签"]
+    N5["管理员｜按课次编辑课程及安排"]
+    N6["网站｜按自动或人工来源同步<br/>并保留用户个人安排"]
+    N7(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
-    N3 --> N4
+    N3 -->|否| B3
+    N3 -->|是| N4
     N4 --> N5
     N5 --> N6
     N6 --> N7
-    N7 --> N8
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -25,9 +25,9 @@ flowchart TD
     class N0 terminal;
     class N1 normal;
     class N2 normal;
-    class N3 normal;
+    class N3 decision;
+    class B3 exception;
     class N4 normal;
     class N5 normal;
     class N6 normal;
-    class N7 normal;
-    class N8 terminal;
+    class N7 terminal;

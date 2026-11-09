@@ -17,7 +17,7 @@ const parse=value=>JSON.parse(value||'null');
 const hash=value=>createHash('sha256').update(json(value)).digest('hex');
 const templateSelectionVersion=(template,t,courses)=>hash({term:[t.id,t.revision],template:[template.id,template.revision],courses:courses.map(c=>[c.id,c.revision])});
 const cleanPrivate=payload=>Object.fromEntries(Object.entries(payload).filter(([,v])=>v!=null&&v!==''&&(!Array.isArray(v)||v.length)));
-export function timetableService(db) {
+export function timetableService(db,{onCoursesChanged=()=>{}}={}) {
   const transaction=fn=>{db.exec('BEGIN IMMEDIATE');try{const value=fn();db.exec('COMMIT');return value;}catch(error){db.exec('ROLLBACK');throw error;}};
   function term(id){const row=db.prepare('SELECT * FROM terms WHERE id = ?').get(id);if(!row)problem('学期不存在，请先由管理员建立学期。',404);return{id:row.id,academicYear:row.academic_year,name:row.name,startsOn:row.starts_on,endsOn:row.ends_on,config:semesterCalendarConfig(parse(row.config_json),row.starts_on,row.ends_on),revision:row.revision,updatedAt:row.updated_at};}
   const table=(userId,termId)=>db.prepare('SELECT * FROM timetables WHERE user_id = ? AND term_id = ?').get(userId,termId);
@@ -123,7 +123,7 @@ export function timetableService(db) {
   }
   const warningsPresent=p=>p.warnings?.length||p.conflicts?.length||p.courses.some(c=>c.warnings.length);
   function requireReview(p,body){if(warningsPresent(p)&&body.acceptWarnings!==true)problem('预览中有缺失、重复或时间冲突，请核对并勾选确认后保存。');}
-  const templateImporter=templateImportService(db,{term,prepare,requireReview});
+  const templateImporter=templateImportService(db,{term,prepare,requireReview,onCoursesChanged});
   function selectedCourses(ids,t,cardOnly=false,existingIds=[]){
     if(!Array.isArray(ids)||!ids.length||ids.length>200)problem('请选择 1—200 门课程。');
     return [...new Set(ids)].map(id=>{const c=master(id);if(!c||c.term_id!==t.id||(!existingIds.includes(id)&&(!c.published||(cardOnly&&!c.card_enabled))))problem('选择中包含其他学期、已下架或未生成卡片的课程，请刷新后重新选择。');return courseView(c,t);});
@@ -208,14 +208,14 @@ export function timetableService(db) {
       transaction(()=>{for(const c of p.courses){const existing=matchingMaster(c,t);
         if(existing){if(body.source==='manual')problem('该课程已经添加过了：课程名称、教师和上课时间一致，请编辑已有卡片模板，避免重复添加。',409);skipped++;if(body.generateCards!==false&&!existing.card_enabled){db.prepare('UPDATE public_courses SET card_enabled=1 WHERE id=?').run(existing.id);cardsCreated++;}continue;}
         db.prepare('INSERT INTO public_courses (id,term_id,class_code,payload_json,card_enabled,published,origin) VALUES (?,?,?,?,?,?,?)').run(randomUUID(),t.id,null,json(normalizeCourse(c,t)),body.generateCards===false?0:1,body.published===false?0:1,body.source==='manual'?'manual':'template');created++;if(body.generateCards!==false)cardsCreated++;
-      }});send(201,{created,skipped,cardsCreated});return;
+      }onCoursesChanged(t.id);});send(201,{created,skipped,cardsCreated});return;
     }
     const courseEdit=path.match(/^\/api\/admin\/timetable\/courses\/([\w-]+)$/);
     if(courseEdit&&req.method==='PUT'){
       const body=await read(),old=master(courseEdit[1]);if(!old)problem('课程不存在。',404);if(Number(body.revision)!==old.revision)problem('课程已被修改，请刷新后再编辑。',409);
       const t=term(old.term_id),c=normalizeCourse(body.course,t);const check={courses:[{...c,...expandCourse(c,t)}],warnings:[],conflicts:[]};requireReview(check,body);
       if(matchingMaster(c,term(old.term_id),false,old.id))problem('已有课程名称、教师及上课时间完全一致的课程，请编辑原课程。',409);
-      db.prepare(`UPDATE public_courses SET class_code=?,payload_json=?,card_enabled=?,published=?,revision=revision+1,updated_at=${NOW} WHERE id=?`).run(null,json(c),body.cardEnabled===false?0:1,body.published===false?0:1,old.id);send(200,courseView(master(old.id),t));return;
+      transaction(()=>{db.prepare(`UPDATE public_courses SET class_code=?,payload_json=?,card_enabled=?,published=?,revision=revision+1,updated_at=${NOW} WHERE id=?`).run(null,json(c),body.cardEnabled===false?0:1,body.published===false?0:1,old.id);onCoursesChanged(t.id);});send(200,courseView(master(old.id),t));return;
     }
     if(path==='/api/admin/timetable/templates'&&req.method==='POST'){
       const body=await read(),t=term(body.termId);const name=trim(body.name,80);if(!name)problem('请输入模板名称。');if(db.prepare('SELECT id FROM timetable_templates WHERE term_id=? AND name=? COLLATE NOCASE').get(t.id,name))problem('本学期已有同名模板，请使用不同名称。',409);const courses=selectedCourses(body.courseIds,t);const id=randomUUID();transaction(()=>{templateImporter.rejectDuplicate(t,courses,user.id);db.prepare('INSERT INTO timetable_templates (id,term_id,name,description,published,created_by) VALUES (?,?,?,?,?,?)').run(id,t.id,name,trim(body.description,500),body.published===false?0:1,user.id);for(const c of courses)db.prepare('INSERT INTO template_courses(template_id,course_id,course_snapshot_json) VALUES (?,?,?)').run(id,c.id,c.origin==='manual'?json(normalizeCourse(c,t)):null);});send(201,{id});return;
@@ -274,6 +274,7 @@ export function timetableService(db) {
         db.prepare(`UPDATE timetable_templates SET name=?,description=?,published=?,revision=revision+1,updated_at=${NOW} WHERE id=?`).run(name,body.description===undefined?old.description:trim(body.description,500),body.published===false?0:1,old.id);db.prepare('DELETE FROM template_courses WHERE template_id=?').run(old.id);for(const c of courses)db.prepare('INSERT INTO template_courses(template_id,course_id,course_snapshot_json) VALUES (?,?,?)').run(old.id,c.id,c.origin==='manual'?json(manualChanged.get(c.id)||normalizeCourse(c,t)):null);
         const updated=db.prepare('SELECT * FROM timetable_templates WHERE id=?').get(old.id);
         for(const tt of db.prepare("SELECT tt.* FROM timetables tt JOIN timetable_template_subscriptions sub ON sub.timetable_id=tt.id WHERE sub.template_id=? AND tt.term_id=?").all(old.id,old.term_id))syncTemplateMembers(tt,updated);
+        onCoursesChanged(old.term_id);
       });send(200,{ok:true});return;
     }
     const personal=path.match(/^\/api\/timetable\/([\w-]+)$/);
@@ -286,7 +287,7 @@ export function timetableService(db) {
       if(body.source==='ai'){
         const p=prepare(body,t);requireImport(user.id,t,p);requireReview(p,body);let added=0;
         transaction(()=>{tt=tt||newTable(user.id,t,body.source);
-          for(const raw of p.courses){const c=normalizeCourse(raw,t),pub=matchingMaster(c,t,true);insertEntry(tt,pub?.id||null,c,body.source);added++;}bump(tt);
+          for(const raw of p.courses){const c=normalizeCourse(raw,t),pub=matchingMaster(c,t,true);insertEntry(tt,pub?.id||null,c,body.source);added++;}bump(tt);onCoursesChanged(t.id);
         });send(200,{...get(user.id,t.id),added,skipped:0});return;
       }
       let chosen,template=null;

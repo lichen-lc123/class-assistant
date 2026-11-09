@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createApp } from '../server/app.mjs';
@@ -19,6 +19,15 @@ for (const file of [
   'server/confirmed-schedule.mjs', 'server/reconcile-courses.mjs',
   'scripts/reconcile-courses.mjs', 'scripts/verify-production.mjs',
 ]) assert.ok(existsSync(resolve(root, file)), `部署文件缺失：${file}`);
+const pdfRoot='dist/pdfjs/6.5.438/';
+const pdfAssets=['cmaps','standard_fonts','wasm'].map(dir=>{
+  const files=readdirSync(resolve(root,pdfRoot,dir));
+  const file=files.find(name=>dir==='wasm'?name.endsWith('.wasm'):!name.startsWith('LICENSE'));
+  assert.ok(file,`PDF 预览资源缺失：${dir}`);
+  return '/pdfjs/6.5.438/'+dir+'/'+file;
+});
+const worker=readdirSync(resolve(root,'dist/assets')).find(name=>/^pdf\.worker.*\.mjs$/.test(name));
+assert.ok(worker,'PDF 预览工作线程缺失。');
 
 const { server, db } = await createApp({ databasePath: ':memory:', serveStatic: true });
 try {
@@ -35,10 +44,12 @@ try {
   const assets = [...html.matchAll(/(?:src|href)=["'](\/assets\/[^"']+)["']/g)].map(m => m[1]);
   assert.ok(assets.some(path => path.endsWith('.js')), '首页缺少脚本。');
   assert.ok(assets.some(path => path.endsWith('.css')), '首页缺少样式。');
-  for (const path of [...assets, '/images/login-illustration.png', '/calendar-reference-2026.png']) {
+  for (const path of [...assets, ...pdfAssets, '/assets/'+worker, '/images/login-illustration.png', '/calendar-reference-2026.png']) {
     const file = await fetch(base + path);
     assert.equal(file.status, 200, `资源不可用：${path}`);
     assert.ok((await file.arrayBuffer()).byteLength > 0, `资源为空：${path}`);
+    if(path.endsWith('.mjs'))assert.match(file.headers.get('content-type'),/javascript/,'PDF 工作线程 MIME 不正确。');
+    if(path.endsWith('.wasm'))assert.equal(file.headers.get('content-type'),'application/wasm');
   }
   const unauthorized = await fetch(base + '/api/admin/users');
   assert.equal(unauthorized.status, 401, '管理接口未拦截匿名访问。');

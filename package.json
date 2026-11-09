@@ -7,6 +7,8 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "predev": "node scripts/copy-pdf-assets.mjs",
+    "prebuild": "node scripts/copy-pdf-assets.mjs",
     "dev": "node scripts/dev.mjs",
     "dev:web": "vite --host 127.0.0.1 --port 5173",
     "start": "node server/index.mjs --static",
@@ -16,6 +18,7 @@
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
+    "pdfjs-dist": "6.5.438",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

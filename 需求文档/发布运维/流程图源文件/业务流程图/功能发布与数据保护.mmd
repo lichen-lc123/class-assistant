@@ -1,0 +1,36 @@
+%% 功能发布与数据保护 · 业务流程图 · 当前版 · 2026-11-09
+flowchart TD
+    N0(["开始"])
+    N1["维护者｜完成功能测试与构建"]
+    N2["维护者｜排除数据库和密钥后提交 GitHub"]
+    N3["服务器｜核验程序包并备份原数据"]
+    N4["服务器｜在备份副本检查兼容性"]
+    N5{"服务器｜原内容摘要及附件字节一致？"}
+    B5["服务器｜终止发布并保留原版本"]
+    N6["服务器｜只切换程序并验证外部链接"]
+    N7["维护者｜记录版本、更新点及备份位置"]
+    N8(["结束"])
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+    N4 --> N5
+    N5 -->|否| B5
+    N5 -->|是| N6
+    N6 --> N7
+    N7 --> N8
+    classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
+    classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
+    classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
+    classDef exception fill:#F2EAE6,stroke:#B09B91,color:#344235;
+    classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
+    class N0 terminal;
+    class N1 normal;
+    class N2 normal;
+    class N3 normal;
+    class N4 normal;
+    class N5 decision;
+    class B5 exception;
+    class N6 normal;
+    class N7 normal;
+    class N8 terminal;

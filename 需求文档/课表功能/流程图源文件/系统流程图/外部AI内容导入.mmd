@@ -1,32 +1,24 @@
-%% 外部AI内容导入 · 系统流程图 · V1.0 · 2026-11-02
+%% 外部AI内容导入 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜复制提示词<br/>网站不发送资料到 AI"]
-    N2["学生与外部 AI｜在网站外处理<br/>原始资料 → JSON"]
-    N3["前端｜提交学期与 JSON<br/>source=ai"]
-    N4{"后端｜本次新增课程时间<br/>与已有安排均不重复？"}
-    B4["提示课程时间重复及具体时段<br/>整批不保存，不能确认绕过"]
-    N5["后端｜解析 JSON 与版本<br/>校验字段、学期、班号和规则"]
-    N6{"后端｜结构与必要字段<br/>是否有效？"}
-    B6["返回具体问题与修正建议<br/>不保存为正式课表"]
-    N7[("数据库｜读取公共课程候选<br/>教学日历与节次作息")]
-    N8["后端｜展开明确日期并合并课次<br/>检查本批及本人已有时段占用"]
-    N9["前端｜展示全部课次及未纳入原文<br/>用户核对日期处理与待确认问题"]
-    N10[("数据库｜确认时重新校验学期来源<br/>保存个人课表、原文与个人覆盖")]
-    N11(["结束"])
+    N1["后端｜返回与当前解析规则一致的提示词"]
+    N2["后端｜解析 JSON 并验证目标学期"]
+    N3["后端｜规范化完整学期周次及教室继承<br/>应用严格限定的确认日期规则"]
+    N4["后端｜展开具体日期并检查课程时间冲突"]
+    N5["前端｜预览课程安排并允许修改"]
+    N6{"后端｜保存时版本和冲突再次通过？"}
+    B6["后端｜整批拒绝，原课表保持不变"]
+    N7[("数据库｜保存个人课程<br/>或管理员模板事务")]
+    N8(["结束"])
     N0 --> N1
-    N1 -->|提示词与用户提供的原始资料| N2
-    N2 -->|用户复制回来的 JSON| N3
+    N1 --> N2
+    N2 --> N3
     N3 --> N4
-    N4 -->|否| B4
-    N4 -->|是| N5
+    N4 --> N5
     N5 --> N6
     N6 -->|否| B6
     N6 -->|是| N7
-    N7 -->|公共候选、教学日历及作息| N8
-    N8 -->|日期预览、缺失及冲突提示| N9
-    N9 -->|用户确认结果和个人修改| N10
-    N10 --> N11
+    N7 --> N8
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -36,13 +28,9 @@ flowchart TD
     class N1 normal;
     class N2 normal;
     class N3 normal;
-    class N4 decision;
-    class B4 exception;
+    class N4 normal;
     class N5 normal;
     class N6 decision;
     class B6 exception;
     class N7 database;
-    class N8 normal;
-    class N9 normal;
-    class N10 database;
-    class N11 terminal;
+    class N8 terminal;

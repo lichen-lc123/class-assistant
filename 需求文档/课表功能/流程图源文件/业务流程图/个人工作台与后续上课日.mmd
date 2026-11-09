@@ -1,22 +1,18 @@
-%% 个人工作台与后续上课日 · 业务流程图 · V1.0 · 2026-11-02
+%% 个人工作台与后续上课日 · 业务流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["用户｜登录或进入个人中心<br/>默认打开工作台"]
-    N2["系统｜读取本人所有已导入课表<br/>包括已导入的后续学期"]
-    N3["系统｜按北京时间排除今天及过去<br/>忽略没有明确日期的课程"]
-    N4["系统｜跳过无课日期<br/>取最近三个有课日期"]
-    N5["系统｜同一天课程合并为日期卡片<br/>按上课时间排列"]
-    N6["用户｜查看课程与距离上课天数<br/>可进入完整课表查看"]
-    N7["用户｜在课表管理导入或调整课程<br/>工作台重新读取最新安排"]
-    N8(["结束"])
+    N1["用户｜登录后进入工作台"]
+    N2["网站｜读取本人课程及作业摘要"]
+    N3["网站｜电脑取未来 3 个有课日<br/>手机取今天未结束或下一有课日"]
+    N4["用户｜手机单节课左右切换<br/>电脑按上课日轮播"]
+    N5["用户｜查看或完成待做作业<br/>点击课程可看课程全部信息"]
+    N6(["结束"])
     N0 --> N1
     N1 --> N2
     N2 --> N3
     N3 --> N4
     N4 --> N5
     N5 --> N6
-    N6 --> N7
-    N7 --> N8
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -28,6 +24,4 @@ flowchart TD
     class N3 normal;
     class N4 normal;
     class N5 normal;
-    class N6 normal;
-    class N7 normal;
-    class N8 terminal;
+    class N6 terminal;

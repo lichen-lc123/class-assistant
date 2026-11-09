@@ -1,22 +1,19 @@
-%% 登录 · 业务流程图 · V1.0 · 2026-11-02
+%% 登录 · 业务流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["用户打开登录页"]
-    N2["输入账号与密码"]
-    N3{"账号密码正确？"}
-    B3["提示错误，重新输入"]
-    N4{"需要修改初始密码？"}
-    B4["按角色进入页面<br/>管理员：系统设置<br/>学生：我的账号"]
-    N5["进入我的账号<br/>先修改初始密码"]
-    N6(["结束"])
+    N1["用户｜打开 MEM2602 链接"]
+    N2{"网站｜已保留有效登录？"}
+    B2["用户｜输入姓名或学号与密码<br/>校验成功，首次登录先修改密码"]
+    N3["网站｜恢复本人登录身份"]
+    N4["用户｜直接进入工作台<br/>可主动退出或修改密码"]
+    N5(["结束"])
     N0 --> N1
     N1 --> N2
-    N2 --> N3
-    N3 -->|否| B3
-    N3 -->|是| N4
-    N4 -->|否| B4
-    N4 -->|是| N5
-    N5 --> N6
+    N2 -->|否| B2
+    N2 -->|是| N3
+    N3 --> N4
+    N4 --> N5
+    B2 --> N3
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -24,10 +21,8 @@ flowchart TD
     classDef database fill:#E7EDF0,stroke:#8A9CA6,color:#344235;
     class N0 terminal;
     class N1 normal;
-    class N2 normal;
-    class N3 decision;
-    class B3 exception;
-    class N4 decision;
-    class B4 exception;
-    class N5 normal;
-    class N6 terminal;
+    class N2 decision;
+    class B2 exception;
+    class N3 normal;
+    class N4 normal;
+    class N5 terminal;

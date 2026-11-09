@@ -1,30 +1,18 @@
-%% 课表默认定位与时间视图 · 系统流程图 · V1.0 · 2026-11-02
+%% 课表默认定位与时间视图 · 系统流程图 · 当前版 · 2026-11-09
 flowchart TD
     N0(["开始"])
-    N1["前端｜提交本人视图选择<br/>首次进入采用今天和日视图"]
-    N2["后端｜从会话识别用户<br/>按 Asia/Shanghai 计算当前时刻"]
-    N3[("数据库｜读取学期起止日期<br/>定位当前学年与学期")]
-    N4{"后端｜当前学期匹配唯一？"}
-    B4["返回待管理员检查的提示<br/>不向学生提供学期设置"]
-    N5[("数据库｜读取本人所选班级<br/>公共安排及个人覆盖")]
-    N6["后端｜个人安排优先合成实际课表<br/>返回课程、缺失与冲突"]
-    N7["前端｜按视图范围筛选课程<br/>标记正在上课及已结束状态"]
-    N8["前端｜渲染今天或所选范围<br/>空课表与缺失时间分开提示"]
-    N9["前端｜自动定位模式下<br/>跨日或回到页面时重新定位"]
-    N10["学生｜手动浏览其他日期时<br/>保持所选范围，回到今天后恢复自动"]
-    N11(["结束"])
+    N1["前端｜检测布局并设默认课程 Tab"]
+    N2["后端｜返回当前学期及本人课表"]
+    N3["前端｜课表 Tab 按设备初始化视图"]
+    N4["前端｜手机周网格直接渲染整周课程<br/>日视图仅渲染目标日"]
+    N5["前端｜日期切换仅变更展示范围<br/>回到今天恢复自动定位"]
+    N6(["结束"])
     N0 --> N1
-    N1 -->|视图、日期及所选学期| N2
+    N1 --> N2
     N2 --> N3
-    N3 -->|学期日期范围与匹配结果| N4
-    N4 -->|否| B4
-    N4 -->|是| N5
-    N5 -->|本人课程、公共基值及个人覆盖| N6
-    N6 -->|筛选后的实际课程安排| N7
-    N7 -->|课程状态、空结果及待安排提示| N8
-    N8 --> N9
-    N9 --> N10
-    N10 --> N11
+    N3 --> N4
+    N4 --> N5
+    N5 --> N6
     classDef normal fill:#FFFFFF,stroke:#A8B2A2,color:#344235;
     classDef decision fill:#F0ECE2,stroke:#A69B83,color:#344235;
     classDef terminal fill:#E5ECE2,stroke:#8A9D82,color:#344235;
@@ -33,13 +21,7 @@ flowchart TD
     class N0 terminal;
     class N1 normal;
     class N2 normal;
-    class N3 database;
-    class N4 decision;
-    class B4 exception;
-    class N5 database;
-    class N6 normal;
-    class N7 normal;
-    class N8 normal;
-    class N9 normal;
-    class N10 normal;
-    class N11 terminal;
+    class N3 normal;
+    class N4 normal;
+    class N5 normal;
+    class N6 terminal;
