@@ -32,6 +32,17 @@ export function initHomeworkSchema(db){
       PRIMARY KEY(user_id,record_id)
     );
     CREATE INDEX IF NOT EXISTS homework_term ON homework_records(term_id);
+    CREATE TABLE IF NOT EXISTS homework_completion_defaults(
+      record_id TEXT PRIMARY KEY REFERENCES homework_records(id) ON DELETE CASCADE,
+      generation INTEGER NOT NULL, completed_at TEXT NOT NULL,
+      updated_by INTEGER REFERENCES users(id) ON DELETE SET NULL
+    );
+    CREATE TABLE IF NOT EXISTS homework_completion_exceptions(
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      record_id TEXT NOT NULL REFERENCES homework_records(id) ON DELETE CASCADE,
+      generation INTEGER NOT NULL,
+      PRIMARY KEY(user_id,record_id)
+    );
     CREATE INDEX IF NOT EXISTS homework_class ON homework_targets(class_code);
     CREATE TABLE IF NOT EXISTS homework_preferences(
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

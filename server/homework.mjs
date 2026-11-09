@@ -60,7 +60,12 @@ export function homeworkService(db,timetable){
   }
   function acknowledge(userId,row){db.prepare('INSERT INTO homework_reads(user_id,record_id,seen_revision) VALUES(?,?,?) ON CONFLICT(user_id,record_id) DO UPDATE SET seen_revision=MAX(seen_revision,excluded.seen_revision)').run(userId,row.id,row.revision);}
   function view(row,userId,admin=false){
-    const data=parse(row.payload_json),term=timetable.term(row.term_id),completion=db.prepare('SELECT completed_revision,updated_at FROM homework_completions WHERE user_id=? AND record_id=?').get(userId,row.id),completed=completion?.completed_revision===row.revision;
+    const data=parse(row.payload_json),term=timetable.term(row.term_id),completion=db.prepare('SELECT completed_revision,updated_at FROM homework_completions WHERE user_id=? AND record_id=?').get(userId,row.id);
+    const defaults=row.kind==='assignment'&&row.owner_id==null?db.prepare('SELECT * FROM homework_completion_defaults WHERE record_id=?').get(row.id):null;
+    const exception=defaults?db.prepare('SELECT generation FROM homework_completion_exceptions WHERE user_id=? AND record_id=?').get(userId,row.id):null;
+    const defaultCompleted=Boolean(defaults&&exception?.generation!==defaults.generation);
+    const completed=exception&&exception.generation===defaults?.generation?false:defaultCompleted||completion?.completed_revision===row.revision;
+    const completedAt=completed?[...(defaultCompleted?[defaults.completed_at]:[]),...(completion?.completed_revision===row.revision?[completion.updated_at]:[])].sort().at(-1):null;
     const today=todayShanghai(),daysUntil=data.due_date?Math.round((Date.parse(data.due_date+'T00:00:00Z')-Date.parse(today+'T00:00:00Z'))/86400000):null;
     const overdue=row.kind==='assignment'&&Boolean(data.due_date&&(data.due_date<today||data.due_date===today&&data.due_time&&Date.now()>Date.parse(data.due_date+'T'+data.due_time+':00+08:00')));
     const attachments=db.prepare('SELECT a.asset_id AS assetId,a.field,a.caption,b.mime,length(b.bytes) AS size FROM homework_attachments a JOIN homework_assets b ON b.id=a.asset_id WHERE a.record_id=?').all(row.id).map(a=>({...a,filename:data.attachment_names?.[a.assetId+':'+a.field]||'',url:`/api/homework/assets/${a.assetId}?recordId=${row.id}&field=${encodeURIComponent(a.field)}`}));
@@ -68,7 +73,8 @@ export function homeworkService(db,timetable){
     if(!admin)delete data.source_rows;
     const preferences=db.prepare('SELECT priority,planned_date,planned_time FROM homework_preferences WHERE user_id=? AND record_id=?').get(userId,row.id)||{priority:'normal',planned_date:null,planned_time:null};
     const seen=db.prepare('SELECT seen_revision FROM homework_reads WHERE user_id=? AND record_id=?').get(userId,row.id);
-    return{...data,...preferences,hasUpdates:!admin&&row.update_revision>(seen?.seen_revision||0),id:row.id,termId:row.term_id,sourceType:row.owner_id!=null?'personal':'class',canEdit:row.owner_id===userId,academicYear:term.academicYear,termName:term.name,kind:row.kind,title:row.title,published:Boolean(row.published),revision:row.revision,updatedAt:row.updated_at,completed,completedAt:completed?completion.updated_at:null,remindersSuppressed:completed,needsReconfirm:Boolean(completion&&!completed),overdue:overdue&&!completed,daysUntil,targets:targets(row.id),attachments};
+    const audience=targets(row.id),draftReason=!row.published?(audience.length===0?'未匹配到课程，请先编辑并选择实际课程。':audience.length>1?'关联了多门课程，请先编辑并选择唯一课程。':'已保存为草稿，点击“发布”后同学才能查看。'):null;
+    return{...data,...preferences,hasUpdates:!admin&&!defaultCompleted&&row.update_revision>(seen?.seen_revision||0),id:row.id,termId:row.term_id,sourceType:row.owner_id!=null?'personal':'class',canEdit:row.owner_id===userId,academicYear:term.academicYear,termName:term.name,kind:row.kind,title:row.title,published:Boolean(row.published),revision:row.revision,updatedAt:row.updated_at,completed,completedAt,remindersSuppressed:completed,needsReconfirm:Boolean(completion&&!completed),overdue:overdue&&!completed,daysUntil,targets:audience,attachments,...(admin?{allCompletedAt:defaults?.completed_at||null,allCompletedGeneration:defaults?.generation||0,draftReason}:{})};
   }
   // Every future sender must call this immediately before sending, including
   // retries. A candidate captured before completion is not a delivery permit.
@@ -136,7 +142,7 @@ export function homeworkService(db,timetable){
     // Existing files may only be retained on their original record; new files
     // must supply their own validated bytes in this request.
     let total=0;const counted=new Set();
-    for(const a of item.attachments){const asset=assets.get(a.assetId);if(!asset&&!previous.has(a.assetId))problem('附件资料缺失或不属于此作业，请重新选择文件上传。');const stored=asset?null:db.prepare('SELECT mime,length(bytes) AS size FROM homework_assets WHERE id=?').get(a.assetId),mime=asset?.mime||stored?.mime;if(a.field!=='attachment'&&!mime?.startsWith('image/'))problem('普通文件需放在附件区域，图片区域仅支持PNG、JPG或WebP。');if(!counted.has(a.assetId)){total+=asset?.bytes.length||stored?.size||0;counted.add(a.assetId);}if(total>20*1024*1024)problem('本项作业的图片与附件合计不能超过20 MB。');}
+    for(const a of item.attachments){const asset=assets.get(a.assetId);if(!asset&&!previous.has(a.assetId))problem('附件资料缺失或不属于此作业，请重新选择文件上传。');const stored=asset?null:db.prepare('SELECT mime,length(bytes) AS size FROM homework_assets WHERE id=?').get(a.assetId),mime=asset?.mime||stored?.mime;if(!counted.has(a.assetId)){total+=asset?.bytes.length||stored?.size||0;counted.add(a.assetId);}if(total>20*1024*1024)problem('本项作业的图片与附件合计不能超过20 MB。');}
     db.prepare('DELETE FROM homework_attachments WHERE record_id=?').run(id);for(const a of item.attachments){const file=assets.get(a.assetId);if(file)db.prepare('INSERT OR IGNORE INTO homework_assets VALUES(?,?,?)').run(a.assetId,file.mime,file.bytes);if(!db.prepare('SELECT id FROM homework_assets WHERE id=?').get(a.assetId))problem('附件资料缺失，请重新上传。');db.prepare('INSERT OR IGNORE INTO homework_attachments VALUES(?,?,?,?)').run(id,a.assetId,a.field,a.caption);}
   }
   async function handle({req,path,url,user,readJson,send,getSession,res}){
@@ -233,6 +239,32 @@ export function homeworkService(db,timetable){
     if(path==='/api/admin/homework/records'&&req.method==='POST'){
       const body=await read(),term=timetable.term(body.termId),item=normalize(body.record,term.id),assets=decodeAssets(body.assets);if(db.prepare('SELECT id FROM homework_records WHERE term_id=? AND source_key=?').get(term.id,item.key))problem('已有相同课程、老师和标题的记录，请编辑原记录。',409);const id=randomUUID();transaction(()=>{db.prepare('INSERT INTO homework_records(id,term_id,source_key,kind,title,payload_json,published,created_by) VALUES(?,?,?,?,?,?,?,?)').run(id,term.id,item.key,item.record.kind,item.record.title,JSON.stringify(item.record),item.published?1:0,user.id);writeLinks(id,item,assets);});send(201,view(getRecord(id),user.id,true));return;
     }
+    const publish=path.match(/^\/api\/admin\/homework\/records\/([\w-]+)\/publish$/);
+    if(publish&&req.method==='POST'){
+      const body=await read(),row=getRecord(publish[1]);
+      if(row.owner_id!=null)problem('个人作业不能发布给其他同学。',403);
+      if(Number(body.revision)!==row.revision)problem('记录已更新，请刷新后再发布。',409);
+      if(row.published){send(200,view(row,user.id,true));return;}
+      const current=view(row,user.id,true),item=normalize({...current,targetKeys:current.targets.map(t=>t.key),autoPublish:true},row.term_id);
+      if(db.prepare('SELECT id FROM homework_records WHERE term_id=? AND source_key=? AND id<>?').get(row.term_id,item.key,row.id))problem('已有相同课程、老师和标题的记录，请先核对。',409);
+      transaction(()=>{
+        db.prepare("UPDATE homework_records SET source_key=?,payload_json=?,published=1,revision=revision+1,update_revision=revision+1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?").run(item.key,JSON.stringify(item.record),row.id);
+        writeLinks(row.id,item,new Map());
+      });send(200,view(getRecord(row.id),user.id,true));return;
+    }
+    const completeAll=path.match(/^\/api\/admin\/homework\/records\/([\w-]+)\/complete-all$/);
+    if(completeAll&&req.method==='POST'){
+      const body=await read(),row=getRecord(completeAll[1]);
+      if(row.owner_id!=null||row.kind!=='assignment'||!row.published)problem('仅能将已发布的课程作业标记为全部完成。',400);
+      if(Number(body.revision)!==row.revision)problem('作业已更新，请刷新后再操作。',409);
+      if(body.confirm!==true)problem('请确认将此作业设为全部完成。');
+      transaction(()=>{
+        const previous=db.prepare('SELECT generation FROM homework_completion_defaults WHERE record_id=?').get(row.id);
+        if(Number(body.generation||0)!==(previous?.generation||0))problem('全员完成状态已更新，请刷新后再操作。',409);
+        db.prepare("INSERT INTO homework_completion_defaults(record_id,generation,completed_at,updated_by) VALUES(?,1,strftime('%Y-%m-%dT%H:%M:%fZ','now'),?) ON CONFLICT(record_id) DO UPDATE SET generation=generation+1,completed_at=excluded.completed_at,updated_by=excluded.updated_by").run(row.id,user.id);
+      });
+      send(200,view(row,user.id,true));return;
+    }
     const edit=path.match(/^\/api\/admin\/homework\/records\/([\w-]+)$/);
     if(edit&&['PUT','DELETE'].includes(req.method)){
       const body=await read(),old=getRecord(edit[1]);if(old.owner_id!=null)problem('个人作业仅能由本人通过个人入口维护。',403);if(Number(body.revision)!==old.revision)problem('记录已更新，请刷新后再操作。',409);
@@ -257,7 +289,16 @@ export function homeworkService(db,timetable){
     }
     if(complete&&req.method==='POST'){
       const body=await read(),row=getRecord(complete[1]);if(!visible(row,user.id)||row.kind!=='assignment')problem('此作业不属于本人的个人作业或已选课程。',403);if(Number(body.revision)!==row.revision)problem('作业内容已更新，请刷新并核对后再标记完成。',409);if(typeof body.completed!=='boolean')problem('完成状态无效。');
-      if(body.completed)db.prepare("INSERT INTO homework_completions(user_id,record_id,completed_revision) VALUES(?,?,?) ON CONFLICT(user_id,record_id) DO UPDATE SET completed_revision=excluded.completed_revision,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE homework_completions.completed_revision<>excluded.completed_revision").run(user.id,row.id,row.revision);else db.prepare('DELETE FROM homework_completions WHERE user_id=? AND record_id=?').run(user.id,row.id);if(body.completed)acknowledge(user.id,row);send(200,view(row,user.id));return;
+      transaction(()=>{
+        if(body.completed){
+          db.prepare('DELETE FROM homework_completion_exceptions WHERE user_id=? AND record_id=?').run(user.id,row.id);
+          db.prepare("INSERT INTO homework_completions(user_id,record_id,completed_revision) VALUES(?,?,?) ON CONFLICT(user_id,record_id) DO UPDATE SET completed_revision=excluded.completed_revision,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE homework_completions.completed_revision<>excluded.completed_revision").run(user.id,row.id,row.revision);acknowledge(user.id,row);
+        }else{
+          db.prepare('DELETE FROM homework_completions WHERE user_id=? AND record_id=?').run(user.id,row.id);
+          const defaults=db.prepare('SELECT generation FROM homework_completion_defaults WHERE record_id=?').get(row.id);
+          if(defaults)db.prepare('INSERT INTO homework_completion_exceptions(user_id,record_id,generation) VALUES(?,?,?) ON CONFLICT(user_id,record_id) DO UPDATE SET generation=excluded.generation').run(user.id,row.id,defaults.generation);
+        }
+      });send(200,view(row,user.id));return;
     }
     problem('作业接口不存在。',404);
   }

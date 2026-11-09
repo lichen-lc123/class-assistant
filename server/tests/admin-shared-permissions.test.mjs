@@ -1,0 +1,54 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createApp} from '../app.mjs';
+import {createInitialAdmin,hashPassword} from '../database.mjs';
+
+test('所有管理员可跨创建者维护模板、卡片与课程作业，学生无管理权限',async t=>{
+ const {server,db}=await createApp({databasePath:':memory:'});
+ await createInitialAdmin(db,'shared-admin-a','测试管理员甲','SharedAdminFixture123');
+ const password=await hashPassword('SharedAdminFixture123');
+ for(const [id,role] of [['shared-admin-b','admin'],['shared-student','student']])db.prepare('INSERT INTO users(student_id,name,role,password_hash,must_change_password) VALUES(?,?,?,?,0)').run(id,id,role,password);
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));
+ const base=`http://127.0.0.1:${server.address().port}`;
+ async function call(path,method='GET',body,cookie){const response=await fetch(base+'/api'+path,{method,headers:{Origin:base,'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},...(body?{body:JSON.stringify(body)}:{})});return{status:response.status,data:await response.json(),cookie:response.headers.get('set-cookie')?.split(';')[0]};}
+ const login=async id=>(await call('/auth/login','POST',{studentId:id,password:'SharedAdminFixture123'})).cookie;
+ const a=await login('shared-admin-a'),b=await login('shared-admin-b'),student=await login('shared-student');
+ const termId=(await call('/admin/timetable/terms','POST',{academicYear:'2026-2027',name:'第一学期'},a)).data.id;
+ const course={course_name:'管理员共享课程',teacher:'测试老师',explicit_sessions:[{date:'2026-11-14',start_time:'08:00',end_time:'10:00',room:'教室甲'}]};
+ assert.equal((await call('/admin/timetable/courses','POST',{termId,source:'manual',courses:[course],acceptWarnings:true},a)).status,201);
+ const card=(await call('/admin/timetable/courses?termId='+termId,'GET',undefined,b)).data[0];
+ assert.equal((await call('/admin/timetable/courses/'+card.id,'PUT',{course,revision:card.revision,acceptWarnings:true},student)).status,403);
+ const updated=await call('/admin/timetable/courses/'+card.id,'PUT',{course:{...course,explicit_sessions:[{...course.explicit_sessions[0],room:'教室乙'}]},revision:card.revision,acceptWarnings:true},b);assert.equal(updated.status,200);assert.equal(updated.data.sessions[0].room,'教室乙');
+ const tpl=(await call('/admin/timetable/templates','POST',{termId,name:'甲上传模板',courseIds:[card.id]},a)).data;
+ assert.equal((await call('/admin/timetable/templates/'+tpl.id,'PUT',{name:'乙修改模板',courseIds:[card.id],revision:1},b)).status,200);
+ assert.equal((await call('/admin/timetable/templates/'+tpl.id,'DELETE',{confirm:true,revision:2},a)).status,200);
+ const record={kind:'assignment',title:'共享作业',content:'原内容',autoPublish:true,targetKeys:['course:'+card.id],attachments:[]};
+ const work=(await call('/admin/homework/records','POST',{termId,record},a)).data;
+ assert.equal((await call('/admin/homework/records/'+work.id,'PUT',{revision:work.revision,record:{...work,targetKeys:record.targetKeys,content:'由另一管理员修改'}},b)).status,200);
+ const all='/admin/homework/records/'+work.id+'/complete-all';
+ assert.equal((await call(all,'POST',{revision:2,confirm:true,generation:0},student)).status,403);
+ assert.equal((await call(all,'POST',{revision:2,confirm:true,generation:0},b)).status,200);
+ assert.equal((await call('/admin/homework/records/'+work.id,'DELETE',{confirm:true,revision:2},a)).status,200);
+ const second=(await call('/admin/homework/records','POST',{termId,record:{...record,title:'乙上传作业'}},b)).data;
+ assert.equal((await call('/admin/homework/batch-delete','POST',{termId,items:[{id:second.id,revision:second.revision}],confirm:true},a)).status,200);
+ // Draft edits do not publish; a separate publish action is available to every administrator.
+ await call('/timetable/'+termId,'POST',{source:'cards',courseIds:[card.id],revision:0,acceptWarnings:true},student);
+ const draftRecord={...record,title:'独立发布流程',autoPublish:false,published:false,course_name:course.course_name,teacher:course.teacher};
+ const draft=(await call('/admin/homework/records','POST',{termId,record:draftRecord},a)).data;
+ assert.equal(draft.published,false);assert.match(draft.draftReason,/点击“发布”/);
+ const edited=(await call('/admin/homework/records/'+draft.id,'PUT',{revision:1,record:{...draftRecord,content:'编辑后仍为草稿'}},b)).data;
+ assert.equal(edited.published,false);
+ const studentRecords=async()=>(await call('/homework','GET',undefined,student)).data.records;
+ assert.ok(!(await studentRecords()).some(r=>r.id===draft.id));
+ const publish='/admin/homework/records/'+draft.id+'/publish';
+ assert.equal((await call(publish,'POST',{revision:2},student)).status,403);
+ assert.equal((await call(publish,'POST',{revision:1},a)).status,409);
+ const published=await call(publish,'POST',{revision:2},b);assert.equal(published.status,200);assert.equal(published.data.published,true);assert.equal(published.data.revision,3);assert.equal(published.data.content,'编辑后仍为草稿');
+ assert.ok((await studentRecords()).some(r=>r.id===draft.id));
+ assert.equal((await call(publish,'POST',{revision:3},a)).data.revision,3);
+ const unmatched=(await call('/admin/homework/records','POST',{termId,record:{...draftRecord,title:'未匹配课程',targetKeys:[]}},a)).data;
+ assert.match(unmatched.draftReason,/未匹配到课程/);
+ assert.equal((await call('/admin/homework/records/'+unmatched.id+'/publish','POST',{revision:1},b)).status,400);
+ assert.equal(db.prepare('SELECT published FROM homework_records WHERE id=?').get(unmatched.id).published,0);
+ assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
+});

@@ -9,8 +9,9 @@ import { homeworkService } from './homework.mjs';
 import { reminderSettingsService } from './reminder-settings.mjs';
 import { clientAddress } from './client-address.mjs';
 
-const SESSION_LIFETIME = 30 * 24 * 60 * 60 * 1000;
-const SESSION_RENEW_INTERVAL = 24 * 60 * 60 * 1000;
+// Zero means no server-side time limit. Browser persistence is refreshed on use;
+// explicit logout, password changes and account administration still revoke tokens.
+const SESSION_COOKIE_MAX_AGE = 400 * 24 * 60 * 60;
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 const fail = (status, message) => { throw new HttpError(status, message); };
 function validateAccount(studentId, name, role) {
@@ -29,13 +30,14 @@ async function readJson(req, limit = 1024 * 1024) {
 }
 export async function createApp({ databasePath, serveStatic = false, allowedOrigins = [], trustLoopbackProxy = false } = {}) {
   const db = openDatabase(databasePath);
+  db.prepare('UPDATE sessions SET expires_at=0 WHERE expires_at>?').run(Date.now());
   const timetable = timetableService(db);
   const homework = homeworkService(db,timetable);
   const reminderSettings = reminderSettingsService(db);
   const dummyHash = await hashPassword(randomBytes(24).toString('hex'));
   const attempts = new Map();
   const cleanup = setInterval(() => {
-    db.prepare('DELETE FROM sessions WHERE expires_at <= ?').run(Date.now());
+    db.prepare('DELETE FROM sessions WHERE expires_at > 0 AND expires_at <= ?').run(Date.now());
     for (const [key, item] of attempts) if (item.until <= Date.now()) attempts.delete(key);
   }, 60000);
   cleanup.unref();
@@ -44,7 +46,7 @@ export async function createApp({ databasePath, serveStatic = false, allowedOrig
     const token = (req.headers.cookie || '').split(';').map((part) => part.trim()).find((part) => part.startsWith('session='))?.slice(8);
     if (!token || !/^[0-9a-f]{64}$/.test(token)) return null;
     const key = tokenHash(token);
-    const row = db.prepare(`SELECT ${publicFields.replaceAll(/\b(id|name|role|created_at|updated_at|student_id|must_change_password)\b/g, 'users.$1')}, sessions.expires_at AS sessionExpiresAt FROM sessions JOIN users ON users.id = sessions.user_id WHERE token_hash = ? AND expires_at > ?`).get(key, Date.now());
+    const row = db.prepare(`SELECT ${publicFields.replaceAll(/\b(id|name|role|created_at|updated_at|student_id|must_change_password)\b/g, 'users.$1')}, sessions.expires_at AS sessionExpiresAt FROM sessions JOIN users ON users.id = sessions.user_id WHERE token_hash = ? AND (expires_at=0 OR expires_at>?)`).get(key, Date.now());
     return row ? { user: publicUser(row), key, token, expiresAt: row.sessionExpiresAt } : null;
   }
   function resolveLogin(identifier) {
@@ -55,11 +57,11 @@ export async function createApp({ databasePath, serveStatic = false, allowedOrig
     return { record: names.length === 1 ? names[0] : undefined, ambiguous: names.length > 1 };
   }
   function sessionCookie(res, token) {
-    res.setHeader('Set-Cookie', `session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_LIFETIME / 1000}${process.env.COOKIE_SECURE === '1' ? '; Secure' : ''}`);
+    res.setHeader('Set-Cookie', `session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_COOKIE_MAX_AGE}${process.env.COOKIE_SECURE === '1' ? '; Secure' : ''}`);
   }
   function setSession(res, userId) {
     const token = randomBytes(32).toString('hex');
-    db.prepare('INSERT INTO sessions VALUES (?, ?, ?)').run(tokenHash(token), userId, Date.now() + SESSION_LIFETIME);
+    db.prepare('INSERT INTO sessions VALUES (?, ?, ?)').run(tokenHash(token), userId, 0);
     sessionCookie(res, token);
   }
   function clearCookie(res) { res.setHeader('Set-Cookie', 'session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'); }
@@ -110,11 +112,9 @@ export async function createApp({ databasePath, serveStatic = false, allowedOrig
       }
       const active = session(req);
       if (!active) { clearCookie(res); fail(401, '登录已失效，请重新登录。'); }
-      // Renew at most once a day, including existing shorter sessions. Revoked or expired sessions never reach this branch.
-      if (active.expiresAt <= Date.now() + SESSION_LIFETIME - SESSION_RENEW_INTERVAL) {
-        db.prepare('UPDATE sessions SET expires_at = ? WHERE token_hash = ?').run(Date.now() + SESSION_LIFETIME, active.key);
-        sessionCookie(res, active.token);
-      }
+      // Upgrade still-valid legacy sessions without reviving revoked/expired tokens.
+      if(active.expiresAt!==0)db.prepare('UPDATE sessions SET expires_at=0 WHERE token_hash=?').run(active.key);
+      sessionCookie(res,active.token);
       const { user } = active;
       if (path === '/api/auth/me' && req.method === 'GET') { send(200, user); return; }
       if (path === '/api/auth/logout' && req.method === 'POST') {

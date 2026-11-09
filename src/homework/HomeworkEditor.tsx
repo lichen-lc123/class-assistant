@@ -10,9 +10,9 @@ export function HomeworkEditor({record,term,classes,assets=[],onSave,onClose}:{r
   const [uploadAssets,setUploadAssets]=useState<HomeworkAsset[]>(assets),[uploading,setUploading]=useState(false);
   const working=busy||uploading;
   const patch=(value:Partial<Homework>)=>setR(old=>({...old,...value}));
-  async function save(e:FormEvent){e.preventDefault();if(working)return;setBusy(true);setError('');try{if(r.targetKeys?.length!==1)throw new Error('请在课程名称中选择一门课程，保存后会自动发布给该课程的同学。');await onSave({...r,published:true,autoPublish:true},uploadAssets);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}
+  async function save(e:FormEvent){e.preventDefault();if(working)return;setBusy(true);setError('');try{if(record.published&&r.targetKeys?.length!==1)throw new Error('请选择实际课程后保存已发布作业。');await onSave({...r,published:record.published,autoPublish:false},uploadAssets);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}
   return <Modal title={record.id?'编辑作业与考核':'核对作业与考核'} onClose={onClose} busy={working}><form className="manage-form homework-editor" onSubmit={save}>
-    <p className="muted-note">{term.academicYear} · {term.name}</p>
+    <p className="muted-note">{term.academicYear} · {term.name}</p><p className="muted-note">{record.published?'保存只更新已发布内容。':'保存后仍为草稿，回到卡片点击“发布”才会发给同学。'}</p>
     <label>类型<select value={r.kind} onChange={e=>patch({kind:e.target.value as Homework['kind']})}><option value="assignment">待做作业</option><option value="reference">课程考核与说明</option></select></label>
     <HomeworkCourseSelect value={r.course_name} classes={classes} selectedKeys={r.targetKeys||[]} disabled={working} onType={value=>patch({course_name:value,...(value!==r.course_name?{targetKeys:[],published:false}:{})})} onSelect={course=>patch({course_name:course.courseName||'',teacher:course.teacher||'',targetKeys:[course.key]})}/>
     <label>任课老师<input readOnly value={r.teacher} placeholder="选择课程后自动填写"/></label><label>标题<input required maxLength={160} value={r.title} onChange={e=>patch({title:e.target.value})}/></label>

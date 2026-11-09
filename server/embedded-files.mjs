@@ -49,12 +49,12 @@ export function nativePackage(stream){
 export function extractEmbeddedFile(bytes,target,progId=''){
   if(!bytes?.length)fail();
   if(bytes.subarray(0,8).equals(CFB)){
-    const streams=compoundStreams(bytes);
-    const native=streams.get('\u0001Ole10Native');if(native)return nativePackage(native);
-    const contents=streams.get('CONTENTS');
+    const streams=new Map([...compoundStreams(bytes)].map(([name,value])=>[name.toLowerCase(),value]));
+    const native=streams.get('\u0001ole10native');if(native)return nativePackage(native);
+    const contents=streams.get('contents');
     if(contents?.subarray(0,5).toString()==='%PDF-')return{filename:attachmentName(target).replace(/\.bin$/i,'.pdf'),bytes:contents};
-    const packageData=streams.get('Package');if(packageData)return{filename:attachmentName(target).replace(/\.bin$/i,/Word/i.test(progId)?'.docx':/Excel/i.test(progId)?'.xlsx':/PowerPoint/i.test(progId)?'.pptx':'.zip'),bytes:packageData};
-    const ext=streams.has('WordDocument')?'.doc':streams.has('Workbook')||streams.has('Book')?'.xls':streams.has('PowerPoint Document')?'.ppt':null;
+    const packageData=streams.get('package');if(packageData)return{filename:attachmentName(target).replace(/\.bin$/i,/Word/i.test(progId)?'.docx':/Excel/i.test(progId)?'.xlsx':/PowerPoint/i.test(progId)?'.pptx':'.zip'),bytes:packageData};
+    const ext=streams.has('worddocument')?'.doc':streams.has('workbook')||streams.has('book')?'.xls':streams.has('powerpoint document')?'.ppt':null;
     if(ext)return{filename:attachmentName(target).replace(/\.bin$/i,ext),bytes};
     fail();
   }

@@ -7,7 +7,7 @@ import {createApp} from '../app.mjs';
 import {createInitialAdmin, tokenHash} from '../database.mjs';
 
 const DAY=24*60*60*1000;
-test('电脑和手机持久登录、自动续期、服务重启与退出（独立测试数据库）',async t=>{
+test('电脑和手机登录不自动到期、服务重启与主动退出（独立测试数据库）',async t=>{
   const directory=await mkdtemp(join(tmpdir(),'mem2602-login-'));
   const databasePath=join(directory,'fixture.sqlite');
   const start=Date.now();
@@ -32,35 +32,40 @@ test('电脑和手机持久登录、自动续期、服务重启与退出（独�
   const desktop=await login('Desktop fixture'),mobile=await login('Mobile fixture');
   for(const result of [desktop,mobile]){
     assert.equal(result.status,200);
-    assert.match(result.setCookie,/Max-Age=2592000/);
+    assert.match(result.setCookie,/Max-Age=34560000/);
     assert.match(result.setCookie,/HttpOnly/);assert.match(result.setCookie,/SameSite=Strict/);
     assert.equal('token' in result.data,false);
   }
   const desktopCookie=desktop.setCookie.split(';')[0],mobileCookie=mobile.setCookie.split(';')[0];
   assert.notEqual(desktopCookie,mobileCookie);
   const desktopKey=tokenHash(desktopCookie.slice(8)),mobileKey=tokenHash(mobileCookie.slice(8));
-  assert.equal(app.db.prepare('SELECT expires_at FROM sessions WHERE token_hash=?').get(desktopKey).expires_at,start+30*DAY);
-  assert.equal((await call('/auth/me','GET',undefined,desktopCookie)).setCookie,null);
+  assert.equal(app.db.prepare('SELECT expires_at FROM sessions WHERE token_hash=?').get(desktopKey).expires_at,0);
+  assert.match((await call('/auth/me','GET',undefined,desktopCookie)).setCookie,/Max-Age=34560000/);
 
   // A fresh browser process sends its retained cookie; the server needs no page or memory state.
   await close();t.mock.timers.setTime(start+2*DAY);await open();
   for(const [cookie,key] of [[desktopCookie,desktopKey],[mobileCookie,mobileKey]]){
     const result=await call('/auth/me','GET',undefined,cookie);
     assert.equal(result.status,200);assert.equal(result.data.studentId,'persistent-fixture');
-    assert.match(result.setCookie,/Max-Age=2592000/);
-    assert.equal(app.db.prepare('SELECT expires_at FROM sessions WHERE token_hash=?').get(key).expires_at,start+32*DAY);
-    assert.equal((await call('/auth/me','GET',undefined,cookie)).setCookie,null);
+    assert.match(result.setCookie,/Max-Age=34560000/);
+    assert.equal(app.db.prepare('SELECT expires_at FROM sessions WHERE token_hash=?').get(key).expires_at,0);
+    assert.match((await call('/auth/me','GET',undefined,cookie)).setCookie,/Max-Age=34560000/);
   }
   // Existing eight-hour cookies can be upgraded without asking the user to log in again.
   app.db.prepare('UPDATE sessions SET expires_at=? WHERE token_hash=?').run(Date.now()+60*60*1000,desktopKey);
-  assert.match((await call('/auth/me','GET',undefined,desktopCookie)).setCookie,/Max-Age=2592000/);
+  assert.match((await call('/auth/me','GET',undefined,desktopCookie)).setCookie,/Max-Age=34560000/);
 
   const logout=await call('/auth/logout','POST',{},desktopCookie);
   assert.equal(logout.status,200);assert.match(logout.setCookie,/Max-Age=0/);
   assert.equal((await call('/auth/me','GET',undefined,desktopCookie)).status,401);
   assert.equal((await call('/auth/me','GET',undefined,mobileCookie)).status,200);
-  // Expiry is authoritative even if the client manually retains a stale cookie.
-  t.mock.timers.setTime(start+33*DAY);
+  // Long inactivity does not expire a persistent server session.
+  t.mock.timers.setTime(start+3000*DAY);
+  await close();await open();
+  assert.equal((await call('/auth/me','GET',undefined,mobileCookie)).status,200);
+  // Expired legacy tokens are never resurrected.
+  app.db.prepare('UPDATE sessions SET expires_at=? WHERE token_hash=?').run(Date.now()-1,mobileKey);
+  await close();await open();
   const expired=await call('/auth/me','GET',undefined,mobileCookie);
   assert.equal(expired.status,401);assert.match(expired.setCookie,/Max-Age=0/);
   assert.equal((await call('/auth/me')).status,401);

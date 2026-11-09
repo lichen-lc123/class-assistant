@@ -26,6 +26,13 @@ test('作业图片与附件上传、保留、移除、下载及私人权限',asy
   const record={kind:'assignment',title:'图片和附件作业',course_name:course.course_name,teacher:course.teacher,content:'',targetKeys:['course:'+course.id],published:true,attachments:[ref(image,'题目截图.png','content'),ref(pdf,'作业说明.pdf')]};
   let shared,personal;
   const download=(url,cookie)=>fetch(base+url,{headers:cookie?{Cookie:cookie}:{}});
+  await t.test('单独发布草稿保留原附件、文件名、所属字段和下载权限',async()=>{
+    const draft=await call('/admin/homework/records','POST',{termId,record:{...record,title:'待发布附件',published:false},assets:[image,pdf]},admin);assert.equal(draft.status,201);
+    assert.equal((await download(draft.data.attachments[0].url,one)).status,403);
+    const published=await call('/admin/homework/records/'+draft.data.id+'/publish','POST',{revision:draft.data.revision},admin);assert.equal(published.status,200);assert.equal(published.data.attachments.length,2);
+    const file=published.data.attachments.find(a=>a.filename==='作业说明.pdf');assert.deepEqual(Buffer.from(await (await download(file.url,one)).arrayBuffer()),pdfBytes);
+    assert.equal(published.data.attachments.find(a=>a.filename==='题目截图.png').field,'content');assert.equal((await download(file.url,outside)).status,403);
+  });
   await t.test('管理员发布图片和附件，授权学生可预览图片并下载中文文件名',async()=>{
     const saved=await call('/admin/homework/records','POST',{termId,record,assets:[image,pdf]},admin);assert.equal(saved.status,201);shared=saved.data;
     const detail=(await call('/homework/records/'+shared.id,'GET',undefined,one)).data;
@@ -61,11 +68,13 @@ test('作业图片与附件上传、保留、移除、下载及私人权限',asy
     assert.equal((await download(picture.url,one)).status,404);assert.equal((await download(file.url,one)).status,200);
     const updated=await call('/admin/homework/records/'+shared.id,'PUT',{revision:1,record:{...shared,targetKeys:record.targetKeys,title:'课程附件保留'}},admin);assert.equal(updated.status,200);assert.equal(updated.data.attachments.length,2);
   });
-  await t.test('非图片文件按附件下载，不能冒充正文图片或绕过字节校验',async()=>{
+  await t.test('各字段中的非图片文件强制下载，不能伪造MIME或绕过字节校验',async()=>{
     const html=asset(Buffer.from('<script>alert("fixture")</script>'));
     const saved=await call('/homework/personal','POST',{termId,record:{kind:'assignment',title:'普通文件下载',course_entry_id:entries[0],attachments:[ref(html,'说明.html')]},assets:[html]},one);assert.equal(saved.status,201);
     const response=await download(saved.data.attachments[0].url,one);assert.equal(response.headers.get('content-type'),'application/octet-stream');assert.match(response.headers.get('content-disposition'),/^attachment/);assert.equal(response.headers.get('x-content-type-options'),'nosniff');
-    for(const [a,r] of [[{...image,id:'0'.repeat(64)},ref({...image,id:'0'.repeat(64)},'错误校验.png','content')],[{...image,content:image.content+'?junk'},ref(image,'坏数据.png','content')],[pdf,ref(pdf,'文件伪装.png','content')]]){
+    const fieldFile=await call('/homework/personal','POST',{termId,record:{kind:'assignment',title:'正文PDF附件',course_entry_id:entries[0],attachments:[ref(pdf,'说明.pdf','content')]},assets:[pdf]},one);assert.equal(fieldFile.status,201);assert.equal(fieldFile.data.attachments[0].field,'content');
+    const fieldDownload=await download(fieldFile.data.attachments[0].url,one);assert.equal(fieldDownload.headers.get('content-type'),'application/octet-stream');assert.match(fieldDownload.headers.get('content-disposition'),/^attachment/);
+    for(const [a,r] of [[{...image,id:'0'.repeat(64)},ref({...image,id:'0'.repeat(64)},'错误校验.png','content')],[{...image,content:image.content+'?junk'},ref(image,'坏数据.png','content')],[{...pdf,mime:'image/png'},ref(pdf,'文件伪装.png','content')]]){
       assert.equal((await call('/homework/personal','POST',{termId,record:{kind:'assignment',title:'无效文件',course_entry_id:entries[0],attachments:[r]},assets:[a]},one)).status,400);
     }
   });

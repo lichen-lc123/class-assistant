@@ -1,9 +1,12 @@
 export interface HomeworkAsset {id:string;mime:string;content:string}
+export const attachmentFieldNames:Record<string,string>={content:'作业内容',assessment_rules:'考核规则',submission:'提交方式',team_requirement:'组队要求',notes:'补充说明',attachment:'附件'};
 export interface HomeworkAttachment {assetId:string;field:string;caption:string;url?:string;mime?:string;filename?:string;size?:number}
 export interface HomeworkTarget {key:string;identityKey?:string|null;timeLabel?:string;courseId:string|null;courseName?:string;teacher?:string;label?:string}
 export interface Homework {
   id?:string;termId?:string;sourceType?:'personal'|'class';canEdit?:boolean;previewId?:string;existingId?:string|null;existingRevision?:number|null;hasUpdates?:boolean;kind:'assignment'|'reference';title:string;course_name:string;teacher:string;credits?:string;sequence?:string;
   course_entry_id?:string|null;
+  allCompletedAt?:string|null;allCompletedGeneration?:number;
+  draftReason?:string|null;
   priority?:'high'|'normal'|'low';planned_date?:string|null;planned_time?:string|null;
   content:string;submission:string;assessment_rules:string;team_requirement:string;notes:string;deadline_raw:string;due_date:string|null;due_time:string|null;
   autoPublish?:boolean;published:boolean;targetKeys?:string[];targets?:HomeworkTarget[];revision?:number;completed?:boolean;completedAt?:string|null;remindersSuppressed?:boolean;needsReconfirm?:boolean;overdue?:boolean;daysUntil?:number|null;

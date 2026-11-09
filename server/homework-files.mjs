@@ -121,7 +121,7 @@ export function homeworkFromFile(file,term){
       const {bytes:blob,filename}=file,mime=imageMime(blob)||'application/octet-stream',id=hash(blob);
       if(blob.length>10*1024*1024||mime.startsWith('image/')&&blob.length>5*1024*1024)problem('单个附件不能超过10 MB，图片不能超过5 MB。');
       if(!assets.has(id)){assetBytes+=blob.length;if(assetBytes>20*1024*1024)problem('表格图片与附件合计不能超过20 MB。');assets.set(id,{id,mime,content:blob.toString('base64')});}
-      attachments.push({assetId:id,field:mime.startsWith('image/')&&field!=='attachment'?field:'attachment',caption,filename,mime,size:blob.length});return '';
+      attachments.push({assetId:id,field:file.field||field,caption,filename,mime,size:blob.length});return '';
     });
     text=text.replace(/=?\b(?:_xlfn\.)?DISPIMG\(\s*["']([^"']+)["'][^)]*\)/gi,(_,name)=>{
       usedImages.add(name);

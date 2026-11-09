@@ -46,7 +46,7 @@
 <path d="M70 846 A220.0 13 0 0 0 510 846" stroke="#8A9CA6" fill="none"/>
 <text text-anchor="middle" font-size="17">
 <tspan x="290.0" y="864.5">数据库｜保存新会话摘要</tspan>
-<tspan x="290.0" y="887.5">保留 30 天，使用时续期</tspan>
+<tspan x="290.0" y="887.5">保持登录，访问刷新凭据</tspan>
 </text>
 <rect x="70" y="1005" width="440" height="74" rx="12" fill="#F2EFE8" stroke="#A59D8B" stroke-width="1.6"/>
 <text text-anchor="middle" font-size="17">

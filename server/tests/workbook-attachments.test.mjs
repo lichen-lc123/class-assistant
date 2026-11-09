@@ -23,6 +23,19 @@ function cfb(stream,name=String.fromCharCode(1)+'Ole10Native'){
 }
 function zip(files){const parts=[],central=[];let offset=0;for(const [name,value]of Object.entries(files)){const n=Buffer.from(name),data=Buffer.isBuffer(value)?value:Buffer.from(value),head=Buffer.alloc(30);head.writeUInt32LE(0x04034b50);head.writeUInt16LE(20,4);head.writeUInt32LE(data.length,18);head.writeUInt32LE(data.length,22);head.writeUInt16LE(n.length,26);parts.push(head,n,data);const dir=Buffer.alloc(46);dir.writeUInt32LE(0x02014b50);dir.writeUInt16LE(20,6);dir.writeUInt32LE(data.length,20);dir.writeUInt32LE(data.length,24);dir.writeUInt16LE(n.length,28);dir.writeUInt32LE(offset,42);central.push(dir,n);offset+=30+n.length+data.length;}const directory=Buffer.concat(central),end=Buffer.alloc(22);end.writeUInt32LE(0x06054b50);end.writeUInt16LE(central.length/2,8);end.writeUInt16LE(central.length/2,10);end.writeUInt32LE(directory.length,12);end.writeUInt32LE(offset,16);return Buffer.concat([...parts,directory,end]);}
 const cell=(col,row,value)=>'<c r="'+col+row+'" t="inlineStr"><is><t>'+xml(value)+'</t></is></c>';
+function fieldWorkbook(col,bytes,progId,{cross=false,none=false}={}){
+ const headers=['课程名称','任课老师','第一次作业内容','课程考核规则','提交平台','备注','附件'];
+ const point=cross?1:col;
+ const anchor='<objectPr><anchor><from><col>'+point+'</col><colOff>'+(cross?900000:0)+'</colOff><row>1</row></from><to><col>'+col+'</col><colOff>950000</colOff><row>2</row></to></anchor></objectPr>';
+ const object='<oleObject shapeId="2050" r:id="o1" progId="'+progId+'">'+anchor+'</oleObject>';
+ return{name:'WPS字段附件.xlsx',content:zip({
+  'xl/workbook.xml':'<workbook><sheets><sheet name="作业" r:id="s1"/></sheets></workbook>',
+  'xl/_rels/workbook.xml.rels':'<Relationships><Relationship Id="s1" Target="worksheets/sheet1.xml"/></Relationships>',
+  'xl/worksheets/sheet1.xml':'<worksheet><cols><col min="2" max="2" width="13.8"/></cols><sheetData><row r="1">'+headers.map((v,i)=>cell('ABCDEFG'[i],1,v)).join('')+'</row><row r="2">'+cell('A',2,'测试课程0')+cell('B',2,'测试老师')+cell('C',2,none?'无':'')+'</row></sheetData><oleObjects><mc:AlternateContent><mc:Choice>'+object+'</mc:Choice><mc:Fallback><oleObject shapeId="2050" r:id="o1" progId="'+progId+'"/></mc:Fallback></mc:AlternateContent></oleObjects></worksheet>',
+  'xl/worksheets/_rels/sheet1.xml.rels':'<Relationships><Relationship Id="o1" Target="../embeddings/oleObject1.bin"/></Relationships>',
+  'xl/embeddings/oleObject1.bin':bytes
+ }).toString('base64')};
+}
 function workbook(items,{content='',unbound=false,none=false}={}){
  const entries={'xl/workbook.xml':'<workbook><sheets><sheet name="作业" r:id="s1"/></sheets></workbook>','xl/_rels/workbook.xml.rels':'<Relationships><Relationship Id="s1" Target="worksheets/sheet1.xml"/></Relationships>'};
  let rows='<row r="1">'+['课程名称','任课老师','第一次作业内容','截止日期','附件','备注'].map((v,i)=>cell('ABCDEF'[i],1,v)).join('')+'</row>',rels='',objects='',links='';
@@ -79,6 +92,26 @@ test('原生Office与PDF对象保留可下载内容，长路径只作为文件�
  const packageBytes=Buffer.from('PK office package');assert.deepEqual(extractEmbeddedFile(cfb(packageBytes,'Package'),'xl/embeddings/object.bin','Word.Document.12'),{filename:'object.docx',bytes:packageBytes});
 });
 
+test('WPS小写package支持Word/PPT/Excel，PDF内容流大小写兼容；兼容节点不重复导入',()=>{
+ for(const [progId,path,ext] of [['Word.Document.12','word/document.xml','docx'],['PowerPoint.Show.12','ppt/presentation.xml','pptx'],['Excel.Sheet.12','xl/workbook.xml','xlsx']]){
+  const bytes=zip({[path]:'<fixture/>'}),file=fieldWorkbook(2,cfb(bytes,'package'),progId,{cross:true});
+  const parsed=homeworkFromFile(file,term),record=parsed.records.find(r=>r.kind==='assignment');
+  assert.equal(parsed.assets.length,1);assert.equal(record.attachments.length,1);assert.equal(record.attachments[0].field,'content');
+  assert.equal(record.attachments[0].filename,'oleObject1.'+ext);assert.deepEqual(Buffer.from(parsed.assets[0].content,'base64'),bytes);
+  assert.ok(parsed.warnings.some(w=>w.includes('图标跨列')));assert.ok(!parsed.warnings.some(w=>w.includes('无法提取')||w.includes('内嵌附件未归入')));
+ }
+ const pdf=Buffer.from('%PDF-mainstream-fixture');assert.deepEqual(extractEmbeddedFile(cfb(pdf,'contents'),'object.bin'),{filename:'object.pdf',bytes:pdf});
+});
+
+test('文档附件保留作业内容、考核规则、提交方式、备注及独立附件的字段归属',()=>{
+ const bytes=cfb(Buffer.from('%PDF-field-fixture'),'contents');
+ for(const [col,field,kind] of [[2,'content','assignment'],[3,'assessment_rules','reference'],[4,'submission','reference'],[5,'notes','reference'],[6,'attachment','assignment']]){
+  const parsed=homeworkFromFile(fieldWorkbook(col,bytes,'AcroExch.Document'),term);
+  const record=parsed.records.find(r=>r.attachments.length);assert.equal(record.kind,kind);assert.equal(record.attachments[0].field,field);assert.equal(parsed.assets.length,1);
+ }
+ assert.equal(homeworkFromFile(fieldWorkbook(2,bytes,'AcroExch.Document',{none:true}),term).records.length,0);
+});
+
 test('内嵌附件从预览、导入到下载保留原始字节与文件名，匿名访问被拒绝',async t=>{
  const {server,db}=await createApp({databasePath:':memory:'});
  await createInitialAdmin(db,'attachment-fixture','附件测试管理员','AttachmentFixture123');
@@ -90,11 +123,11 @@ test('内嵌附件从预览、导入到下载保留原始字节与文件名，�
  const {id:termId}=await call('/admin/timetable/terms',{academicYear:'2026-2027',name:'第一学期',...term});
  await call('/admin/timetable/courses',{termId,source:'manual',acceptWarnings:true,courses:[{course_name:'测试课程0',teacher:'测试老师',explicit_sessions:[{date:'2026-11-14',start_time:'08:00',end_time:'10:00',room:'教室'}]}]});
  const bytes=Buffer.from('%PDF integration fixture'),filename='实验报告.pdf';
- const preview=await call('/admin/homework/preview',{termId,file:workbook([{name:'oleObject.bin',bytes:cfb(native(filename,bytes))}])});
+ const preview=await call('/admin/homework/preview',{termId,file:fieldWorkbook(2,cfb(native(filename,bytes)),'Package',{cross:true})});
  const record=preview.records.find(r=>r.kind==='assignment');assert.equal(record.attachments[0].filename,filename);assert.equal(record.matchCount,1);
  const imported=await call('/admin/homework/import',{termId,records:preview.records,assets:preview.assets,confirm:true});assert.equal(imported.created,1);
  const row=db.prepare('SELECT id FROM homework_records WHERE kind=?').get('assignment'),asset=record.attachments[0].assetId;
- const path=`/api/homework/assets/${asset}?recordId=${row.id}&field=attachment`;
+ const path=`/api/homework/assets/${asset}?recordId=${row.id}&field=content`;
  const download=await fetch(base+path,{headers:{Cookie:cookie}});assert.equal(download.status,200);assert.deepEqual(Buffer.from(await download.arrayBuffer()),bytes);
  assert.ok(decodeURIComponent(download.headers.get('content-disposition')).includes(filename));
  assert.equal((await fetch(base+path)).status,401);

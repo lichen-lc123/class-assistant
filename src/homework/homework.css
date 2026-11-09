@@ -98,3 +98,7 @@
 .homework-text a{color:#426b83;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.homework-import-files{overflow-wrap:anywhere;color:#526b48}
 
 .course-detail-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:0;padding:14px;background:#f8faf5;border-radius:10px}.course-detail-facts dt{font-size:11px;color:#829078;margin-bottom:5px}.course-detail-facts dd{margin:0;font-size:13px;color:#52674a;overflow-wrap:anywhere}
+
+
+
+.homework-complete-all-action{flex-basis:100%;width:100%;display:grid;gap:8px;border-top:1px solid #dce2d6;padding-top:12px;margin-top:4px}.homework-complete-all-action>button{width:100%;justify-content:center}
